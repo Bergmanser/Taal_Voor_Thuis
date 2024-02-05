@@ -150,7 +150,7 @@ button:hover {
   .form-image {
     display: block;
     flex-basis: 45%;
-    background-image: url("./assets/bg-black-square.png");
+    background-image: url("./assets/MDB-Background.png");
     border-radius: 12px 0 0 12px;
   }
 
