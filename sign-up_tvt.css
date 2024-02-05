@@ -149,7 +149,7 @@ button:hover {
 
   .form-image {
     display: block;
-    flex-basis: 45%;
+    flex-basis: 25%;
     background-image: url("./assets/MDB-Background.png");
     border-radius: 12px 0 0 12px;
   }
