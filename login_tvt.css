@@ -17,7 +17,12 @@ body {
   padding: 0 24px;
 }
 
-.sign-up-form {
+.logo{
+  width: auto;
+  max-height: auto
+}
+
+.login-form {
   display: flex;
   flex-direction: column;
   max-width: 900px;
@@ -120,7 +125,7 @@ input:not(:placeholder-shown) + .label label {
 button {
   padding: 12px 18px;
   border: none;
-  align-self: flex-start;
+  align-self: center;
   background-color: #6236ff;
   color: #fff;
   border-radius: 12px;
