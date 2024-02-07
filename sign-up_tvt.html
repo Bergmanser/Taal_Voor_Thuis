@@ -36,34 +36,49 @@
           <!-- Input Wrap -->
           <div class="input-wrap">
             <div class="input">
-              <input type="text" id="username" placeholder="Username" />
+              <input type="text" id="username" placeholder="Username" required />
               <div class="label">
                 <label for="username">Username</label>
               </div>
             </div>
+
             <div class="input">
-              <input type="email" id="email" placeholder="Email" />
+              <input type="email" id="email" placeholder="Email" required />
               <div class="label">
                 <label for="email">Email</label>
               </div>
             </div>
-            <div class="input">
-              <input type="password" id="password" placeholder="Password" />
-              <div class="label">
-                <label for="password">Password</label>
+
+            <div class="password">
+              <div class="input">
+                <input type="password" id="password" placeholder="Password" required/>
+                <div class="label">
+                  <label for="password">Password</label>
+                </div>
               </div>
             </div>
+            
             <div class="input">
-              <input type="password" id="confirmPassword" placeholder="ConfirmPassword" />
+              <input type="password" id="confirmPassword" placeholder="ConfirmPassword"  onkeyup="validate_password()" required/>
               <div class="label">
                 <label for="confirmPassword">ConfirmPassword </label>
               </div>
             </div>
-            <button type="submit">Create Account</button>
-          </div>
-        </form>
+
+            <!-- <span id="wrong_password_alert"></span>
+              <div class="buttons">
+                <div id="create"
+                  onclick="wrong_password_alert()">
+                </div>
+              </div> -->
+
+            <div>
+              <button type="submit">Create Account</button>
+            </div>
+            
+          </form>
       </div>
     </div>
-    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="login.js"></script>
   </body>
 </html>

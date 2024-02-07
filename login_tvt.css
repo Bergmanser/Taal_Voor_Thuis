@@ -138,15 +138,26 @@ button:hover {
   color: #6236ff;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
-
-.buttons-container {
+.remember-forgot-container {
   display: flex;
   justify-content: space-between;
 }
 
+.remember {
+  display: flex;
+  align-items: baseline;
+}
+
+.buttons-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  
+}
+
 /* Desktop Styles */
 @media (min-width: 900px) {
-  .sign-up-form {
+  .login-form {
     flex-direction: row;
   }
 
