@@ -32,6 +32,16 @@ body {
   background-color: #fff;
 }
 
+.sign-up-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  width: 100%;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border-radius: 12px;
+  background-color: #fff;
+}
+
 .form-image {
   display: none;
 }

@@ -12,65 +12,118 @@
           crossorigin="anonymous"
           referrerpolicy="no-referrer"
         />
-        <link rel="stylesheet" href="../assets/css/login_tvt.css"/>
+        <link rel="stylesheet" href="./assets/css/login_tvt.css"/>
      
       </head>
     <body>
-        <div class="container">
-            <div class="login-form">
-              Left (Form Image)
-              <div class="form-image">
-                <img src="./assets/MDB-Background.png" alt="" />
-              </div>
-      
-              <!-- (Form Content) -->
-              <form class="form-content">
-      
-                <!-- Form Heading -->
-                <div class="form-heading">
-                  <img src="./assets/MeerDanBijles-Logo.png" alt="MeerDanBijles-Logo" />
-                  <h1>Login</h1>
-                  <p>Please fill out all the required fields to login to your account</p>
-                </div>
-      
-                <!-- Input Wrap -->
-                <div class="input-wrap">
-                  <div class="input">
-                    <input type="email" id="username" placeholder="Email" required/>
-                    <div class="label">
-                      <label for="username">Email</label>
-                    </div>
-                  </div>
+      <div class="container">
+        <div class="sign-up-form">
 
-                  <div class="input">
-                    <input type="password" id="password" placeholder="Password" required/>
-                    <div class="label">
-                      <label for="password">Password</label>
-                    </div>
-                  </div>
+           <!-- (Form Content) -->
+           <form class="form-content">
 
-                  <div class="remember-forgot-container">
-                    <div class="remember">
-                      <label><input type="checkbox">Remember me</label>
-                    </div>
-
-                    <div class="forgot-password">
-                      <label><a href="#">Wachtwoord vergeten?</a></label>
-                    </div>
-                  </div>
-
-                  <div class="buttons-container">
-                    <button type="submit">Login</button>
-                    <a href="sign-up_tvt.html"><button type="button">Create Account</button></a>
-                  </div>
-                </div>
-              </form>
-            </div>
+          <!-- Form Heading -->
+          <div class="form-heading">
+            <h1>Sign-Up</h1>
+            <p>Please fill out all the required fields to Sign-Up to your account</p>
           </div>
-        
 
+            <!-- Input Wrap -->
+            <div class="input-wrap">
 
+              <div class="input">
+                <input type="email" id="email-user" placeholder="Username" required/>
+                <!-- <div class="label">
+                  <label for="username">Username</label>
+                </div> -->
+              </div>
 
+              <!-- <div class="input">
+                <input type="text" id="username" placeholder="Username" required/>
+                <div class="label">
+                  <label for="username">Email</label>
+                </div>
+              </div> -->
+
+              <div class="input">
+                <input type="password" id="password-user" placeholder="Password" required/>
+                <!-- <div class="label">
+                  <label for="password">Password</label>
+                </div> -->
+              </div>
+              <div>
+                <input type="button" id="signup-button" name="signup_submit" value="Sign Up" />
+              </div>
+            </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="container">
+        <div class="login-form">
+
+          <form class="form-content">
+          <!-- Left (Form Image) -->
+          <div class="form-image">
+            <img src="./assets/images/MDB-Background.png" alt="MDB-Background" />
+          </div>
+  
+          <!-- (Form Content) -->
+          <form class="form-content">
+  
+            <!-- Form Heading -->
+            <div class="form-heading">
+              <img src="./assets/images/MeerDanBijles-Logo.png" alt="MeerDanBijles-Logo" />
+              <h1>Login</h1>
+              <p>Please fill out all the required fields to login to your account</p>
+            </div>
+  
+            <!-- Input Wrap -->
+            <div class="input-wrap">
+
+              <div class="input">
+                <input type="email" id="email-user" placeholder="Username" required/>
+                <div class="label">
+                  <label for="username">Username</label>
+                </div>
+              </div>
+
+              <!-- <div class="input">
+                <input type="text" id="username" placeholder="Username" required/>
+                <div class="label">
+                  <label for="username">Email</label>
+                </div>
+              </div> -->
+
+              <div class="input">
+                <input type="password" id="password-user" placeholder="Password" required/>
+                <div class="label">
+                  <label for="password">Password</label>
+                </div>
+              </div>
+
+              <!-- <div class="remember-forgot-container">
+                <div class="remember">
+                  <label><input type="checkbox" id="remember-me-user">Remember me</label>
+                </div>
+
+                <div class="forgot-password">
+                  <label><a href="#">Wachtwoord vergeten?</a></label>
+                </div>
+              </div> -->
+
+              <!-- <div class="buttons-container">
+                <button type="submit" id="login-user">Login</button>
+                <a href="sign-up_tvt.html"><button type="button" id="create-account-user">Create Account</button></a>
+              </div> -->
+
+              <div>
+                <input type="button" id="login-button" name="login_submit" value="Login" />
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
 
 
         <!-- <div class="section">
@@ -101,6 +154,7 @@
       // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+      import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
       import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
@@ -121,10 +175,70 @@
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const analytics = getAnalytics(app);
-      const auth = getAuth(app);
+      const auth = getAuth();
+      const database = getDatabase(app);
+
+      addEventListener("click",(e) => {
+
+        var email = document.getElementById("email-user").value
+        var password = document.getElementById("password-user").value
+
+        createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed up 
+          const user = userCredential.user;
+
+          // Send users info to real time database
+          set(ref(database, "users/" + user.uid),{
+            username: email,
+          })
+
+
+          // Insert redirect after sign-up here!
+          alert("User Created!");
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+
+          alert(errorMessage);
+           // ..
+          });
+        
+      });
+
+      addEventListener("click",(e) => {
+        
+        var email = document.getElementById("email-user").value
+        var password = document.getElementById("password-user").value
+
+      signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+
+        const date = new Date();
+        update(ref(database, "users/" + user.uid),{
+            last_login: date,
+          })
+
+          // Insert redirect after sign-up here!
+          alert("User logged in!");
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+
+        alert(errorMessage);
+      });
+    });
+      
 
     </script>
 
     
-    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="./assets/js/app.js"></script>
 </html>
