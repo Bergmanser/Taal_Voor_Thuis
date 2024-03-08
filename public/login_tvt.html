@@ -32,7 +32,7 @@
             <div class="input-wrap">
 
               <div class="input">
-                <input type="email" id="email-user" placeholder="Username" required/>
+                <input type="email" id="email-user-signup" placeholder="Username" required/>
                 <!-- <div class="label">
                   <label for="username">Username</label>
                 </div> -->
@@ -46,7 +46,7 @@
               </div> -->
 
               <div class="input">
-                <input type="password" id="password-user" placeholder="Password" required/>
+                <input type="password" id="password-user-signup" placeholder="Password" required/>
                 <!-- <div class="label">
                   <label for="password">Password</label>
                 </div> -->
@@ -82,7 +82,7 @@
             <div class="input-wrap">
 
               <div class="input">
-                <input type="email" id="email-user" placeholder="Username" required/>
+                <input type="email" id="email-user-login" placeholder="Username" required/>
                 <div class="label">
                   <label for="username">Username</label>
                 </div>
@@ -96,7 +96,7 @@
               </div> -->
 
               <div class="input">
-                <input type="password" id="password-user" placeholder="Password" required/>
+                <input type="password" id="password-user-login" placeholder="Password" required/>
                 <div class="label">
                   <label for="password">Password</label>
                 </div>
@@ -180,8 +180,8 @@
 
       addEventListener("click",(e) => {
 
-        var email = document.getElementById("email-user").value
-        var password = document.getElementById("password-user").value
+        var email = document.getElementById("email-user-signup").value
+        var password = document.getElementById("password-user-signup").value
 
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -210,16 +210,16 @@
 
       addEventListener("click",(e) => {
         
-        var email = document.getElementById("email-user").value
-        var password = document.getElementById("password-user").value
+        var email = document.getElementById("email-user-login").value
+        var password = document.getElementById("password-user-login").value
+        
+        signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          const date = new Date();
 
-      signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-
-        const date = new Date();
-        update(ref(database, "users/" + user.uid),{
+          update(ref(database, "users/" + user.uid),{
             last_login: date,
           })
 
@@ -233,6 +233,7 @@
 
 
         alert(errorMessage);
+        console.log(errorMessage);
       });
     });
       
