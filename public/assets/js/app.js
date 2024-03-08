@@ -1,11 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-// import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-// import { database, firestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-admin.js";
+import { auth } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-admin.js";
+//import { database, firestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 // import { user } from "firebase-functions/v1/auth";
 // import { Expression } from "firebase-functions/params";
+// import { firebase } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase.js';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -22,16 +24,76 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
+const analytics = getAnalytics(app);
 // initialize variables
-const db = getFirestore(app);
-const auth = firebase.auth()
+const db = getDatabase(app);
 
-//set up for sign-up function
+//const auth = firebase.auth();
+
+const getAuth = getAuth();
+const auth = auth(app);
+
+const admin = require('./firebase-admin');
+
+const firebase = require(initialize);
+require(auth);
+
+var email = document.getElementById("email-user").value
+var password = document.getElementById("password-user").value
+
+// const email = 'user@example.com';
+// const password = 'user-password';
+
+// createUserWithEmailAndPassword(email, password)
+//     .then((userCredential) => {
+//         // Signed up 
+//         const user = userCredential.user;
+//         console.log('User created:', user);
+//     })
+//     .catch((error) => {
+//         const errorCode = error.code;
+//         const errorMessage = error.message;
+//         console.error('Error creating user:', errorCode, errorMessage);
+//     });
+
+
+
+
+// (attempt 2)
+// var email = document.getElementById("email-user").value
+// var password = document.getElementById("password-user").value
+
+
+// create_account_user.addEventListner('click', (e) => {
+//     createUserWithEmailAndPassword(auth, email, password)
+//   .then((userCredential) => {
+//     // Signed up 
+//     const user = userCredential.user;
+//     // ...
+//   })
+//   .catch((error) => {
+//     const errorCode = error.code;
+//     const errorMessage = error.message;
+
+//     alert(errorMessage)
+//   });
+
+
+// });
+
+
+
+
+
+
+// (attempt 1)
+//set up for sign - up function
 function register() {
     email = document.getElementById("email-user").value
     password = document.getElementById("password-user").value
 }
+
+var email, password, expression;
 
 // validate input fields
 if (validateEmail(email) == false || validatePassword(password) == false) {
@@ -46,8 +108,8 @@ auth.createUserWithEmailAndPassword(email, password)
         // declare user
         var user = auth.currentUser
 
-        // add user to firestore db
-        var firestore_ref = getFirestore.ref()
+        // add user to the firebase realtime databse
+        var database_ref = database.ref()
 
         // create user data
         var user_data = {
@@ -55,7 +117,9 @@ auth.createUserWithEmailAndPassword(email, password)
             last_login: Date.now(),
         }
 
-        firestore_ref.child("users/" + user.uid).set(user_data)
+        database_ref.child("users/" + user.uid).set(user_data)
+        console.log(user_data)
+        alert("User Created")
 
     })
     .catch(function (error) {
@@ -96,7 +160,38 @@ function validateField(field) {
     }
 }
 
-
+getAuth()
+    .importUsers(
+        [
+            {
+                uid: 'some-uid',
+                email: 'user@example.com',
+                // Must be provided in a byte buffer.
+                passwordHash: Buffer.from('base64-password-hash', 'base64'),
+                // Must be provided in a byte buffer.
+                passwordSalt: Buffer.from('base64-salt', 'base64'),
+            },
+        ],
+        {
+            hash: {
+                algorithm: 'SCRYPT',
+                // All the parameters below can be obtained from the Firebase Console's users section.
+                // Must be provided in a byte buffer.
+                key: Buffer.from('base64-secret', 'base64'),
+                saltSeparator: Buffer.from('base64SaltSeparator', 'base64'),
+                rounds: 8,
+                memoryCost: 14,
+            },
+        }
+    )
+    .then((results) => {
+        results.errors.forEach((indexedError) => {
+            console.log(`Error importing user ${indexedError.index}`);
+        });
+    })
+    .catch((error) => {
+        console.log('Error importing users :', error);
+    });
 
 
 
