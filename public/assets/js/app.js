@@ -3,7 +3,7 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { auth } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-admin.js";
+// import { auth } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-admin.js";
 //import { database, firestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 // import { user } from "firebase-functions/v1/auth";
 // import { Expression } from "firebase-functions/params";
@@ -30,13 +30,13 @@ const db = getDatabase(app);
 
 //const auth = firebase.auth();
 
-const getAuth = getAuth();
-const auth = auth(app);
+const auth = getAuth();
+//const auth = auth(app);
 
-const admin = require('./firebase-admin');
+//const admin = require('./firebase-admin');
 
-const firebase = require(initialize);
-require(auth);
+// const firebase = require(initialize);
+// require(auth);
 
 var email = document.getElementById("email-user").value
 var password = document.getElementById("password-user").value
