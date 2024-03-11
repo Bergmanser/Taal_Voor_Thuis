@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Taal Voor Thuis Account Login Form For The Student Role</title>
+        <title>Taal Voor Thuis Account Login For The Parent Role</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <link
           rel="stylesheet"
@@ -12,7 +12,7 @@
           crossorigin="anonymous"
           referrerpolicy="no-referrer"
         />
-        <link rel="stylesheet" href="./assets/css/login_tvt.css"/>
+        <link rel="stylesheet" href="./assets/css/login_tvt_parent.css"/>
      
       </head>
     <body>
@@ -32,19 +32,25 @@
             <div class="form-heading">
               <img src="./assets/images/MeerDanBijles-Logo.png" alt="MeerDanBijles-Logo" />
               <h1>Login</h1>
-              <p>Please fill out all the required fields to login to your Student account</p>
+              <p>Please fill out all the required fields to login into your Parent account</p>
             </div>
   
             <!-- Input Wrap -->
             <div class="input-wrap">
 
               <div class="input">
-                <!-- Set type to text to make it possible to for a student to login with an username -->
-                <input type="text" id="email-user-login" placeholder="Username" required/>
+                <input type="email" id="email-user-login" placeholder="Username" required/>
                 <div class="label">
                   <label for="username">Username</label>
                 </div>
               </div>
+
+              <!-- <div class="input">
+                <input type="text" id="username" placeholder="Username" required/>
+                <div class="label">
+                  <label for="username">Email</label>
+                </div>
+              </div> -->
 
               <div class="input">
                 <input type="password" id="password-user-login" placeholder="Password" required/>
@@ -74,9 +80,33 @@
             </div>
           </form>
         </div>
-      </div>   
-    </body>
+      </div>
 
+
+        <!-- <div class="section">
+        Form Part
+        <div class="form-box">
+            <div class="button-box">
+                <div id="btn"></div>
+            </div>
+            <div class="social-icons">
+
+                <a href="https://www.fb.com/"><img src="login/fb.png"></a>
+                <a href="https://www.twitter.com/"><img src="login/tw.png"></a>
+                <a href="https://www.google.com/"><img src="login/gp.png"></a>
+            </div>
+
+            <form id="login" class="input-group">
+                <input type="text" class="input-field" placeholder="User Id" required>
+                <input type="text" class="input-field" placeholder="Enter Password" required>
+                <input type="checkbox" class="check-box"><span>Remember Password</span>
+                <button type="submit" class="submit-btn">Log in</button>
+            </form>
+        </div>
+    </div> -->
+    
+    
+    </body>
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
