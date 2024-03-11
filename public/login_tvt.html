@@ -179,6 +179,9 @@
 
       addEventListener("change",(e) => {
 
+        // event.stopImmediatePropagation();
+        // event.stopPropagation();
+
         var email = document.getElementById("email-user-signup").value
         var password = document.getElementById("password-user-signup").value
 
@@ -188,7 +191,7 @@
           const user = userCredential.user;
 
           // Send users info to real time database
-          set(ref(database, "users/" + user.uid),{
+          update (ref(database, "users/" + user.uid),{
             username: email,
           })
 
@@ -208,6 +211,9 @@
       });
 
       addEventListener("change",(e) => {
+
+        //event.stopImmediatePropagation();
+        // event.stopPropagation();
         
         var email = document.getElementById("email-user-login").value
         var password = document.getElementById("password-user-login").value
