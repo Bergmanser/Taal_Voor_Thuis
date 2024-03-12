@@ -63,10 +63,7 @@
                 </div>
               </div> -->
 
-              <!-- <div class="buttons-container">
-                <button type="submit" id="login-user">Login</button>
-                <a href="sign-up_tvt.html"><button type="button" id="create-account-user">Create Account</button></a>
-              </div> -->
+             
 
               <div>
                 <input type="button" id="login-button" name="login_submit" value="Login" />
@@ -110,10 +107,11 @@
         //event.stopImmediatePropagation();
         // event.stopPropagation();
         
-        var email = document.getElementById("email-user-login").value
-        var password = document.getElementById("password-user-login").value
+        var email = document.getElementById("email-user-login").value;
+        var username = document.getElementById("email-user-login").value;
+        var password = document.getElementById("password-user-login").value;
         
-        signInWithEmailAndPassword(auth, email, password)
+        signInWithEmailAndPassword(auth, email, username, password)
         .then((userCredential) => {
           // Signed in 
           const user = userCredential.user;

@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Taal Voor Thuis Account Sign-up Form</title>
+        <title>Taal Voor Thuis Account Add Students</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <link
           rel="stylesheet"
@@ -31,28 +31,29 @@
             <!-- Input Wrap -->
             <div class="input-wrap">
 
+                <!-- Email input field is hidden -->
               <div class="input">
-                <input type="email" id="email-user-signup" placeholder="Username" required/>
+                <input type="email" id="email-student-signup" placeholder="Email" required/>
+                <!-- <div class="label">
+                  <label for="email">Email</label>
+                </div> -->
+              </div>
+
+              <div class="input">
+                <input type="text" id="username-student-signup" placeholder="Username" required/>
                 <!-- <div class="label">
                   <label for="username">Username</label>
                 </div> -->
               </div>
 
-              <!-- <div class="input">
-                <input type="text" id="username" placeholder="Username" required/>
-                <div class="label">
-                  <label for="username">Email</label>
-                </div>
-              </div> -->
-
               <div class="input">
-                <input type="password" id="password-user-signup" placeholder="Password" required/>
+                <input type="password" id="password-student-signup" placeholder="Password" required/>
                 <!-- <div class="label">
                   <label for="password">Password</label>
                 </div> -->
               </div>
               <div>
-                <input type="button" id="signup-button" name="signup_submit" value="Sign Up" />
+                <input type="button" id="signup-button" name="signup_student_submit" value="Add User" />
               </div>
             </div>
         </div>
@@ -66,8 +67,8 @@
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
       import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
       import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
+    //   import { } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-functions.js";
+    //   import { } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-admin.js";
     
       // Your web app's Firebase configuration
       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -88,15 +89,52 @@
       const auth = getAuth();
       const database = getDatabase(app);
 
+      // Variables related to userdata
+    //   var parentEmail = document.getElementById("").value;
+      var email = document.getElementById("email-student-signup").value;
+      var username = document.getElementById("username-student-signup").value;
+      var password = document.getElementById("password-student-signup").value;
+
+    // Counts the amount of users related to the ParentRole (Unfinished)
+    // let counter = {};
+
+//       //There still needs to be a possibility for getting the parent email
+//       // Add the generateUniqueEmail function
+//       function generateUniqueEmail(parentEmail, counter) {
+//         const baseEmail = parentEmail.split('@')[0];
+//         const domain = parentEmail.split('@')[1];
+//         return `${baseEmail + counter}@${domain}`;
+//     }
+
+//     // Add the createNewUser Cloud Function call
+//     async function createNewUser(username, password, counter) {
+//     const uniqueEmail = generateUniqueEmail(firebase.auth().currentUser.email, counter);
+
+//   try {
+//     const response = await functions.httpsCallable('createNewUser')({
+//       username,
+//       password,
+//       counter,
+//     });
+
+//     if (response.data.success) {
+//       // User created successfully
+//       alert("Student Added!");
+//     } else {
+//       // Error occurred
+//     }
+//   } catch (error) {
+//     // Error occurred
+//         const errorCode = error.code;
+//         const errorMessage = error.message;
+
+//         alert(errorMessage);
+//   }
+// }
+
+
       //Sign-up logic
       addEventListener("change",(e) => {
-
-        // event.stopImmediatePropagation();
-        // event.stopPropagation();
-
-        var email = document.getElementById("email-user-signup").value;
-        var username = document.getElementById("email-user-signup").value;
-        var password = document.getElementById("password-user-signup").value;
 
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -106,13 +144,11 @@
           // Send users info to real time database
           update (ref(database, "users/" + user.uid),{
             email: email,
-            username: username
           })
 
-
           // Insert redirect after sign-up here!
-          alert("User Created!");
-          window.location.href = "login_parent_tvt.html";
+          alert("Student Added!");
+        //   window.location.href = "login_student_tvt.html";
           // ...
         })
         .catch((error) => {

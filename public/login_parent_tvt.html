@@ -81,30 +81,6 @@
           </form>
         </div>
       </div>
-
-
-        <!-- <div class="section">
-        Form Part
-        <div class="form-box">
-            <div class="button-box">
-                <div id="btn"></div>
-            </div>
-            <div class="social-icons">
-
-                <a href="https://www.fb.com/"><img src="login/fb.png"></a>
-                <a href="https://www.twitter.com/"><img src="login/tw.png"></a>
-                <a href="https://www.google.com/"><img src="login/gp.png"></a>
-            </div>
-
-            <form id="login" class="input-group">
-                <input type="text" class="input-field" placeholder="User Id" required>
-                <input type="text" class="input-field" placeholder="Enter Password" required>
-                <input type="checkbox" class="check-box"><span>Remember Password</span>
-                <button type="submit" class="submit-btn">Log in</button>
-            </form>
-        </div>
-    </div> -->
-    
     
     </body>
     <script type="module">
@@ -140,8 +116,8 @@
         //event.stopImmediatePropagation();
         // event.stopPropagation();
         
-        var email = document.getElementById("email-user-login").value
-        var password = document.getElementById("password-user-login").value
+        var email = document.getElementById("email-user-login").value;
+        var password = document.getElementById("password-user-login").value;
         
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -155,6 +131,7 @@
 
           // Insert redirect after sign-up here!
           alert("User logged in!");
+
         // ...
       })
       .catch((error) => {
