@@ -67,11 +67,7 @@
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
       import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
       import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-    //   import { } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-functions.js";
-    //   import { } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-admin.js";
-    
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+ 
       const firebaseConfig = {
         apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
         authDomain: "project-plato-eb365.firebaseapp.com",
@@ -91,35 +87,37 @@
 
       // Variables related to userdata
       const user = auth.currentUser;
-      
-    
 
-    // Counts the amount of users related to the ParentRole (Unfinished)
-    // let studentCounter = {};
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const uid = user.uid;
-      const parentEmail = user.email;
-      // ...
-    } else {
-     // User is signed out
-      window.location.href = "login_parent_tvt.html";
+
+    // Function to count the number of students created under the signed-in parent user
+    function studentCounter() {
+    const parentUid = auth.currentUser.uid;
+    if (!studentCounter[parentUid]) {
+      studentCounter[parentUid] = 0;
     }
-    });
+      return studentCounter[parentUid];
+    }
 
-      // Add the generateUniqueEmail function
-      function generateUniqueEmail(parentEmail, counter) {
+    // Add the generateUniqueEmail function
+    function generateUniqueEmail(parentEmail, counter) {
         const baseEmail = parentEmail.split('@')[0];
         const domain = parentEmail.split('@')[1];
         return `${baseEmail + counter}@${domain}`;
     }
 
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const uid = user.uid;
+      const parentEmail = user.email;
+      
+      // Counts the number of students created under the signed-in parent role
+      const counter = studentCounter();
 
       //Add Student under parentRole logic
       addEventListener("change",(e) => {
         
-        const uniqueEmail = generateUniqueEmail(auth().currentUser.email, counter);
+        const uniqueEmail = generateUniqueEmail(auth.currentUser.email, counter);
         var email = document.getElementById(uniqueEmail).value;
         var username = document.getElementById("username-student-signup").value;
         var password = document.getElementById("password-student-signup").value;
@@ -150,6 +148,15 @@
           });
         
       });
+      // ...
+    }
+    else {
+     // User is signed out
+      window.location.href = "login_parent_tvt.html";
+    }
+    });
+
+  
     </script>
 
     
