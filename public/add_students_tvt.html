@@ -25,7 +25,7 @@
           <!-- Form Heading -->
           <div class="form-heading">
             <h1>Sign-Up</h1>
-            <p>Please fill out all the required fields to Sign-Up to your account</p>
+            <p>Please fill out all the required fields to add a new student</p>
           </div>
 
             <!-- Input Wrap -->
@@ -85,10 +85,8 @@
       const auth = getAuth();
       const database = getDatabase(app);
 
-      // Variables related to userdata
+      // Declarations related to userdata
       const user = auth.currentUser;
-
-
 
     // Function to count the number of students created under the signed-in parent user
     function studentCounter() {
