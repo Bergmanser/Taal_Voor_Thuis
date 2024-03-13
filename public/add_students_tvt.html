@@ -31,13 +31,13 @@
             <!-- Input Wrap -->
             <div class="input-wrap">
 
-                <!-- Email input field is hidden -->
-              <div class="input">
+              <!-- Email input field is hidden -->
+              <!-- <div class="input">
                 <input type="email" id="email-student-signup" placeholder="Email" required/>
-                <!-- <div class="label">
+                <div class="label">
                   <label for="email">Email</label>
-                </div> -->
-              </div>
+                </div>
+              </div> -->
 
               <div class="input">
                 <input type="text" id="username-student-signup" placeholder="Username" required/>
@@ -66,7 +66,7 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
       import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-      import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+      import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
     //   import { } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-functions.js";
     //   import { } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-admin.js";
     
@@ -90,26 +90,23 @@
       const database = getDatabase(app);
 
       // Variables related to userdata
-      var parentEmail = document.getElementById("getUserByEmail").value;
-      var email = document.getElementById("email-student-signup").value;
-      var username = document.getElementById("username-student-signup").value;
-      var password = document.getElementById("password-student-signup").value;
-      const uniqueEmail = generateUniqueEmail(firebase.auth().currentUser.email, counter);
+      const user = auth.currentUser;
+      
+    
 
     // Counts the amount of users related to the ParentRole (Unfinished)
     // let studentCounter = {};
 
-    getAuth()
-    .getUserByEmail(email)
-    .then((userRecord) => {
-    // See the UserRecord reference doc for the contents of userRecord.
-    console.log(`Successfully fetched user data: ${userRecord.toJSON()}`);
-    })
-    .catch((error) => {
-    console.log('Error fetching user data:', error);
-   });
-
-
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const uid = user.uid;
+      const parentEmail = user.email;
+      // ...
+    } else {
+     // User is signed out
+      window.location.href = "login_parent_tvt.html";
+    }
+    });
 
       // Add the generateUniqueEmail function
       function generateUniqueEmail(parentEmail, counter) {
@@ -118,36 +115,14 @@
         return `${baseEmail + counter}@${domain}`;
     }
 
-//     // Add the createNewUser Cloud Function call
-//     async function createNewUser(username, password, counter) {
-//     const uniqueEmail = generateUniqueEmail(firebase.auth().currentUser.email, counter);
 
-//   try {
-//     const response = await functions.httpsCallable('createNewUser')({
-//       username,
-//       password,
-//       counter,
-//     });
-
-//     if (response.data.success) {
-//       // User created successfully
-//       alert("Student Added!");
-//     } else {
-//       // Error occurred
-//     }
-//   } catch (error) {
-//     // Error occurred
-//         const errorCode = error.code;
-//         const errorMessage = error.message;
-
-//         alert(errorMessage);
-//   }
-// }
-
-
-      //Sign-up logic
+      //Add Student under parentRole logic
       addEventListener("change",(e) => {
         
+        const uniqueEmail = generateUniqueEmail(auth().currentUser.email, counter);
+        var email = document.getElementById(uniqueEmail).value;
+        var username = document.getElementById("username-student-signup").value;
+        var password = document.getElementById("password-student-signup").value;
 
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -156,7 +131,7 @@
 
           // Send users info to real time database
           set (ref(database, "users/" + user.uid),{
-            email: email,
+            email: uniqueEmail,
             username: username,
             counter: counter,
           })
