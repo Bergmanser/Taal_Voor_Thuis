@@ -104,9 +104,9 @@
           const user = userCredential.user;
 
           // Send users info to real time database
-          update (ref(database, "users/" + user.uid),{
+          set (ref(database, "users/" + user.uid),{
             email: email,
-            username: username
+            username: username,
           })
 
 

@@ -90,21 +90,33 @@
       const database = getDatabase(app);
 
       // Variables related to userdata
-    //   var parentEmail = document.getElementById("").value;
+      var parentEmail = document.getElementById("getUserByEmail").value;
       var email = document.getElementById("email-student-signup").value;
       var username = document.getElementById("username-student-signup").value;
       var password = document.getElementById("password-student-signup").value;
+      const uniqueEmail = generateUniqueEmail(firebase.auth().currentUser.email, counter);
 
     // Counts the amount of users related to the ParentRole (Unfinished)
-    // let counter = {};
+    // let studentCounter = {};
 
-//       //There still needs to be a possibility for getting the parent email
-//       // Add the generateUniqueEmail function
-//       function generateUniqueEmail(parentEmail, counter) {
-//         const baseEmail = parentEmail.split('@')[0];
-//         const domain = parentEmail.split('@')[1];
-//         return `${baseEmail + counter}@${domain}`;
-//     }
+    getAuth()
+    .getUserByEmail(email)
+    .then((userRecord) => {
+    // See the UserRecord reference doc for the contents of userRecord.
+    console.log(`Successfully fetched user data: ${userRecord.toJSON()}`);
+    })
+    .catch((error) => {
+    console.log('Error fetching user data:', error);
+   });
+
+
+
+      // Add the generateUniqueEmail function
+      function generateUniqueEmail(parentEmail, counter) {
+        const baseEmail = parentEmail.split('@')[0];
+        const domain = parentEmail.split('@')[1];
+        return `${baseEmail + counter}@${domain}`;
+    }
 
 //     // Add the createNewUser Cloud Function call
 //     async function createNewUser(username, password, counter) {
@@ -135,6 +147,7 @@
 
       //Sign-up logic
       addEventListener("change",(e) => {
+        
 
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -142,8 +155,10 @@
           const user = userCredential.user;
 
           // Send users info to real time database
-          update (ref(database, "users/" + user.uid),{
+          set (ref(database, "users/" + user.uid),{
             email: email,
+            username: username,
+            counter: counter,
           })
 
           // Insert redirect after sign-up here!
