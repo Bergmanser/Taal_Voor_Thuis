@@ -77,7 +77,7 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-      import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+      import { getDatabase, ref, set, update, onValue,   } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
       import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
@@ -103,35 +103,58 @@
 
       //Login logic
       addEventListener("change",(e) => {
+        // hier gaat iets fout met het aanroepen van de username fix dit later PLZ
+        var emailInput = document.getElementById("email-user-login");
+        var usernameInput = document.getElementById("email-user-login");
+        var passwordInput = document.getElementById("password-user-login");
 
-        //event.stopImmediatePropagation();
-        // event.stopPropagation();
+        // Check if both input fields have valid data
+        if (emailInput.value && passwordInput.value) {
+          var email = emailInput.value;
+          var username =usernameInput.value;
+          var password = passwordInput.value;
         
-        var email = document.getElementById("email-user-login").value;
-        var username = document.getElementById("email-user-login").value;
-        var password = document.getElementById("password-user-login").value;
-        
-        signInWithEmailAndPassword(auth, email, username, password)
-        .then((userCredential) => {
-          // Signed in 
-          const user = userCredential.user;
-          const date = new Date();
+        signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      const date = new Date();
 
-          update(ref(database, "users/" + user.uid),{
+      // Retrieve the username associated with the signed-in user
+      const userRef = ref(database, "users/" + user.uid);
+      onValue(userRef, "value").then((snapshot) => {
+        const snapshotValue = snapshot.val();
+        const username = snapshotValue.username;
+
+        // Check if the entered username matches the retrieved username
+        if (username === enteredUsername) {
+          // Update the last_login timestamp
+          update(ref(database, "users/" + user.uid), {
             last_login: date,
           })
-
-          // Insert redirect after sign-up here!
-          alert("User logged in!");
-        // ...
+          .then(() => {
+            // Insert redirect after sign-up here!
+            alert("User logged in!");
+          })
+          .catch((error) => {
+            console.error(error);
+            alert("Error updating last_login timestamp.");
+          });
+        } else {
+          alert("Invalid username.");
+        }
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-
-        alert(errorMessage);
+        console.error(error);
+        alert("Error retrieving username.");
       });
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+
+      alert(errorMessage);
     });
+    }});
       
     </script>
 

@@ -112,12 +112,13 @@
 
       //Login logic
       addEventListener("change",(e) => {
+        var emailInput = document.getElementById("email-user-login");
+        var passwordInput = document.getElementById("password-user-login");
 
-        //event.stopImmediatePropagation();
-        // event.stopPropagation();
-        
-        var email = document.getElementById("email-user-login").value;
-        var password = document.getElementById("password-user-login").value;
+        // Check if both input fields have valid data
+        if (emailInput.value && passwordInput.value) {
+          var email = emailInput.value;
+          var password = passwordInput.value;
         
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -142,7 +143,7 @@
 
         alert(errorMessage);
       });
-    });
+    }});
       
     </script>
 

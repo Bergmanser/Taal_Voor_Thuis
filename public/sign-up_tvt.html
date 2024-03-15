@@ -91,12 +91,24 @@
       //Sign-up logic
       addEventListener("change",(e) => {
 
-        // event.stopImmediatePropagation();
-        // event.stopPropagation();
+        var emailInput = document.getElementById("email-user-signup");
+        var usernameInput = document.getElementById("email-user-signup");
+        var passwordInput = document.getElementById("password-user-signup");
 
-        var email = document.getElementById("email-user-signup").value;
-        var username = document.getElementById("email-user-signup").value;
-        var password = document.getElementById("password-user-signup").value;
+      //   Checks if both fields are empty (unfinished) (Works in the wrong way))
+      //   addEventListener("onsubmit",(e) => {
+      //   // Check if all input fields have valid data
+      //   if (!emailInput.value || !passwordInput.value || !usernameInput.value) {
+      //   alert("One or both of the login fields are empty.");
+      //   return;
+      //   }
+      // });
+
+        // Check if both input fields have valid data
+        if (emailInput.value && passwordInput.value) {
+          var email = emailInput.value;
+          var username =usernameInput.value;
+          var password = passwordInput.value;
 
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -105,10 +117,10 @@
 
           // Send users info to real time database
           set (ref(database, "users/" + user.uid),{
+            uid: user.uid,
             email: email,
             username: username,
           })
-
 
           // Insert redirect after sign-up here!
           alert("User Created!");
@@ -123,7 +135,7 @@
            // ..
           });
         
-      });
+      }});
     </script>
 
     
