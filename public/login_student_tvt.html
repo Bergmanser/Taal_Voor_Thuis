@@ -113,7 +113,7 @@ addEventListener("change", (e) => {
     var password = passwordInput.value;
 
     // Retrieve the email address associated with the entered username
-    const usersRef = ref(database, "users");
+    const usersRef = ref(database, "users/");
     onValue(usersRef, (snapshot) => {
       var snapshotValue = snapshot.val();
       var userData = snapshotValue[username];
