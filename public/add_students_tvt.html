@@ -123,8 +123,13 @@
         
         const uniqueEmail = generateUniqueEmail(auth.currentUser.email, counter);
         var email = uniqueEmail;
-        var username = document.getElementById("username-student-signup").value;
-        var password = document.getElementById("password-student-signup").value;
+        var usernameInput = document.getElementById("username-student-signup");
+        var passwordInput = document.getElementById("password-student-signup");
+
+         // Check if both input fields have valid data
+         if (emailInput.value && passwordInput.value) {
+          var username =usernameInput.value;
+          var password = passwordInput.value;
 
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -155,7 +160,7 @@
            // ..
           });
         
-      });
+      }});
       // ...
     }
     else {
