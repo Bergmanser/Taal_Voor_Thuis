@@ -104,37 +104,40 @@
     // }
 
     // Add the generateUniqueEmail function
-    function generateUniqueEmail(parentEmail, counter) {
+async function generateUniqueEmail(parentEmail, counter) {
   if (!parentEmail) {
     throw new Error("parentEmail is undefined or null");
   }
-    const baseEmail = parentEmail.split('@')[0];
-    const domain = parentEmail.split('@')[1];
-    let uniqueEmail = "";
-  do {
-    uniqueEmail = `${baseEmail + "+" + counter}@${domain}`;
+  const baseEmail = parentEmail.split('@')[0];
+  const domain = parentEmail.split('@')[1];
+  let uniqueEmail = "";
+
+  while (true) {
+    uniqueEmail = `${baseEmail+ "+" + counter}@${domain}`;
+    if (!await getStudent(uniqueEmail)) {
+      break;
+    }
     counter++;
-  } while (getStudent(uniqueEmail));
-    return uniqueEmail;
+  }
+  return uniqueEmail;
 }
 
-  function getStudent(email) {
-    const studentsRef = ref(database, `users/`);
-    let student = null;
-
+function getStudent(email) {
+  const studentsRef = ref(database, `users/`);
+  return new Promise((resolve) => {
     onValue(studentsRef, (snapshot) => {
-    snapshot.forEach((childSnapshot) => {
-      const childData = childSnapshot.val();
-      if (childData.email === email) {
-        student = childData;
-      }
+      let exists = false;
+      snapshot.forEach((childSnapshot) => {
+        const childData = childSnapshot.val();
+        if (childData.email === email) {
+          exists = true;
+        }
       });
-      },
-       {
-        onlyOnce: true,
-      });
-
-  return student;
+      resolve(exists);
+    }, {
+      onlyOnce: true,
+    });
+  });
 }
 
   onAuthStateChanged(auth, (user) => {
@@ -145,11 +148,10 @@
       // Counts the number of students created under the signed-in parent role
       const counter = getStudentCounter();
       
-
       //Add Student under parentRole logic
       addEventListener("change",(e) => {
         
-        const uniqueEmail = generateUniqueEmail(auth.currentUser.email, counter);
+        var uniqueEmail = generateUniqueEmail(auth.currentUser.email, counter);
         var email = uniqueEmail;
         // var usernameInput = document.getElementById("username-student-signup");
         // var passwordInput = document.getElementById("password-student-signup");
@@ -166,10 +168,9 @@
         .then((userCredential) => {
           // Signed up 
           const user = userCredential.user;
-          console.log(user);
 
           // Send users info to real time database
-          set(ref(database, "users/students" + user.uid),{
+          set(ref(database, "users/" + user.uid),{
             email: uniqueEmail,
             username: username,
             counter: counter,

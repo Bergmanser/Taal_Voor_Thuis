@@ -77,7 +77,7 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-      import { getDatabase, ref, set, update, onValue,   } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+      import { getDatabase, ref, set, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
       import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
@@ -114,7 +114,7 @@ addEventListener("change", (e) => {
 
     // Retrieve the email address associated with the entered username
     const usersRef = ref(database, "users/");
-    onValue(usersRef, (snapshot) => {
+    get(usersRef, (snapshot) => {
       var snapshotValue = snapshot.val();
       var userData = snapshotValue[username];
 
