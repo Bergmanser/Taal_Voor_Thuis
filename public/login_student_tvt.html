@@ -101,61 +101,54 @@
       const auth = getAuth();
       const database = getDatabase(app);
 
-      //Login logic
-      addEventListener("change",(e) => {
-        // hier gaat iets fout met het aanroepen van de username fix dit later PLZ
-        var emailInput = document.getElementById("email-user-login");
-        var usernameInput = document.getElementById("email-user-login");
-        var passwordInput = document.getElementById("password-user-login");
+      // Login logic
+addEventListener("change", (e) => {
+  // Retrieve the entered username and password
+  var usernameInput = document.getElementById("email-user-login");
+  var passwordInput = document.getElementById("password-user-login");
 
-        // Check if both input fields have valid data
-        if (emailInput.value && passwordInput.value) {
-          var email = emailInput.value;
-          var username =usernameInput.value;
-          var password = passwordInput.value;
-        
+  // Check if both input fields have valid data
+  if (usernameInput.value && passwordInput.value) {
+    var username = usernameInput.value;
+    var password = passwordInput.value;
+
+    // Retrieve the email address associated with the entered username
+    const usersRef = ref(database, "users");
+    onValue(usersRef, (snapshot) => {
+      var snapshotValue = snapshot.val();
+      var userData = snapshotValue[username];
+
+      // Check if the entered username exists
+      if (userData) {
+        var email = userData.email;
+
+        // Authenticate the user using the retrieved email address and the entered password
         signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      const date = new Date();
+          .then((userCredential) => {
+            const user = userCredential.user;
+            const date = new Date();
 
-      // Retrieve the username associated with the signed-in user
-      const userRef = ref(database, "users/" + user.uid);
-      onValue(userRef, "value").then((snapshot) => {
-        const snapshotValue = snapshot.val();
-        const username = snapshotValue.username;
-
-        // Check if the entered username matches the retrieved username
-        if (username === enteredUsername) {
-          // Update the last_login timestamp
-          update(ref(database, "users/" + user.uid), {
-            last_login: date,
-          })
-          .then(() => {
-            // Insert redirect after sign-up here!
-            alert("User logged in!");
+            // Update the last_login timestamp
+            update(ref(database, "users/" + user.uid), {
+              last_login: date,
+            })
+            .then(() => {
+              // Insert redirect after sign-up here!
+              alert("User logged in!");
+            })
+            .catch((error) => {
+              console.error(error);
+              alert("Error updating last_login timestamp.");
+            });
           })
           .catch((error) => {
-            console.error(error);
-            alert("Error updating last_login timestamp.");
-          });
-        } else {
-          alert("Invalid username.");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        alert("Error retrieving username.");
-      });
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
+            const errorCode = error.code;
+            const errorMessage = error.message;
 
-      alert(errorMessage);
-    });
+            alert(errorMessage);
+          });
+      }});
     }});
-      
     </script>
 
     

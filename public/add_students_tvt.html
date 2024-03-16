@@ -24,7 +24,7 @@
 
           <!-- Form Heading -->
           <div class="form-heading">
-            <h1>Sign-Up</h1>
+            <h1>Add students</h1>
             <p>Please fill out all the required fields to add a new student</p>
           </div>
 
@@ -65,8 +65,8 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-      import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-      import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+      import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+      import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
  
       const firebaseConfig = {
         apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
@@ -98,21 +98,49 @@
       return studentCounter[parentUid];
     }
 
+    // function updateStudentCounter(numStudents) {
+    // const parentUid = auth.currentUser.uid;
+    // studentCounter[parentUid] = numStudents;
+    // }
+
     // Add the generateUniqueEmail function
     function generateUniqueEmail(parentEmail, counter) {
-      if (!parentEmail) {
-        throw new Error("parentEmail is undefined or null");
+  if (!parentEmail) {
+    throw new Error("parentEmail is undefined or null");
+  }
+    const baseEmail = parentEmail.split('@')[0];
+    const domain = parentEmail.split('@')[1];
+    let uniqueEmail = "";
+  do {
+    uniqueEmail = `${baseEmail + "+" + counter}@${domain}`;
+    counter++;
+  } while (getStudent(uniqueEmail));
+    return uniqueEmail;
+}
+
+  function getStudent(email) {
+    const studentsRef = ref(database, `users/`);
+    let student = null;
+
+    onValue(studentsRef, (snapshot) => {
+    snapshot.forEach((childSnapshot) => {
+      const childData = childSnapshot.val();
+      if (childData.email === email) {
+        student = childData;
       }
-        const baseEmail = parentEmail.split('@')[0];
-        const domain = parentEmail.split('@')[1];
-        return `${baseEmail + "+" + counter}@${domain}`; 
-    }
+      });
+      },
+       {
+        onlyOnce: true,
+      });
+
+  return student;
+}
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
       const uid = user.uid;
       const parentEmail = user.email;
-      console.log(parentEmail);
       
       // Counts the number of students created under the signed-in parent role
       const counter = getStudentCounter();
@@ -123,13 +151,16 @@
         
         const uniqueEmail = generateUniqueEmail(auth.currentUser.email, counter);
         var email = uniqueEmail;
-        var usernameInput = document.getElementById("username-student-signup");
-        var passwordInput = document.getElementById("password-student-signup");
+        // var usernameInput = document.getElementById("username-student-signup");
+        // var passwordInput = document.getElementById("password-student-signup");
+        var username = document.getElementById("username-student-signup").value;
+        var password = document.getElementById("password-student-signup").value;
 
-         // Check if both input fields have valid data
-         if (emailInput.value && passwordInput.value) {
-          var username =usernameInput.value;
-          var password = passwordInput.value;
+
+        //  Check if both input fields have valid data
+        //  if (usernameInput.value && passwordInput.value) {
+        //   var username =usernameInput.value;
+        //   var password = passwordInput.value;
 
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -144,9 +175,6 @@
             counter: counter,
           })
 
-          // Increment the student counter for the parent user
-          studentCounter[uid]++;
-
           // Insert redirect after sign-up here!
           alert("Student Added!");
         //   window.location.href = "login_student_tvt.html";
@@ -159,8 +187,8 @@
           alert(errorMessage);
            // ..
           });
-        
-      }});
+        });
+   
       // ...
     }
     else {
@@ -168,8 +196,6 @@
       window.location.href = "login_parent_tvt.html";
     }
     });
-
-  
     </script>
 
     
