@@ -1,13 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-import { getDatabase, ref, set, update, } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+// import { getDatabase, ref, set, update, } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+// import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
     authDomain: "project-plato-eb365.firebaseapp.com",
@@ -22,8 +18,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const auth = getAuth();
-const database = getDatabase(app);
+// const auth = getAuth();
+// const database = getDatabase(app);
 const db = getFirestore(app);
 
 // Contains test data for 3 quizes
@@ -208,21 +204,6 @@ class BST {
             this.insert(i);
         }
     }
-
-    // findMin() {
-    //     let current = this.root;
-    //     while (current.left !== null) {
-    //         current = current.left;
-    //     }
-    //     return current.data;
-    // }
-    // findMax() {
-    //     let current = this.root;
-    //     while (current.right !== null) {
-    //         current = current.right;
-    //     }
-    //     return current.data;
-    // }
     find(data) {
         let current = this.root;
         while (current.data !== data) {
@@ -237,20 +218,35 @@ class BST {
         }
         return current;
     }
-    isPresent(data) {
-        let current = this.root;
-        while (current) {
-            if (data === current.data) {
-                return true;
-            }
-            if (data < current.data) {
-                current = current.left;
-            } else {
-                current = current.right;
-            }
-        }
-        return false;
-    }
+    // findMin() {
+    //     let current = this.root;
+    //     while (current.left !== null) {
+    //         current = current.left;
+    //     }
+    //     return current.data;
+    // }
+    // findMax() {
+    //     let current = this.root;
+    //     while (current.right !== null) {
+    //         current = current.right;
+    //     }
+    //     return current.data;
+    // }
+
+    // isPresent(data) {
+    //     let current = this.root;
+    //     while (current) {
+    //         if (data === current.data) {
+    //             return true;
+    //         }
+    //         if (data < current.data) {
+    //             current = current.left;
+    //         } else {
+    //             current = current.right;
+    //         }
+    //     }
+    //     return false;
+    // }
     // remove(data) {
     //     const removeNode = function (node, data) {
     //         if (node == null) {
@@ -330,21 +326,10 @@ bst.insert(7);
 
 // test
 const quizId = 1;
-// const quizNode = bst.search(quizId);
-
-// if (quizNode !== null) {
-//     // Use the Firebase Realtime Database or Firestore API to retrieve the quiz data for the node
-//     const quizData = // ...
-
-//         // Use the quiz data as needed
-//         console.log(quizData);
-// } else {
-//     console.log(`Quiz with ID ${quizId} not found`);
-// }
-
-if (quizData !== null) {
+let quizData = null; // declare quizData here
+if (bst.find(quizId) !== null) {
     // Use the Firebase Firestore API to retrieve the quiz data for the node
-    const quizData = await getQuizById(quizId);
+    quizData = await getQuizById(quizId);
     console.log(quizData);
 } else {
     console.log(`Quiz with ID ${quizId} not found`);
