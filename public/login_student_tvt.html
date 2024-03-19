@@ -115,7 +115,7 @@ addEventListener("change", (e) => {
     // Retrieve the email address associated with the entered username
     const usersRef = ref(database, "users/");
     get(usersRef, (snapshot) => {
-      var snapshotValue = snapshot.val();
+      var snapshotValue = snapshot.value();
       var userData = snapshotValue[username];
 
       // Check if the entered username exists
