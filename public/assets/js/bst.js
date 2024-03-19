@@ -198,9 +198,8 @@ class BST {
             return searchTree(node);
         }
     }
-
-    generate() {
-        for (let i = 0; i < 4096; i++) {
+    generate(numNodes = 4096) {
+        for (let i = 0; i < numNodes; i++) {
             this.insert(i);
         }
     }
@@ -313,6 +312,7 @@ class BST {
 
 }
 
+// Creates Binary Search Tree
 const bst = new BST();
 bst.generate();
 
