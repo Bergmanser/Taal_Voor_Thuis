@@ -324,13 +324,30 @@ bst.insert(3);
 bst.insert(5);
 bst.insert(7);
 
-// test
-const quizId = 1;
+// test 1
+// const quizId = 1;
+// let quizData = null; // declare quizData here
+// if (bst.find(quizId) !== null) {
+//     // Use the Firebase Firestore API to retrieve the quiz data for the node
+//     quizData = await getQuizById(quizId);
+//     console.log(quizData);
+// } else {
+//     console.log(`Quiz with ID ${quizId} not found`);
+// }
+
+// test 2
+const quizId = 2;
 let quizData = null; // declare quizData here
-if (bst.find(quizId) !== null) {
+const quizNode = bst.find(quizId);
+
+if (quizNode !== null) {
     // Use the Firebase Firestore API to retrieve the quiz data for the node
     quizData = await getQuizById(quizId);
     console.log(quizData);
 } else {
-    console.log(`Quiz with ID ${quizId} not found`);
+    console.log(`Quiz with ID ${quizId} not found in the BST`);
+}
+
+if (quizData === null) {
+    console.log(`Quiz data for ID ${quizId} not found in Firestore`);
 }
