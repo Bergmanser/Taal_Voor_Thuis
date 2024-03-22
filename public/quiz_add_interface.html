@@ -1,8 +1,20 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-// import { getDatabase, ref, set, update, } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-// import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>BST Test</title>
+    <!-- <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script> -->
+    <!-- <script src="../public/assets/js/bst.js"></script> -->
+  </head>
+  <body>
+    <button id="run-btn">Run BST Test</button>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+    // import { getDatabase, ref, set, update, } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    // import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
@@ -21,6 +33,7 @@ const analytics = getAnalytics(app);
 // const auth = getAuth();
 // const database = getDatabase(app);
 const db = getFirestore(app);
+
 
 // Contains test data for 2 quizes
 const quizzes = [
@@ -198,11 +211,13 @@ class BST {
             return searchTree(node);
         }
     }
+
     generate(numNodes = 4096) {
         for (let i = 0; i < numNodes; i++) {
-            this.insert(i);
+            this.add(i);
         }
-    }
+    };
+
     find(data) {
         let current = this.root;
         while (current.data !== data) {
@@ -217,137 +232,61 @@ class BST {
         }
         return current;
     }
-    // findMin() {
-    //     let current = this.root;
-    //     while (current.left !== null) {
-    //         current = current.left;
-    //     }
-    //     return current.data;
-    // }
-    // findMax() {
-    //     let current = this.root;
-    //     while (current.right !== null) {
-    //         current = current.right;
-    //     }
-    //     return current.data;
-    // }
-
-    // isPresent(data) {
-    //     let current = this.root;
-    //     while (current) {
-    //         if (data === current.data) {
-    //             return true;
-    //         }
-    //         if (data < current.data) {
-    //             current = current.left;
-    //         } else {
-    //             current = current.right;
-    //         }
-    //     }
-    //     return false;
-    // }
-    // remove(data) {
-    //     const removeNode = function (node, data) {
-    //         if (node == null) {
-    //             return null;
-    //         }
-    //         if (data == node.data) {
-    //             // node has no children 
-    //             if (node.left == null && node.right == null) {
-    //                 return null;
-    //             }
-    //             // node has no left child 
-    //             if (node.left == null) {
-    //                 return node.right;
-    //             }
-    //             // node has no right child 
-    //             if (node.right == null) {
-    //                 return node.left;
-    //             }
-    //             // node has two children 
-    //             var tempNode = node.right;
-    //             while (tempNode.left !== null) {
-    //                 tempNode = tempNode.left;
-    //             }
-    //             node.data = tempNode.data;
-    //             node.right = removeNode(node.right, tempNode.data);
-    //             return node;
-    //         } else if (data < node.data) {
-    //             node.left = removeNode(node.left, data);
-    //             return node;
-    //         } else {
-    //             node.right = removeNode(node.right, data);
-    //             return node;
-    //         }
-    //     }
-    //     this.root = removeNode(this.root, data);
-    // }
-    // isBalanced() {
-    //     return (this.findMinHeight() >= this.findMaxHeight() - 1)
-    // }
-    // findMinHeight(node = this.root) {
-    //     if (node == null) {
-    //         return -1;
-    //     };
-    //     let left = this.findMinHeight(node.left);
-    //     let right = this.findMinHeight(node.right);
-    //     if (left < right) {
-    //         return left + 1;
-    //     } else {
-    //         return right + 1;
-    //     };
-    // }
-    // findMaxHeight(node = this.root) {
-    //     if (node == null) {
-    //         return -1;
-    //     };
-    //     let left = this.findMaxHeight(node.left);
-    //     let right = this.findMaxHeight(node.right);
-    //     if (left > right) {
-    //         return left + 1;
-    //     } else {
-    //         return right + 1;
-    //     };
-    // }
-
+    isPresent(data) {
+        let current = this.root;
+        while (current) {
+            if (data === current.data) {
+                return true;
+            }
+            if (data < current.data) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        return false;
+    }
 }
+    
 
-// Creates Binary Search Tree
-const bst = new BST();
-bst.generate();
+      const runBtn = document.getElementById("run-btn");
+      runBtn.addEventListener("click", () => {
+        // Creates Binary Search Tree
+        const bst = new BST();
+        bst.generate();
 
-bst.insert(1024);
-bst.insert(3072);
-bst.insert(256);
-bst.insert(768);
-bst.insert(2304);
-bst.insert(767);
-bst.insert(3);
+        bst.add(1024);
+        bst.add(3072);
+        bst.add(256);
+        bst.add(768);
+        bst.add(2304);
+        bst.add(767);
+        bst.add(3);
 
-// test 1
-// const quizId = 1;
-// let quizData = null; // declare quizData here
-// if (bst.find(quizId) !== null) {
-//     // Use the Firebase Firestore API to retrieve the quiz data for the node
-//     quizData = await getQuizById(quizId);
-//     console.log(quizData);
-// } else {
-//     console.log(`Quiz with ID ${quizId} not found`);
-// }
+        const node = bst.find(3);
 
-// test 2
-const quizId = 2;
-let quizData = null; // declare quizData here
-const quizNode = bst.find(quizId);
+        if (node) {
+        console.log(`Node with value ${node.value} found!`);
+        } else {
+        console.log(`Node with value 3 not found in the BST.`);
+        }
 
-if (quizNode !== null) {
-    // Use the Firebase Firestore API to retrieve the quiz data for the node
-    quizData = await getQuizById(quizId);
-    console.log(quizData);
-} else {
-    console.log(`Quiz with ID ${quizId} not found in the BST`);
-}
+        // test
+        // const quizId = 2;
+        // let quizData = null; // declare quizData here
+        // const quizNode = bst.find(quizId);
 
-if (quizData === null) {
-    console.log(`Quiz data for ID ${quizId} not found in Firestore`);
-}
+        // if (quizNode !== null) {
+        //   // Use the Firebase Firestore API to retrieve the quiz data for the node
+        //   getQuizById(quizId).then((quizData) => {
+        //     console.log(quizData);
+        //   }).catch((error) => {
+        //     console.log(`Quiz data for ID ${quizId} not found in Firestore: ${error}`);
+        //   });
+        // } else {
+        //   console.log(`Quiz with ID ${quizId} not found in the BST`);
+        // }
+      });
+    </script>
+  </body>
+</html>
