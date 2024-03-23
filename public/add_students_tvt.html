@@ -86,34 +86,29 @@
       const database = getDatabase(app);
 
       // Declarations related to userdata
-      const user = auth.currentUser;
-      const studentCounter = {};
+const user = auth.currentUser;
+let studentCounter = {};
 
-    // Function to count the number of students created under the signed-in parent user
-    function getStudentCounter() {
-    const parentUid = auth.currentUser.uid;
-    if (!studentCounter[parentUid]) {
-      studentCounter[parentUid] = 0;
-    }
-      return studentCounter[parentUid];
-    }
+// Function to count the number of students created under the signed-in parent user
+function getStudentCounter() {
+  const parentUid = auth.currentUser.uid;
+  if (!studentCounter[parentUid]) {
+    studentCounter[parentUid] = 0;
+  }
+  return studentCounter[parentUid];
+}
 
-    // function updateStudentCounter(numStudents) {
-    // const parentUid = auth.currentUser.uid;
-    // studentCounter[parentUid] = numStudents;
-    // }
-
-    // Add the generateUniqueEmail function
+// Add the generateUniqueEmail function
 async function generateUniqueEmail(parentEmail, counter) {
   if (!parentEmail) {
     throw new Error("parentEmail is undefined or null");
   }
-  const baseEmail = parentEmail.split('@')[0];
-  const domain = parentEmail.split('@')[1];
+  const baseEmail = parentEmail.split("@")[0];
+  const domain = parentEmail.split("@")[1];
   let uniqueEmail = "";
 
   while (true) {
-    uniqueEmail = `${baseEmail+ "+" + counter}@${domain}`;
+    uniqueEmail = `${baseEmail + "+" + counter}@${domain}`;
     if (!await getStudent(uniqueEmail)) {
       break;
     }
@@ -140,63 +135,49 @@ function getStudent(email) {
   });
 }
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const uid = user.uid;
-      const parentEmail = user.email;
-      
-      // Counts the number of students created under the signed-in parent role
-      const counter = getStudentCounter();
-      
-      //Add Student under parentRole logic
-      addEventListener("change",(e) => {
-        
-        var uniqueEmail = generateUniqueEmail(auth.currentUser.email, counter);
-        var email = uniqueEmail;
-        // var usernameInput = document.getElementById("username-student-signup");
-        // var passwordInput = document.getElementById("password-student-signup");
-        var username = document.getElementById("username-student-signup").value;
-        var password = document.getElementById("password-student-signup").value;
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    const uid = user.uid;
+    const parentEmail = user.email;
 
+    // Counts the number of students created under the signed-in parent role
+    const counter = getStudentCounter();
 
-        //  Check if both input fields have valid data
-        //  if (usernameInput.value && passwordInput.value) {
-        //   var username =usernameInput.value;
-        //   var password = passwordInput.value;
+    //Add Student under parentRole logic
+    addEventListener("change", async (e) => {
+      var uniqueEmail = await generateUniqueEmail(user.email, counter);
+      var username = document.getElementById("username-student-signup").value;
+      var password = document.getElementById("password-student-signup").value;
 
-        createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Signed up 
-          const user = userCredential.user;
+      // Check if both input fields have valid data
 
-          // Send users info to real time database
-          set(ref(database, "users/" + user.uid),{
-            email: uniqueEmail,
-            username: username,
-            counter: counter,
+        createUserWithEmailAndPassword(auth, uniqueEmail, password)
+          .then((userCredential) => {
+            // Signed up
+            const user = userCredential.user;
+
+            // Send users info to real time database
+            set(ref(database, "users/students" + user.uid), {
+              email: uniqueEmail,
+              username: username,
+              counter: counter,
+            });
+
+            // Insert redirect after sign-up here!
+            alert("Student Added!");
           })
-
-          // Insert redirect after sign-up here!
-          alert("Student Added!");
-        //   window.location.href = "login_student_tvt.html";
-          // ...
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-
-          alert(errorMessage);
-           // ..
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(errorMessage);
           });
-        });
-   
-      // ...
-    }
-    else {
-     // User is signed out
-      window.location.href = "login_parent_tvt.html";
-    }
-    });
+      }
+    );
+  } else {
+    // User is signed out
+    window.location.href = "login_parent_tvt.html";
+  }
+});
     </script>
 
     

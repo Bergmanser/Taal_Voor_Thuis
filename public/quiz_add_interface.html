@@ -14,7 +14,7 @@
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
     // import { getDatabase, ref, set, update, } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     // import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
@@ -33,7 +33,7 @@ const analytics = getAnalytics(app);
 // const auth = getAuth();
 // const database = getDatabase(app);
 const db = getFirestore(app);
-
+console.log("db:", db);
 
 // Contains test data for 2 quizes
 const quizzes = [
@@ -45,8 +45,8 @@ const quizzes = [
         Banner: 'https://example.com/programming-banner.jpg',
         embedded_text: '<p>This quiz covers the basics of programming, including variables, data types, and control flow.</p>',
         Difficulty: 'Beginner',
-        Created_at: firebase.firestore.Timestamp.fromDate(new Date()),
-        Modified_at: firebase.firestore.Timestamp.fromDate(new Date()),
+        // Created_at: firebase.firestore.Timestamp.fromDate(new Date()),
+        // Modified_at: firebase.firestore.Timestamp.fromDate(new Date()),
         GroupID_Subject: '1001',
         Questions: [
             {
@@ -89,8 +89,8 @@ const quizzes = [
         Banner: 'https://example.com/programming-banner.jpg',
         embedded_text: '<p>This quiz covers intermediate programming concepts, including functions, arrays, and objects.</p>',
         Difficulty: 'Intermediate',
-        Created_at: firebase.firestore.Timestamp.fromDate(new Date()),
-        Modified_at: firebase.firestore.Timestamp.fromDate(new Date()),
+        // Created_at: firebase.firestore.Timestamp.fromDate(new Date()),
+        // Modified_at: firebase.firestore.Timestamp.fromDate(new Date()),
         GroupID_Subject: '1002',
         Questions: [
             {
@@ -132,7 +132,7 @@ async function updateQuizzes() {
     try {
         // Get a reference to the quizzes document
         const docRef = db.collection('quizzes').doc('main');
-
+        console.log("docRef:", docRef);
         // Try to get the document
         const doc = await docRef.get();
 
@@ -263,7 +263,7 @@ class BST {
         bst.add(767);
         bst.add(3);
 
-        const node = bst.find(3);
+        const node = bst.find(2);
 
         if (node) {
         console.log(`Node with value ${node.value} found!`);
@@ -272,20 +272,20 @@ class BST {
         }
 
         // test
-        // const quizId = 2;
-        // let quizData = null; // declare quizData here
-        // const quizNode = bst.find(quizId);
+        const quizId = 2;
+        let quizData = null; // declare quizData here
+        const quizNode = bst.find(quizId);
 
-        // if (quizNode !== null) {
-        //   // Use the Firebase Firestore API to retrieve the quiz data for the node
-        //   getQuizById(quizId).then((quizData) => {
-        //     console.log(quizData);
-        //   }).catch((error) => {
-        //     console.log(`Quiz data for ID ${quizId} not found in Firestore: ${error}`);
-        //   });
-        // } else {
-        //   console.log(`Quiz with ID ${quizId} not found in the BST`);
-        // }
+        if (quizNode !== null) {
+          // Use the Firebase Firestore API to retrieve the quiz data for the node
+          getQuizById(quizId).then((quizData) => {
+            console.log(quizData);
+          }).catch((error) => {
+            console.log(`Quiz data for ID ${quizId} not found in Firestore: ${error}`);
+          });
+        } else {
+          console.log(`Quiz with ID ${quizId} not found in the BST`);
+        }
       });
     </script>
   </body>

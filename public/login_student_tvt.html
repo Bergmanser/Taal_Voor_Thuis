@@ -104,13 +104,16 @@
       // Login logic
 addEventListener("change", (e) => {
   // Retrieve the entered username and password
-  var usernameInput = document.getElementById("email-user-login");
-  var passwordInput = document.getElementById("password-user-login");
+  var usernameInput = document.getElementById("email-user-login").value;
+  var passwordInput = document.getElementById("password-user-login").value;
+
+  // var usernameInput = document.getElementById("email-user-login");
+  // var passwordInput = document.getElementById("password-user-login");
 
   // Check if both input fields have valid data
-  if (usernameInput.value && passwordInput.value) {
-    var username = usernameInput.value;
-    var password = passwordInput.value;
+  // if (usernameInput.value && passwordInput.value) {
+  //   var username = usernameInput.value;
+  //   var password = passwordInput.value;
 
     // Retrieve the email address associated with the entered username
     const usersRef = ref(database, "users/");
@@ -148,7 +151,7 @@ addEventListener("change", (e) => {
             alert(errorMessage);
           });
       }});
-    }});
+    });
     </script>
 
     
