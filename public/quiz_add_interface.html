@@ -3,18 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <title>BST Test</title>
-    <!-- <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script> -->
-    <!-- <script src="../public/assets/js/bst.js"></script> -->
   </head>
   <body>
     <button id="run-btn">Run BST Test</button>
+    <input type="number" id="quiz-id-input" />
+    <!-- <button id="searchQuizBtn">Search Quiz</button> -->
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
     // import { getDatabase, ref, set, update, } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-    // import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getAuth,  onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
@@ -30,7 +29,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-// const auth = getAuth();
+const auth = getAuth();
 // const database = getDatabase(app);
 const db = getFirestore(app);
 console.log("db:", db);
@@ -45,8 +44,8 @@ const quizzes = [
         Banner: 'https://example.com/programming-banner.jpg',
         embedded_text: '<p>This quiz covers the basics of programming, including variables, data types, and control flow.</p>',
         Difficulty: 'Beginner',
-        // Created_at: firebase.firestore.Timestamp.fromDate(new Date()),
-        // Modified_at: firebase.firestore.Timestamp.fromDate(new Date()),
+        // Created_at: new Timestamp(new Date().getTime(), 0),
+        // Modified_at: new Timestamp(new Date().getTime(), 0),
         GroupID_Subject: '1001',
         Questions: [
             {
@@ -89,8 +88,8 @@ const quizzes = [
         Banner: 'https://example.com/programming-banner.jpg',
         embedded_text: '<p>This quiz covers intermediate programming concepts, including functions, arrays, and objects.</p>',
         Difficulty: 'Intermediate',
-        // Created_at: firebase.firestore.Timestamp.fromDate(new Date()),
-        // Modified_at: firebase.firestore.Timestamp.fromDate(new Date()),
+        // Created_at: new Timestamp(new Date().getTime(), 0),
+        // Modified_at: new Timestamp(new Date().getTime(), 0),
         GroupID_Subject: '1002',
         Questions: [
             {
@@ -130,47 +129,36 @@ const quizzes = [
 // Temporary function for uploading a quiz filled with test data and sends it to Firestore
 async function updateQuizzes() {
     try {
-        // Get a reference to the quizzes document
-        const docRef = db.collection('quizzes').doc('main');
-        console.log("docRef:", docRef);
-        // Try to get the document
-        const doc = await docRef.get();
+    const quizzesRef = collection(db, "quizzes");
+    const quizDocRef = doc(quizzesRef, "platoCollection");
 
-        // If the document doesn't exist, create it
-        if (!doc.exists) {
-            console.log('Creating new quizzes document...');
-            await docRef.set({ quizzes });
-            console.log('Quizzes document created!');
-        } else {
-            console.log('Updating quizzes document...');
-            await docRef.update({ quizzes });
-            console.log('Quizzes document updated!');
-        }
-    } catch (error) {
-        console.error('Error updating quizzes document:', error);
-    }
-}
-
-// Call the updateQuizzes function
-updateQuizzes();
-
-
-
-// Cals upon firestore to find a quiz by id
-async function getQuizById(quizId) {
-    const quizDocRef = doc(db, "quizzes", quizId);
+    // Try to get the document
     const quizDocSnap = await getDoc(quizDocRef);
 
-    if (quizDocSnap.exists()) {
-        return quizDocSnap.data();
-    } else {
-        console.log(`Quiz with ID ${quizId} not found`);
-        return null;
-    }
+    // If the document doesn't exist, create it
+    if (!quizDocSnap.exists()) {
+      console.log("Creating new quizzes document...");
+      await setDoc(quizDocRef, { quizzes });
+      console.log("Quizzes document created!");
+    }  
+  } catch (error) {
+    console.error("Error updating quizzes document:", error);
+  }
+};
+
+async function getQuizById(quizIdInput) {
+  const quizRef = doc(db, "quizzes", quizIdInput.toString());
+  const quizDoc = await getDoc(quizRef);
+
+  if (quizDoc.exists()) {
+    return quizDoc.data();
+  } else {
+    console.log("No such quiz found!");
+    return null;
+  }
 }
 
 /* Binary Search Tree logic related to searching relevant quiz data*/
-
 class Node {
     constructor(data, left = null, right = null) {
         this.data = data;
@@ -218,20 +206,26 @@ class BST {
         }
     };
 
-    find(data) {
-        let current = this.root;
-        while (current.data !== data) {
-            if (data < current.data) {
-                current = current.left;
-            } else {
-                current = current.right;
-            }
-            if (current === null) {
-                return null;
-            }
-        }
-        return current;
+    find(value) {
+    if (this.root === null) {
+      return null;
     }
+    return this._find(this.root, value);
+  }
+
+  _find(node, value) {
+    if (node === null) {
+      return null;
+    }
+    if (value < node.value) {
+      return this._find(node.left, value);
+    } else if (value > node.value) {
+      return this._find(node.right, value);
+    } else {
+      return node;
+    }
+  }
+
     isPresent(data) {
         let current = this.root;
         while (current) {
@@ -247,10 +241,22 @@ class BST {
         return false;
     }
 }
-    
 
-      const runBtn = document.getElementById("run-btn");
-      runBtn.addEventListener("click", () => {
+let quizIdInput;
+
+// Check if the user is logged in
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+
+        // Runs BST and Quiz retrieval code
+        console.log('Current User Email:', user.email);
+        // Cals the updateQuizzes function
+        updateQuizzes();  
+          const runBtn = document.getElementById("run-btn");
+          runBtn.addEventListener("click", async () => {
+
+        const quizIdInput = Number(document.getElementById("quiz-id-input").value);   
+
         // Creates Binary Search Tree
         const bst = new BST();
         bst.generate();
@@ -263,30 +269,45 @@ class BST {
         bst.add(767);
         bst.add(3);
 
-        const node = bst.find(2);
+        console.log("quizIdInput:", quizIdInput);
+        const node = bst.find(quizIdInput);
 
         if (node) {
         console.log(`Node with value ${node.value} found!`);
         } else {
-        console.log(`Node with value 3 not found in the BST.`);
+        console.log(`Node with inserted value not found in the BST.`);
         }
 
-        // test
-        const quizId = 2;
-        let quizData = null; // declare quizData here
-        const quizNode = bst.find(quizId);
+
+        const quizData = await getQuizById(quizIdInput);
+        const quizNode = bst.find(quizIdInput);
+
+        console.log("quizData:", quizData);
 
         if (quizNode !== null) {
           // Use the Firebase Firestore API to retrieve the quiz data for the node
-          getQuizById(quizId).then((quizData) => {
-            console.log(quizData);
-          }).catch((error) => {
-            console.log(`Quiz data for ID ${quizId} not found in Firestore: ${error}`);
+          getQuizById(quizIdInput)
+  .then(quizData => {
+    console.log("Quiz data retrieved correctly:", quizData);
+    console.log(quizData);
+  })
+  .catch(error => {
+    console.log("Error while retrieving data:", error);
+  });
+        } else {
+          console.log(`Quiz with ID ${quizIdInput} not found in the BST`);
+        }
           });
         } else {
-          console.log(`Quiz with ID ${quizId} not found in the BST`);
+          // Redirect the user to the 'login_parent_tvt.html' page if the user is not logged in
+          window.location.href = "login_parent_tvt.html";
         }
       });
+    
+
+     
     </script>
   </body>
 </html>
+
+

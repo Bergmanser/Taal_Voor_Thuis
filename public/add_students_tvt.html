@@ -85,35 +85,85 @@
       const auth = getAuth();
       const database = getDatabase(app);
 
-      // Declarations related to userdata
-const user = auth.currentUser;
-let studentCounter = {};
-
-// Function to count the number of students created under the signed-in parent user
-function getStudentCounter() {
+      function getStudentCounter() {
   const parentUid = auth.currentUser.uid;
-  if (!studentCounter[parentUid]) {
-    studentCounter[parentUid] = 0;
-  }
-  return studentCounter[parentUid];
+
+  // Initialize the counter to 0
+  let counter = 0;
+
+  // Check if there are any existing students under the parent role
+  getStudentsAmount(parentUid).then((students) => {
+    if (students.length > 0) {
+      // If there are existing students, set the counter to the highest counter value
+      const existingCounters = students.map((student) => parseInt(student.split("+")[0].split("@")[0]));
+      counter = Math.max(...existingCounters) + 1;
+    }
+  });
+
+  return counter;
 }
 
-// Add the generateUniqueEmail function
-async function generateUniqueEmail(parentEmail, counter) {
+function getStudentsAmount(uid) {
+  const studentsRef = ref(database, `users/${uid}/students`);
+  return new Promise((resolve) => {
+    onValue(studentsRef, (snapshot) => {
+      const students = [];
+
+      snapshot.forEach((childSnapshot) => {
+        const childData = childSnapshot.val();
+        students.push(childData.email);
+      });
+
+      resolve(students);
+    }, {
+      onlyOnce: true,
+    });
+  });
+}
+
+      // Add the generateUniqueEmail function
+      async function generateUniqueEmail(parentEmail, counter) {
   if (!parentEmail) {
     throw new Error("parentEmail is undefined or null");
   }
-  const baseEmail = parentEmail.split("@")[0];
-  const domain = parentEmail.split("@")[1];
-  let uniqueEmail = "";
 
-  while (true) {
-    uniqueEmail = `${baseEmail + "+" + counter}@${domain}`;
-    if (!await getStudent(uniqueEmail)) {
-      break;
+  // Extract the local part of the email address
+  const baseEmail = parentEmail.split("@")[0];
+
+  let existingCounter = 0;
+
+  // Check if there are any existing + symbols in baseEmail
+  baseEmail.split("+").forEach((part) => {
+    if (existingCounter < parseInt(part.split("@")[0])) {
+      existingCounter = parseInt(part.split("@")[0]);
     }
-    counter++;
+  });
+
+  let newCounter = counter;
+
+  // If there are existing + symbols, use the highest existing counter
+  if (existingCounter > 0) {
+    newCounter += existingCounter;
   }
+
+  let uniqueEmail = `${baseEmail}+${newCounter}@${parentEmail.split("@")[1]}`;
+
+  // Check if the unique email already exists in the database
+  const exists = await getStudent(uniqueEmail);
+
+  if (exists) {
+    newCounter++;
+    uniqueEmail = `${baseEmail}+${newCounter}@${parentEmail.split("@")[1]}`;
+    return generateUniqueEmail(parentEmail, newCounter);
+  }
+
+  // Make sure there is only one '+' sign
+  if (uniqueEmail.includes('++')) {
+    newCounter++;
+    uniqueEmail = `${baseEmail}+${newCounter}@${parentEmail.split("@")[1]}`;
+    return generateUniqueEmail(parentEmail, newCounter);
+  }
+
   return uniqueEmail;
 }
 
@@ -145,9 +195,11 @@ onAuthStateChanged(auth, (user) => {
 
     //Add Student under parentRole logic
     addEventListener("change", async (e) => {
-      var uniqueEmail = await generateUniqueEmail(user.email, counter);
+      var uniqueEmail = await generateUniqueEmail(parentEmail, counter);
       var username = document.getElementById("username-student-signup").value;
       var password = document.getElementById("password-student-signup").value;
+
+      console.log(uniqueEmail)
 
       // Check if both input fields have valid data
 
@@ -165,6 +217,7 @@ onAuthStateChanged(auth, (user) => {
 
             // Insert redirect after sign-up here!
             alert("Student Added!");
+            // window.location.href = "student_overview_parent_tvt.html";
           })
           .catch((error) => {
             const errorCode = error.code;
@@ -174,6 +227,7 @@ onAuthStateChanged(auth, (user) => {
       }
     );
   } else {
+    
     // User is signed out
     window.location.href = "login_parent_tvt.html";
   }

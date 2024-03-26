@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Student Overview Page Parent Dashboard</title>
+    <!-- (Add other imports if necessary) -->
+  </head>
+  <body>
+    <button id="run-btn">Add new student accounts</button>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+      import { getDatabase, ref, set, update, } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+   
+      // Initialize Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
+        authDomain: "project-plato-eb365.firebaseapp.com",
+        databaseURL: "https://project-plato-eb365-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "project-plato-eb365",
+        storageBucket: "project-plato-eb365.appspot.com",
+        messagingSenderId: "753582080609",
+        appId: "1:753582080609:web:98b2db93e63a500a56e020",
+        measurementId: "G-KHJXGLJM4Y"
+      };
+      
+      // Your Firebase config.
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const auth = getAuth();
+      const database = getDatabase(app);
+
+      // Check if the user is logged in
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log('Current User Email:', user.email);
+          // Redirect the user to the 'add_students_tvt.html' page if the 'run-btn' is clicked
+          const runBtn = document.getElementById("run-btn");
+          runBtn.addEventListener("click", () => {
+            window.location.href = "add_students_tvt.html";
+          });
+        } else {
+          // Redirect the user to the 'login_parent_tvt.html' page if the user is not logged in
+          window.location.href = "login_parent_tvt.html";
+        }
+      });
+    </script>
+  </body>
+</html>
+
+
+

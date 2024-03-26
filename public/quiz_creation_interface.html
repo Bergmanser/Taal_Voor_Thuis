@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="styles.css"/>
+        <script type="text/javascript" src="app.js"></script>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Taal Voor Thuis Quiz Creation Interface</title>
+        <script type="module" src="../assets/js/app.js"></script>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <link rel="stylesheet" href="../assets/css/quiz_creation_interface.css"/>
+    </head>
+    <body>
+        <h1>MDB: Hello World!</h1>
+        <section class="hero is-medium is-link is-admin">
+            <div class="hero-body">
+                <p class="title">
+                    Invulformulier Co-Maker student
+                </p>
+            </div>
+        </section>
+        
+        <form method="post" action="/create" enctype="multipart/form-data" id="form_id" class="form">
+        
+            <div class="form-control">
+                <label for="bedrijfsnaam">Bedrijfsnaam</label>
+                <input type="text" name="bedrijfsnaam" class="form-input input" placeholder=""
+                    value="{{ request.form['bedrijfsnaam'] }}"></input>
+            </div>
+        
+            <div class="form-control">
+                <label for="naam_opdracht">Naam opdracht</label>
+                <input type="text" name="naam_opdracht" class="form-input input"
+                    value="{{ request.form['naam_opdracht'] }}"></input>
+            </div>
+        
+            <div class="form-control">
+                <label for="voornaam">Voornaam</label>
+                <input type="text" name="voornaam" class="form-input input" value="{{ request.form['voornaam'] }}"></input>
+            </div>
+        
+            <div class="form-control">
+                <label for="tussenvoegsel">Tussenvoegsel</label>
+                <input type="text" name="tussenvoegsel" class="form-input input"
+                    value="{{ request.form['tussenvoegsel'] }}"></input>
+            </div>
+        
+            <div class="form-control">
+                <label for="achternaam">Achternaam</label>
+                <input type="text" name="achternaam" class="form-input input" value="{{ request.form['achternaam'] }}"></input>
+            </div>
+        
+            <div class="form-control">
+                <label for="studentnummer">Studentnummer</label>
+                <input type="text" name="studentnummer" class="form-input input"
+                    value="{{ request.form['studentnummer'] }}"></input>
+            </div>
+        
+            <div class="form-control">
+                <label for="email">Email</label>
+                <input type="email" name="email" class="form-input input" value="{{ request.form['email'] }}"></input>
+            </div>
+        
+            <div class="form-control hidden">
+                <input type="text" class="form-input" onkeyup="honeyChecker()" />
+            </div>
+        
+            <div class="form-control">
+                <label for="afstudeerrichting_student">Afstudeerrichting</label>
+                <div class="form-select select">
+                    <select name="afstudeerrichting_student" class="form-input select" name="afstudeerrichting_student"
+                        value="{{ request.form['afstudeerrichting_student']}}">
+                        <option value="SE">Software Engineering</option>
+                        <option value="BIM">Business IT & Management</option>
+                    </select>
+                </div>
+            </div>
+        
+            <div class="form-control">
+                <label for="locatie">Locatie</label>
+                <div class="form-select select">
+                    <select name="locatie" class="form-input select" name="locatie" value="{{ request.form['locatie']}}">
+                        <option value="almere">Almere</option>
+                        <option value="zwolle">Zwolle</option>
+                    </select>
+                </div>
+            </div>
+        
+            <div class="form-control">
+                <label for="sector">Sector</label>
+                <div class="form-select select">
+                    <select name="sector" class="form-input select" value="{{ request.form['sector'] }}">
+                        <option value="ict">ICT</option>
+                        <option value="onderwijs">Onderwijs</option>
+                        <option value="zorg">Zorg</option>
+                        <option value="logistiek">Logistiek</option>
+                        <option value="industrie">Industrie</option>
+                        <option value="overheid">Overheid</option>
+                        <option value="horeca">Horeca</option>
+                        <option value="detailhandel">Detailhandel</option>
+                        <option value="overig">Overig</option>
+                    </select>
+                </div>
+            </div>
+        
+            <div class="form-control">
+                <label for="leerjaar">Leerjaar</label>
+                <div class="form-select select">
+                    <select name="leerjaar" class="form-input" value="{{ request.form['leerjaar'] }}">
+                        <option value="y2022tm2023">2022/2023</option>
+                        <option value="y2023tm2024">2023/2024</option>
+                        <option value="y2024tm2025">2024/2025</option>
+                        <option value="y2025tm2026">2025/2026</option>
+                        <option value="y2026tm2027">2026/2027</option>
+                        <option value="y2027tm2028">2027/2028</option>
+                        <option value="y2028tm2029">2028/2029</option>
+                        <option value="y2029tm2030">2029/2030</option>
+                    </select>
+                </div>
+            </div>
+        
+            <div class="form-control">
+                <label for="beschrijving_opdracht">Beschrijving opdracht</label>
+                <textarea name="beschrijving_opdracht"
+                    class="form-input textarea">{{ request.form['beschrijving_opdracht'] }}</textarea>
+            </div>
+        
+            <div class="form-control">
+                <label for="ervaring_student">Ervaring opdracht</label>
+                <textarea name="ervaring_student" class="form-input textarea">{{ request.form['ervaring_student'] }}</textarea>
+            </div>
+        
+            <div class="form-control form-checkbox">
+                <input type="checkbox" name="toestemming_studentnaam" id="toestemming_studentnaam_hidden" class="hidden"
+                    value="0" />
+                <label class="checkbox">
+                    <input type="checkbox" name="toestemming_studentnaam" id="toestemming_studentnaam" value="1"
+                        onchange="check_student(this.value)">
+                    Toestemming studentnaam gebruiken in testimonial
+                </label>
+            </div>
+        
+            <div class="form-control form-titel">
+                <h2>Invulformulier Co-Maker bedrijf</h2>
+            </div>
+        
+            <div class="form-control">
+                <label for="ervaring_bedrijf">Ervaring opdrachtgever</label>
+                <textarea name="ervaring_bedrijf" class="form-input textarea">{{ request.form['ervaring_bedrijf'] }}</textarea>
+            </div>
+        
+            <div class="form-control">
+                <label for="logo_bedrijf">Logo bedrijf</label>
+                <input type="file" id="fileInput" name="files[]" accept="image/*">
+            </div>
+        
+            <div class="form-control form-checkbox">
+                <input type="checkbox" name="toestemming_bedrijfsnaam" id="toestemming_bedrijfsnaam_hidden" class="hidden"
+                    value="0">
+                <label for="toestemming_bedrijfsnaam">
+                    <input type="checkbox" name="toestemming_bedrijfsnaam" id="toestemming_bedrijfsnaam" value="1"
+                        onchange="check_bedrijf(this.value)">
+                    Toestemming bedrijfsnaam gebruiken in testimonial</label>
+            </div>
+        
+            <div class="form-control">
+                <button type="submit" class="postSubmit">Versturen</button>
+            </div>
+        
+        </form>
+        
+
+    </body>
+
+</html>
