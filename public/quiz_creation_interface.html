@@ -1,175 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <link rel="stylesheet" href="styles.css"/>
-        <script type="text/javascript" src="app.js"></script>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Taal Voor Thuis Quiz Creation Interface</title>
-        <script type="module" src="../assets/js/app.js"></script>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <link rel="stylesheet" href="../assets/css/quiz_creation_interface.css"/>
-    </head>
-    <body>
-        <h1>MDB: Hello World!</h1>
-        <section class="hero is-medium is-link is-admin">
-            <div class="hero-body">
-                <p class="title">
-                    Invulformulier Co-Maker student
-                </p>
-            </div>
-        </section>
-        
-        <form method="post" action="/create" enctype="multipart/form-data" id="form_id" class="form">
-        
-            <div class="form-control">
-                <label for="bedrijfsnaam">Bedrijfsnaam</label>
-                <input type="text" name="bedrijfsnaam" class="form-input input" placeholder=""
-                    value="{{ request.form['bedrijfsnaam'] }}"></input>
-            </div>
-        
-            <div class="form-control">
-                <label for="naam_opdracht">Naam opdracht</label>
-                <input type="text" name="naam_opdracht" class="form-input input"
-                    value="{{ request.form['naam_opdracht'] }}"></input>
-            </div>
-        
-            <div class="form-control">
-                <label for="voornaam">Voornaam</label>
-                <input type="text" name="voornaam" class="form-input input" value="{{ request.form['voornaam'] }}"></input>
-            </div>
-        
-            <div class="form-control">
-                <label for="tussenvoegsel">Tussenvoegsel</label>
-                <input type="text" name="tussenvoegsel" class="form-input input"
-                    value="{{ request.form['tussenvoegsel'] }}"></input>
-            </div>
-        
-            <div class="form-control">
-                <label for="achternaam">Achternaam</label>
-                <input type="text" name="achternaam" class="form-input input" value="{{ request.form['achternaam'] }}"></input>
-            </div>
-        
-            <div class="form-control">
-                <label for="studentnummer">Studentnummer</label>
-                <input type="text" name="studentnummer" class="form-input input"
-                    value="{{ request.form['studentnummer'] }}"></input>
-            </div>
-        
-            <div class="form-control">
-                <label for="email">Email</label>
-                <input type="email" name="email" class="form-input input" value="{{ request.form['email'] }}"></input>
-            </div>
-        
-            <div class="form-control hidden">
-                <input type="text" class="form-input" onkeyup="honeyChecker()" />
-            </div>
-        
-            <div class="form-control">
-                <label for="afstudeerrichting_student">Afstudeerrichting</label>
-                <div class="form-select select">
-                    <select name="afstudeerrichting_student" class="form-input select" name="afstudeerrichting_student"
-                        value="{{ request.form['afstudeerrichting_student']}}">
-                        <option value="SE">Software Engineering</option>
-                        <option value="BIM">Business IT & Management</option>
-                    </select>
-                </div>
-            </div>
-        
-            <div class="form-control">
-                <label for="locatie">Locatie</label>
-                <div class="form-select select">
-                    <select name="locatie" class="form-input select" name="locatie" value="{{ request.form['locatie']}}">
-                        <option value="almere">Almere</option>
-                        <option value="zwolle">Zwolle</option>
-                    </select>
-                </div>
-            </div>
-        
-            <div class="form-control">
-                <label for="sector">Sector</label>
-                <div class="form-select select">
-                    <select name="sector" class="form-input select" value="{{ request.form['sector'] }}">
-                        <option value="ict">ICT</option>
-                        <option value="onderwijs">Onderwijs</option>
-                        <option value="zorg">Zorg</option>
-                        <option value="logistiek">Logistiek</option>
-                        <option value="industrie">Industrie</option>
-                        <option value="overheid">Overheid</option>
-                        <option value="horeca">Horeca</option>
-                        <option value="detailhandel">Detailhandel</option>
-                        <option value="overig">Overig</option>
-                    </select>
-                </div>
-            </div>
-        
-            <div class="form-control">
-                <label for="leerjaar">Leerjaar</label>
-                <div class="form-select select">
-                    <select name="leerjaar" class="form-input" value="{{ request.form['leerjaar'] }}">
-                        <option value="y2022tm2023">2022/2023</option>
-                        <option value="y2023tm2024">2023/2024</option>
-                        <option value="y2024tm2025">2024/2025</option>
-                        <option value="y2025tm2026">2025/2026</option>
-                        <option value="y2026tm2027">2026/2027</option>
-                        <option value="y2027tm2028">2027/2028</option>
-                        <option value="y2028tm2029">2028/2029</option>
-                        <option value="y2029tm2030">2029/2030</option>
-                    </select>
-                </div>
-            </div>
-        
-            <div class="form-control">
-                <label for="beschrijving_opdracht">Beschrijving opdracht</label>
-                <textarea name="beschrijving_opdracht"
-                    class="form-input textarea">{{ request.form['beschrijving_opdracht'] }}</textarea>
-            </div>
-        
-            <div class="form-control">
-                <label for="ervaring_student">Ervaring opdracht</label>
-                <textarea name="ervaring_student" class="form-input textarea">{{ request.form['ervaring_student'] }}</textarea>
-            </div>
-        
-            <div class="form-control form-checkbox">
-                <input type="checkbox" name="toestemming_studentnaam" id="toestemming_studentnaam_hidden" class="hidden"
-                    value="0" />
-                <label class="checkbox">
-                    <input type="checkbox" name="toestemming_studentnaam" id="toestemming_studentnaam" value="1"
-                        onchange="check_student(this.value)">
-                    Toestemming studentnaam gebruiken in testimonial
-                </label>
-            </div>
-        
-            <div class="form-control form-titel">
-                <h2>Invulformulier Co-Maker bedrijf</h2>
-            </div>
-        
-            <div class="form-control">
-                <label for="ervaring_bedrijf">Ervaring opdrachtgever</label>
-                <textarea name="ervaring_bedrijf" class="form-input textarea">{{ request.form['ervaring_bedrijf'] }}</textarea>
-            </div>
-        
-            <div class="form-control">
-                <label for="logo_bedrijf">Logo bedrijf</label>
-                <input type="file" id="fileInput" name="files[]" accept="image/*">
-            </div>
-        
-            <div class="form-control form-checkbox">
-                <input type="checkbox" name="toestemming_bedrijfsnaam" id="toestemming_bedrijfsnaam_hidden" class="hidden"
-                    value="0">
-                <label for="toestemming_bedrijfsnaam">
-                    <input type="checkbox" name="toestemming_bedrijfsnaam" id="toestemming_bedrijfsnaam" value="1"
-                        onchange="check_bedrijf(this.value)">
-                    Toestemming bedrijfsnaam gebruiken in testimonial</label>
-            </div>
-        
-            <div class="form-control">
-                <button type="submit" class="postSubmit">Versturen</button>
-            </div>
-        
-        </form>
-        
+<html>
+  <head>
+    <title>Create a Quiz</title>
+    <!-- <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script> -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script>
+  </head>
+  <body>
+    <h1>Create a Quiz</h1>
+    <form id="quiz-form">
+      <input type="text" id="title" placeholder="Title" required />
+      <input type="text" id="group-id-subject" placeholder="Group ID/Subject" required />
+      <input type="file" id="banner" accept="image/jpeg,image/png,image/jpg" required />
+      <div id="quill-container"></div>
+      <input type="text" id="difficulty" placeholder="Difficulty" required />
+      <div id="questions"></div>
+      <button id="add-question-button">Add a question</button>
+      <button type="submit">Submit</button>
+    </form>
+    <script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    </body>
+const firebaseConfig = {
+    apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
+    authDomain: "project-plato-eb365.firebaseapp.com",
+    databaseURL: "https://project-plato-eb365-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "project-plato-eb365",
+    storageBucket: "project-plato-eb365.appspot.com",
+    messagingSenderId: "753582080609",
+    appId: "1:753582080609:web:98b2db93e63a500a56e020",
+    measurementId: "G-KHJXGLJM4Y"
+};
 
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth();
+const db = getFirestore(app);
+console.log("db:", db);
+
+const quizForm = document.getElementById('quiz-form');
+const questionsContainer = document.getElementById('questions');
+document.getElementById("add-question-button").addEventListener("click", addQuestion);
+
+let questionId = 1;
+
+// Check if the user is logged in
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log('Current User Email:', user.email);
+        function addQuestion() {
+            const question = document.createElement('div');
+            question.id = `question-${questionId}`;
+            question.innerHTML = `
+        <h2>Question ${questionId}</h2>
+        <input type="text" id="question-text-${questionId}" placeholder="Question text" required />
+        <select id="question-type-${questionId}" required>
+          <option value="multiple-choice">Multiple Choice</option>
+          <option value="true-or-false">True or False</option>
+          <option value="other">Other</option>
+        </select>
+        <div id="question-options-${questionId}"></div>
+        <button type="button" onclick="addOption(${questionId})">Add Option</button>
+        <button type="button" onclick="removeQuestion(${questionId})">Remove Question</button>
+        <input type="text" id="question-hint-${questionId}" placeholder="Hint" required />
+      `;
+            questionsContainer.appendChild(question);
+            addOption(questionId);
+            questionId++;
+        }
+
+        function addOption(questionId) {
+            const question = document.getElementById(`question-${questionId}`);
+            const optionsContainer = document.getElementById(`question-options-${questionId}`);
+            const option = document.createElement('div');
+            option.innerHTML = `
+        <input type="text" id="question-option-text-${questionId}-0" placeholder="Option text" required />
+        <input type="radio" name="question-option-correct-${questionId}" value="0" required />
+      `;
+            for (let i = 1; i < 4; i++) {
+                option.innerHTML += `
+          <input type="text" id="question-option-text-${questionId}-${i}" placeholder="Option text" />
+          <input type="radio" name="question-option-correct-${questionId}" value="${i}" />
+        `;
+            }
+        };
+
+    } else {
+        // Redirect the user to the 'login_parent_tvt.html' page if the user is not logged in
+        window.location.href = "login_parent_tvt.html";
+    }
+});
+
+    </script>
+    <!-- <script src="quiz_creation.js"></script> -->
+    
+    <script src="quill-image-uploader.js"></script>
+    <script>
+      ClassicEditor.create(document.querySelector('#quill-container'), {
+        // Add any desired options here
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    </script>
+  </body>
 </html>

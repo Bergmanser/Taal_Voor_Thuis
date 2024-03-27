@@ -37,7 +37,7 @@ console.log("db:", db);
 // Contains test data for 2 quizes
 const quizzes = [
     {
-        QuizUID: '1',
+        QuizUID: '0',
         QuizGroupId: '8001',
         Title: 'Introduction to Programming Quiz',
         Description: 'A quiz about the basics of programming',
@@ -81,7 +81,7 @@ const quizzes = [
         ]
     },
     {
-        QuizUID: '2',
+        QuizUID: '1',
         QuizGroupId: '8002',
         Title: 'Intermediate Programming Quiz',
         Description: 'A quiz about intermediate programming concepts',
@@ -147,8 +147,9 @@ async function updateQuizzes() {
 };
 
 async function getQuizById(quizIdInput) {
-  const quizRef = doc(db, "quizzes", quizIdInput.toString());
-  const quizDoc = await getDoc(quizRef);
+  const quizzesRef = collection(db, "quizzes");
+  const quizDocRef = doc(quizzesRef, quizIdInput.toString());
+  const quizDoc = await getDoc(quizDocRef);
 
   if (quizDoc.exists()) {
     return quizDoc.data();
@@ -157,7 +158,6 @@ async function getQuizById(quizIdInput) {
     return null;
   }
 }
-
 /* Binary Search Tree logic related to searching relevant quiz data*/
 class Node {
     constructor(data, left = null, right = null) {
