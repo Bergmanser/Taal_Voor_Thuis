@@ -1,24 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Create a Quiz</title>
-    <!-- <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script> -->
+    <title>Upload een Quiz</title>
     <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script>
+    <link rel="stylesheet" href="./assets/css/quiz_creation_interface.css"/>
   </head>
   <body>
     <h1>Create a Quiz</h1>
+    
     <form id="quiz-form">
-      <input type="text" id="title" placeholder="Title" required />
-      <input type="text" id="group-id-subject" placeholder="Group ID/Subject" required />
-      <input type="file" id="banner" accept="image/jpeg,image/png,image/jpg" required />
+    <label for="title">Quiz tiltle</label>
+      <input type="text" id="title" name="title" placeholder="Title" required />
+      <div>
+        <label for="group-id-subject">Group ID/Subject:</label>
+        <select id="group-id-subject">
+          <option value="3000">3000</option>
+          <option value="4000">4000</option>
+          <option value="5000">5000</option>
+          <option value="6000">6000</option>
+          <option value="7000">7000</option>
+          <option selected value="8000">8000</option>
+        </select>
+      </div>
+      <label for="banner">Voeg een afbeelding toe als quiz banner</label>
+      <div></div>
+      <input type="file" id="banner" accept="image/jpeg,image/png,image/jpg" />
+      <div></div>
+      <label for="quill-container">Voeg in deze sectie de text voor de quiz toe</label>
       <div id="quill-container"></div>
-      <input type="text" id="difficulty" placeholder="Difficulty" required />
+      <label for="difficulty">Difficulty:</label>
+      <div>
+        <select id="difficulty" name="difficulty">
+            <option value="">Select difficulty</option>
+            <option value="easy">Easy</option>
+            <option value="average">Average</option>
+            <option value="hard">Hard</option>
+        </select>
+    </div>
       <div id="questions"></div>
-      <button id="add-question-button">Add a question</button>
+      <button id="add-question-button">Add another question</button>
+      <div></div>
+      <label for="remove-question-id-input">Remove a question by id:</label>
+      <input type="text" id="remove-question-id-input" placeholder="Question ID" />
+      <button id="remove-question-button">Remove question</button>
       <button type="submit">Submit</button>
     </form>
-    <script>
+    <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -44,50 +71,186 @@ console.log("db:", db);
 
 const quizForm = document.getElementById('quiz-form');
 const questionsContainer = document.getElementById('questions');
-document.getElementById("add-question-button").addEventListener("click", addQuestion);
+document.getElementById("add-question-button").addEventListener("click", addQuestion());
 
-let questionId = 1;
 
+// This code is responsible for handling the image upload related to the banner image
+const banner = document.getElementById('banner');
+banner.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            document.getElementById('banner-preview').appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        const img = document.createElement('img');
+        img.src = 'MeerDanBijles-Logo.png';
+        document.getElementById('banner-preview').appendChild(img);
+    }
+});
+
+//Responsible for generating a GroupID for the quiz based on the selected group
+const groupIdSubject = document.getElementById('group-id-subject').value;
+const groupRef = doc(collection(db, 'quizzes'), groupIdSubject);
+getDoc(groupRef).then((doc) => {
+  if (doc.exists) {
+    // Generate the next group ID based on the current number of quizzes
+    const nextGroupId = parseInt(groupIdSubject) + doc.data().nextQuizId;
+    // Update the nextQuizId for the group
+    setDoc(groupRef, { nextQuizId: nextGroupId }, { merge: true });
+    // Set the group ID for the new quiz
+    quizForm.groupIdSubject.value = nextGroupId;
+  } else {
+    setDoc(groupRef, { nextQuizId: 1 });
+    quizForm.groupIdSubject.value = groupIdSubject;
+  }
+});
+
+// This code is responsible for dynamically adding new questions input fields
+quizForm.questionId = questionId;
+
+function addQuestion() {
+    let questionId = questionsContainer.children.length + 1;
+    const question = document.createElement('div');
+    question.id = `question-${questionId}`;
+    question.innerHTML = `
+    <h2>Question ${questionId}</h2>
+    <label for="question-type">Question title</label>
+    <input type="text" id="question-text-${questionId}" placeholder="Question text" required />
+    <select id="question-type-${questionId}" required>
+    //     <option>Choose Question Type</option>
+    //     <option value="multiple-choice">Multiple Choice</option>
+    //     <option value="true-or-false">True or False</option>
+    </select>
+    <div id="question-options-${questionId}"></div>
+    <button type="button" id="add-option-button-${questionId}">Add Option</button>
+    <input type="text" id="question-hint-${questionId}" placeholder="Hint" required />
+    <button id="add-question-button">Add another question</button>
+    <button type="button" id="remove-question-button-${questionId}">Remove Question</button>
+
+  `;
+    questionsContainer.appendChild(question);
+    addOption(questionId);
+    questionId++;
+
+    // Add event listeners to the "Add Option" and "Remove Question" buttons
+    document.getElementById(`add-option-button-${questionId}`).addEventListener('click', () => {
+        addOption(questionId);
+    });
+    document.getElementById(`remove-question-button-${questionId}`).addEventListener('click', () => {
+        removeQuestion(questionId);
+    });
+}
+function addOption(questionId) {
+    const question = document.getElementById(`question-${questionId}`);
+    const optionsContainer = document.getElementById(`question-options-${questionId}`);
+    const option = document.createElement('div');
+    option.innerHTML = `
+    <input type="text" id="question-option-text-${questionId}-0" placeholder="Option text" required />
+    <input type="radio" name="question-option-correct-${questionId}" value="0" required />
+  `;
+    for (let i = 1; i < 4; i++) {
+        option.innerHTML += `
+      <input type="text" id="question-option-text-${questionId}-${i}" placeholder="Option text" />
+      <input type="radio" name="question-option-correct-${questionId}" value="${i}" />
+    `;
+    }
+    optionsContainer.appendChild(option);
+}
+
+function removeQuestion(questionId) {
+    // Remove the question element from the DOM
+    const question = document.getElementById(`question-${questionId}`);
+    question.remove();
+
+    // Remove the corresponding question, options, and hint from the Firestore database
+    const quizRef = db.collection('quizzes').doc(quizId);
+    const questionRef = quizRef.collection('questions').doc(`question-${questionId}`);
+    questionRef.delete().then(() => {
+        console.log(`Question ${questionId} deleted from database`);
+    }).catch((error) => {
+        console.error(`Error deleting Question ${questionId} from database: `, error);
+    });
+
+    // Remove the corresponding question, options, and hint from the `questions` and `options` arrays
+    const questionIndex = questions.findIndex(q => q.id === questionId);
+    questions.splice(questionIndex, 1);
+
+    // Remove the corresponding options from the `options` array
+    const optionsToRemove = options.filter(option => option.questionId === questionId);
+    optionsToRemove.forEach(option => {
+        const optionIndex = options.indexOf(option);
+        options.splice(optionIndex, 1);
+    });
+}
+     
 // Check if the user is logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log('Current User Email:', user.email);
-        function addQuestion() {
-            const question = document.createElement('div');
-            question.id = `question-${questionId}`;
-            question.innerHTML = `
-        <h2>Question ${questionId}</h2>
-        <input type="text" id="question-text-${questionId}" placeholder="Question text" required />
-        <select id="question-type-${questionId}" required>
-          <option value="multiple-choice">Multiple Choice</option>
-          <option value="true-or-false">True or False</option>
-          <option value="other">Other</option>
-        </select>
-        <div id="question-options-${questionId}"></div>
-        <button type="button" onclick="addOption(${questionId})">Add Option</button>
-        <button type="button" onclick="removeQuestion(${questionId})">Remove Question</button>
-        <input type="text" id="question-hint-${questionId}" placeholder="Hint" required />
-      `;
-            questionsContainer.appendChild(question);
-            addOption(questionId);
-            questionId++;
-        }
 
-        function addOption(questionId) {
-            const question = document.getElementById(`question-${questionId}`);
-            const optionsContainer = document.getElementById(`question-options-${questionId}`);
-            const option = document.createElement('div');
-            option.innerHTML = `
-        <input type="text" id="question-option-text-${questionId}-0" placeholder="Option text" required />
-        <input type="radio" name="question-option-correct-${questionId}" value="0" required />
-      `;
-            for (let i = 1; i < 4; i++) {
-                option.innerHTML += `
-          <input type="text" id="question-option-text-${questionId}-${i}" placeholder="Option text" />
-          <input type="radio" name="question-option-correct-${questionId}" value="${i}" />
-        `;
-            }
-        };
+        const quizForm = document.getElementById('quiz-form');
+
+// This addEventListner is responsible for uploading the quiz data to Firestore
+quizForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const title = document.getElementById('title');
+  const groupId = document.getElementById('group-id-subject');
+  const banner = document.getElementById('banner');
+  const quillContainer = document.getElementById('quill-container');
+  const difficulty = document.getElementById('difficulty');
+
+  const titleError = document.getElementById(`title-error`);
+  const groupIdError = document.getElementById(`group-id-error`);
+  const bannerError = document.getElementById(`banner-error`);
+  const quillError = document.getElementById(`quill-error`);
+  const difficultyError = document.getElementById(`difficulty-error`);
+
+  if (title.value.trim() === '') {
+    titleError.innerText = 'Title is required';
+  } else {
+    titleError.innerText = '';
+  }
+
+  if (groupId.value === '') {
+    groupIdError.innerText = 'Group ID is required';
+  } else {
+    groupIdError.innerText = '';
+  }
+
+  if (banner.files.length === 0) {
+    bannerError.innerText = 'Banner is required';
+  }
+
+  if (quillContainer.innerHTML.trim() === '') {
+    quillError.innerText = 'Embedded text is required';
+  }
+
+  if (difficulty.value.trim() === '') {
+    difficultyError.innerText = 'Difficulty is required';
+  }
+
+  quizForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  if (
+    title.value.trim() !== '' &&
+    groupId.value !== '' &&
+    banner.files.length > 0 &&
+    quillContainer.innerHTML.trim() !== '' &&
+    difficulty.value.trim() !== ''
+  ) {
+    quizForm.submit();
+  } else {
+    alert('Please fill out all required fields.');
+  }
+});
+});
 
     } else {
         // Redirect the user to the 'login_parent_tvt.html' page if the user is not logged in
@@ -98,7 +261,70 @@ onAuthStateChanged(auth, (user) => {
     </script>
     <!-- <script src="quiz_creation.js"></script> -->
     
-    <script src="quill-image-uploader.js"></script>
+    <!-- <script src="quill-image-uploader.js"></script> -->
+    <!-- <script>
+        import { Quill } from "quill";
+        import { QuillImageUploader } from 'quill-image-uploader';
+
+        const uploader = new QuillImageUploader({
+        uploadEndpoint: '/upload-image',
+        quill: quill,
+});
+
+    </script> -->
+    <!-- <script type="text/javascript">
+        Quill.register("modules/imageUploader", ImageUploader);
+  
+        console.log("script");
+        document.addEventListener("DOMContentLoaded", function () {
+          const fullToolbarOptions = [
+            [{ header: [1, 2, 3, false] }],
+            ["bold", "italic"],
+            ["clean"],
+            ["image"]
+          ];
+  
+          console.log("Dom loaded");
+  
+          var quill = new Quill("#editor", {
+            theme: "snow",
+            modules: {
+              toolbar: {
+                container: fullToolbarOptions
+              },
+              imageUploader: {
+                upload: (file) => {
+                  return new Promise((resolve, reject) => {
+                    const formData = new FormData();
+                    formData.append("image", file);
+  
+                    fetch(
+                      "https://api.imgbb.com/1/upload?key=d36eb6591370ae7f9089d85875e56b22",
+                      {
+                        method: "POST",
+                        body: formData
+                      }
+                    )
+                      .then((response) => response.json())
+                      .then((result) => {
+                        console.log(result);
+                        resolve(result.data.url);
+                      })
+                      .catch((error) => {
+                        reject("Upload failed");
+                        console.error("Error:", error);
+                      });
+                  });
+                }
+              }
+            }
+          });
+  
+          console.log(quill);
+        });
+      </script> -->
+
+
     <script>
       ClassicEditor.create(document.querySelector('#quill-container'), {
         // Add any desired options here
@@ -106,6 +332,56 @@ onAuthStateChanged(auth, (user) => {
       .catch(error => {
         console.error(error);
       });
+
+    //   Quill.register("modules/imageUploader", ImageUploader);
+  
+    //     console.log("script");
+    //     document.addEventListener("DOMContentLoaded", function () {
+    //       const fullToolbarOptions = [
+    //         [{ header: [1, 2, 3, false] }],
+    //         ["bold", "italic"],
+    //         ["clean"],
+    //         ["image"]
+    //       ];
+  
+    //       console.log("Dom loaded");
+  
+    //       var quill = new Quill("#editor", {
+    //         theme: "snow",
+    //         modules: {
+    //           toolbar: {
+    //             container: fullToolbarOptions
+    //           },
+    //           imageUploader: {
+    //             upload: (file) => {
+    //               return new Promise((resolve, reject) => {
+    //                 const formData = new FormData();
+    //                 formData.append("image", file);
+  
+    //                 fetch(
+    //                   "https://api.imgbb.com/1/upload?key=d36eb6591370ae7f9089d85875e56b22",
+    //                   {
+    //                     method: "POST",
+    //                     body: formData
+    //                   }
+    //                 )
+    //                   .then((response) => response.json())
+    //                   .then((result) => {
+    //                     console.log(result);
+    //                     resolve(result.data.url);
+    //                   })
+    //                   .catch((error) => {
+    //                     reject("Upload failed");
+    //                     console.error("Error:", error);
+    //                   });
+    //               });
+    //             }
+    //           }
+    //         }
+    //       });
+  
+    //       console.log(quill);
+    //     });
     </script>
   </body>
 </html>

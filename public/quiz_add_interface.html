@@ -11,7 +11,6 @@
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-    // import { getDatabase, ref, set, update, } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     import { getAuth,  onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
     import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
@@ -37,7 +36,7 @@ console.log("db:", db);
 // Contains test data for 2 quizes
 const quizzes = [
     {
-        QuizUID: '0',
+        QuizUId: '0',
         QuizGroupId: '8001',
         Title: 'Introduction to Programming Quiz',
         Description: 'A quiz about the basics of programming',
@@ -46,10 +45,10 @@ const quizzes = [
         Difficulty: 'Beginner',
         // Created_at: new Timestamp(new Date().getTime(), 0),
         // Modified_at: new Timestamp(new Date().getTime(), 0),
-        GroupID_Subject: '1001',
+        GroupId_Subject: '1001',
         Questions: [
             {
-                QuestionID: '1',
+                QuestionId: '1',
                 Text: 'What is a variable in programming?',
                 Options: ['A container for data', 'A type of data', 'A function', 'A loop'],
                 CorrectOption: 0,
@@ -59,7 +58,7 @@ const quizzes = [
                 ScoreWithHints: 0
             },
             {
-                QuestionID: '2',
+                QuestionId: '2',
                 Text: 'Which of the following is a data type in JavaScript?',
                 Options: ['Number', 'String', 'Boolean', 'All of the above'],
                 CorrectOption: 3,
@@ -69,7 +68,7 @@ const quizzes = [
                 ScoreWithHints: 0
             },
             {
-                QuestionID: '3',
+                QuestionId: '3',
                 Text: 'What is a conditional statement in programming?',
                 Options: ['A statement that executes code based on a condition', 'A statement that loops through code', 'A statement that assigns a value to a variable', 'A statement that defines a function'],
                 CorrectOption: 0,
@@ -81,7 +80,7 @@ const quizzes = [
         ]
     },
     {
-        QuizUID: '1',
+        QuizUId: '1',
         QuizGroupId: '8002',
         Title: 'Intermediate Programming Quiz',
         Description: 'A quiz about intermediate programming concepts',
@@ -90,10 +89,10 @@ const quizzes = [
         Difficulty: 'Intermediate',
         // Created_at: new Timestamp(new Date().getTime(), 0),
         // Modified_at: new Timestamp(new Date().getTime(), 0),
-        GroupID_Subject: '1002',
+        GroupId_Subject: '1002',
         Questions: [
             {
-                QuestionID: '1',
+                QuestionId: '1',
                 Text: 'What is a function in programming?',
                 Options: ['A block of code that performs a specific task', 'A data type', 'A variable', 'A loop'],
                 CorrectOption: 0,
@@ -103,7 +102,7 @@ const quizzes = [
                 ScoreWithHints: 0
             },
             {
-                QuestionID: '2',
+                QuestionId: '2',
                 Text: 'What is an array in programming?',
                 Options: ['A collection of values', 'A data type', 'A function', 'A loop'],
                 CorrectOption: 0,
@@ -113,7 +112,7 @@ const quizzes = [
                 ScoreWithHints: 0
             },
             {
-                QuestionID: '3',
+                QuestionId: '3',
                 Text: 'What is an object in programming?',
                 Options: ['A collection of properties and methods', 'Adata type', 'A function', 'A loop'],
                 CorrectOption: 0,
@@ -295,7 +294,7 @@ onAuthStateChanged(auth, (user) => {
     console.log("Error while retrieving data:", error);
   });
         } else {
-          console.log(`Quiz with ID ${quizIdInput} not found in the BST`);
+          console.log(`Quiz with Id ${quizIdInput} not found in the BST`);
         }
           });
         } else {

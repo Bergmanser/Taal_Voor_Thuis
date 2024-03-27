@@ -1,516 +1,93 @@
-html {
-    background-color: unset !important;
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
   }
   
-  * {
-    font-family: "Roboto", sans-serif;
-    color: #000000;
-  }
-  
-  body {
-    background-color: #F6F6F6;
-  }
-  
-  a {
-    color: #000000 !important;
-  }
-  
-  .testimonialAdmin {
-    font-size: xx-small;
-    background-color: #f5a61a;
-    padding: 10px;
-    margin: 5px;
-  }
-  
-  @media only screen and (min-width: 600px) {
-    .testimonialAdmin {
-      width: 43%;
-      display: inline-block;
-    }
-  }
-  
-  @media only screen and (max-width: 600px) {
-    .cards {
-      display: unset !important;
-    }
-  
-    .editLink {
-      margin: 0px !important;
-    }
-  }
-  
-  @media only screen and (min-width: 992px) {
-    .testimonialAdmin {
-      width: 100%;
-      font-size: small;
-      display: inline-block;
-      max-width: 300px;
-    }
-  }
-  
-  .card-title {
-    margin-top: 50px
-  }
-  
-  .editLink {
-    float: right;
-    color: white !important;
-    background: #FBC418;
-    padding: 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 13px;
-    margin: 10px;
-  }
-  
-  hr {
-    background-color: lightgray !important;
-  }
-  
-  nav a {
-    font-size: 18px;
-    font-weight: bold;
-    margin-left: 50px;
-    text-decoration: none;
-    padding-top: 40px;
-    background-color: white;
-  }
-  
-  nav a:hover {
-    color: #F5A61A !important;
-  }
-  
-  .navbar-brand {
-    margin-left: 0px !important;
-    padding-top: 0px !important;
-  }
-  
-  .form-control {
-    display: grid;
-    padding: 7px 0px;
-  }
-  
-  .form {
-    display: grid;
-    justify-content: center;
-    padding: 0px 20px;
-  }
-  
-  .form-input {
-    max-width: 500px;
-    padding: 10px;
-  }
-  
-  .form-admin {
-    width: 100%;
-  }
-  
-  .form-titel {
-    display: flex;
-    justify-content: center;
+  h1 {
+    text-align: center;
     margin-top: 50px;
+  }
+  
+  form {
+    background-color: #f5f5f5;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    margin-top: 50px;
+  }
+  
+  input[type="text"],
+  select {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  #quill-container {
+    height: 300px;
     margin-bottom: 20px;
   }
   
-  .form-checkbox {
-    display: flex;
+  button[type="submit"] {
+    display: block;
+    width: 100%;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
   }
   
-  .navbar {
+  button[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+  
+  button[type="button"] {
+    display: block;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  button[type="button"]:hover {
+    background-color: #ccc;
+  }
+  
+  .question {
+    margin-bottom: 50px;
+  }
+  
+  .question-options {
+    margin-left: 20px;
+  }
+  
+  .question-option {
     display: flex;
     align-items: center;
-    background-color: white;
-    padding-bottom: 15px;
+    margin-bottom: 10px;
   }
   
-  .logo {
-    width: 100%;
-    max-width: 140px;
-    padding: 15px;
-  }
-  
-  .login-logo {
-    max-width: 180px !important;
-  }
-  
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    padding-top: 40px;
-    background-color: white;
-  }
-  
-  li {
-    display: inline-block;
-    background-color: white;
-  }
-  
-  @media screen and (max-width: 992px) {
-    nav a {
-      margin-left: 14px;
-      display: none;
-    }
-  
-    /* .form-input {
-      max-width: 330px;
-    } */
-  }
-  
-  .testimonial_img {
-    max-height: 250px;
-  }
-  
-  .testimonial-solo-img {
-    max-height: 410px;
-    width: 50%;
-    height: 100%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .center {
-    text-align: center;
-  }
-  
-  .solo {
-    display: grid;
-    justify-content: center;
-  }
-  
-  .text {
-    margin-top: 75px;
-    font-size: xx-small;
-  }
-  
-  .login-form {
-    display: grid;
-    justify-content: center;
-  }
-  
-  .form-control-login {
-    padding: 7px 0px;
-  }
-  
-  .login-button {
-    background: rgb(251, 196, 24);
-    border: none;
-    padding: 8px 18px;
-    cursor: pointer;
-    color: white;
-  }
-  
-  .login-container {
-    margin-top: 40px;
-  }
-  
-  .solo-container {
-    margin-top: 50px;
-  }
-  
-  .index-title {
-    text-align: center;
-    margin-top: 50px;
-  }
-  
-  .card-container {
-    text-align: center;
-  }
-  
-  img {
-    display: block;
-    border: 0;
-    width: 100%;
-    height: auto;
-  }
-  
-  .card {
-    background: white !important;
-    margin-bottom: 2em;
-  }
-  
-  .card a {
-    text-decoration: none;
-  }
-  
-  .card a:hover {
-    box-shadow: 3px 3px 8px hsl(0, 0%, 80%);
-  }
-  
-  .card-content {
-    padding: 1.4em;
-    white-space: nowrap;
-  }
-  
-  .card-content h2 {
-    margin-top: 0;
-    margin-bottom: .5em;
-    font-weight: bold;
-    font-size: 18px;
-  }
-  
-  .card-content p {
-    font-size: 80%;
-  }
-  
-  /* Flexbox stuff */
-  
-  .cards {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
-  .card {
-    flex: 1 0 500px;
-    box-sizing: border-box;
-    margin: 1rem .25em;
-  }
-  
-  @media screen and (min-width: 40em) {
-    .card {
-      max-width: calc(50% - 1em);
-    }
-  }
-  
-  @media screen and (min-width: 60em) {
-    .card {
-      max-width: calc(25% - 1em);
-    }
-  }
-  
-  .centered {
-    margin: 0 auto;
-    padding: 0 1em;
-  }
-  
-  @media screen and (min-width: 52em) {
-    .centered {
-      max-width: 100em;
-    }
-  }
-  
-  .deleteLink {
-    float: left;
-    color: white;
-    background: red;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 13px;
-    margin: 10px;
-    cursor: pointer;
-  }
-  
-  .EditSave {
-    color: white;
-    background: #f5a61a;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 13px;
-    margin: 10px;
-    cursor: pointer;
-    text-transform: uppercase;
-  }
-  
-  .postSubmit {
-    color: white;
-    background: #f5a61a;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 13px;
-    margin: 10px;
-    cursor: pointer;
-    text-transform: uppercase;
-  }
-  
-  .solo {
-    max-width: 500px;
-  }
-  
-  .container {
-    display: flex;
-    justify-content: center;
-  }
-  
-  @media (min-width: 1024px) {
-    .titel-solo {
-      font-size: 2.25rem;
-    }
-  }
-  
-  @media (min-width: 768px) {
-    .titel-solo {
-      font-size: 1.875rem;
-    }
-  }
-  
-  .titel-solo {
-    font-size: 1.75rem;
-  }
-  
-  .container-solo {
-    width: 100%;
-  }
-  
-  .container-solo p {
-    margin-left: 10px;
+  .question-option input[type="radio"] {
     margin-right: 10px;
   }
   
-  @media (min-width: 1024px) {
-    .container-solo {
-      max-width: 960px;
-      width: 960px;
-    }
-  
-    .container-solo p {
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-  
-  .margin-solo {
+  .question-hint {
     margin-top: 10px;
-  }
-  
-  .margin-solo-top {
-    margin-top: 15px;
-    margin-left: 10px;
-    margin-right: 10px;
   }
   
   .hidden {
     display: none;
   }
   
-  .filter {
-    background: white;
-    color: black;
-    border: 1px solid white;
-    font-size: 18px;
-    font-weight: normal;
-    padding: 20px 50px;
-    text-transform: none;
-  }
-  
-  .filter:hover {
-    cursor: pointer;
-  }
-  
-  .filter:focus-visible {
-    outline: none;
-  }
-  
-  .item {
-    background: white;
-    color: black;
-    border: 1px solid white;
-    font-size: 15px;
-    font-weight: normal;
-    padding: 30px 50px;
-    outline: none;
-    border: #FBC418;
-  }
-  
-  .form-select {
-    display: grid;
-  }
-  
-  input[type="file"]::file-selector-button {
-    border: 2px solid #f5a61a;
-    padding: 0.2em 0.4em;
-    border-radius: 0.2em;
-    background-color: #f5a61a;
-    transition: 1s;
-    cursor: pointer;
-    color: white;
-    font-weight: 700;
-  }
-  
-  input[type="file"]::-ms-browse:hover {
-    background-color: #f5a61a;
-    border: 2px solid #f5a61a;
-  }
-  
-  input[type="file"]::-webkit-file-upload-button:hover {
-    background-color: #f5a61a;
-    border: 2px solid #f5a61a;
-  }
-  
-  input[type="file"]::file-selector-button:hover {
-    background-color: #f5a61a;
-    border: 2px solid #f5a61a;
-  }
-  
-  .select:not(.is-multiple):not(.is-loading)::after {
-    border-color: lightgray;
-  }
-  
-  .alert {
-    display: flex;
-    justify-content: center;
-    font-size: 25px;
-    font-weight: 700;
-    color: white;
-    background-color: red;
-  }
-  
-  .admin-alert {
-    background-color: #f5a61a;
-  }
-  
-  .goedkeuring {
-    text-align: center;
-    text-transform: uppercase;
-    font-weight: bold;
-    margin-bottom: 0px !important;
-    color: white;
-    padding: 5px;
-  }
-  
-  .goedgekeurd {
-    background-color: #FBC418;
-  }
-  
-  .afgekeurd {
-    background-color: red;
-  }
-  
-  .afwachting {
-    background-color: grey;
-  }
-  
-  .hero.is-medium {
-    background-image: url(../static/images/banner_index.jpg);
-    background-position-y: center;
-    margin-bottom: 50px
-  }
-  
-  .hero.is-medium .hero-body {
-    padding: 12rem 4.5rem;
-  }
-  
-  .is-admin {
-    background-image: url(../static/images/banner_admin.jpg) !important;
-  }
-  
-  .medewerker-create {
-    margin-top: 150px;
-  }
-  
-  .thanks-card {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-  }
-  
-  @media screen and (min-width: 769px) {
-  .hero.is-large .hero-body {
-      padding: 10rem 6rem;
-    }
+  .errors {
+    color: red;
+    margin-top: 10px;
+    font-size: 12px;
   }
