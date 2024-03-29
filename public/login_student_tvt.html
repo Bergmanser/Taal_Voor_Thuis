@@ -79,8 +79,7 @@
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
       import { getDatabase, ref, set, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
       import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
+      
     
       // Your web app's Firebase configuration
       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -103,55 +102,50 @@
 
       // Login logic
 addEventListener("change", (e) => {
+
+async function logInStudent () {
   // Retrieve the entered username and password
-  var usernameInput = document.getElementById("email-user-login").value;
-  var passwordInput = document.getElementById("password-user-login").value;
+var usernameInput = document.getElementById("email-user-login").value;
+var passwordInput = document.getElementById("password-user-login").value;
 
-  // var usernameInput = document.getElementById("email-user-login");
-  // var passwordInput = document.getElementById("password-user-login");
+// Retrieve the email address associated with the entered username
+const usersRef = collection(database, "users");
+const userQuery = query(usersRef, where("username", "==", usernameInput));
+const userSnapshot = await getDocs(userQuery);
 
-  // Check if both input fields have valid data
-  // if (usernameInput.value && passwordInput.value) {
-  //   var username = usernameInput.value;
-  //   var password = passwordInput.value;
+if (userSnapshot.size === 1) {
+  const userDoc = userSnapshot.docs[0];
+  const email = userDoc.data().email;
 
-    // Retrieve the email address associated with the entered username
-    const usersRef = ref(database, "users/");
-    get(usersRef, (snapshot) => {
-      var snapshotValue = snapshot.value();
-      var userData = snapshotValue[username];
+  // Authenticate the user using the retrieved email address and the entered password
+  signInWithEmailAndPassword(auth, email, passwordInput)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      const date = new Date();
 
-      // Check if the entered username exists
-      if (userData) {
-        var email = userData.email;
+      // Update the last_login timestamp
+      updateDoc(doc(database, "users", user.uid), {
+        last_login: date,
+      })
+      .then(() => {
+        // Insert redirect after sign-up here!
+        alert("User logged in!");
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("Error updating last_login timestamp.");
+      });
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
 
-        // Authenticate the user using the retrieved email address and the entered password
-        signInWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            const user = userCredential.user;
-            const date = new Date();
-
-            // Update the last_login timestamp
-            update(ref(database, "users/" + user.uid), {
-              last_login: date,
-            })
-            .then(() => {
-              // Insert redirect after sign-up here!
-              alert("User logged in!");
-            })
-            .catch((error) => {
-              console.error(error);
-              alert("Error updating last_login timestamp.");
-            });
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-
-            alert(errorMessage);
-          });
-      }});
+      alert(errorMessage);
     });
+} else {
+  alert("User not found.");
+}
+}});
     </script>
 
     

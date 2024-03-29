@@ -65,8 +65,10 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-      import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+      // import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
       import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+      import { getFirestore, collection, doc, getDoc, getDocs, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
  
       const firebaseConfig = {
         apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
@@ -83,7 +85,8 @@
       const app = initializeApp(firebaseConfig);
       const analytics = getAnalytics(app);
       const auth = getAuth();
-      const database = getDatabase(app);
+      // const database = getDatabase(app);
+      const database = getFirestore(app);
 
       function getStudentCounter() {
   const parentUid = auth.currentUser.uid;
@@ -103,22 +106,16 @@
   return counter;
 }
 
-function getStudentsAmount(uid) {
-  const studentsRef = ref(database, `users/${uid}/students`);
-  return new Promise((resolve) => {
-    onValue(studentsRef, (snapshot) => {
-      const students = [];
+async function getStudentsAmount(uid) {
+  const studentsRef = doc(database, `users/${uid}`);
+  const studentDoc = await getDoc(studentsRef);
 
-      snapshot.forEach((childSnapshot) => {
-        const childData = childSnapshot.val();
-        students.push(childData.email);
-      });
-
-      resolve(students);
-    }, {
-      onlyOnce: true,
-    });
-  });
+  if (studentDoc.exists()) {
+    const students = studentDoc.data().students || [];
+    return students.length;
+  } else {
+    return 0;
+  }
 }
 
       // Add the generateUniqueEmail function
@@ -167,67 +164,59 @@ function getStudentsAmount(uid) {
   return uniqueEmail;
 }
 
-function getStudent(email) {
-  const studentsRef = ref(database, `users/`);
-  return new Promise((resolve) => {
-    onValue(studentsRef, (snapshot) => {
-      let exists = false;
-      snapshot.forEach((childSnapshot) => {
-        const childData = childSnapshot.val();
-        if (childData.email === email) {
-          exists = true;
-        }
-      });
-      resolve(exists);
-    }, {
-      onlyOnce: true,
-    });
-  });
+async function getStudent(email) {
+  const studentsRef = collection(database, "users");
+  const studentQuery = query(studentsRef, where("email", "==", email));
+  const studentSnapshot = await getDocs(studentQuery);
+
+  return studentSnapshot.size > 0;
 }
 
-onAuthStateChanged(auth, (user) => {
+
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     const uid = user.uid;
     const parentEmail = user.email;
 
-    // Counts the number of students created under the signed-in parent role
     const counter = getStudentCounter();
 
-    //Add Student under parentRole logic
     addEventListener("change", async (e) => {
       var uniqueEmail = await generateUniqueEmail(parentEmail, counter);
       var username = document.getElementById("username-student-signup").value;
       var password = document.getElementById("password-student-signup").value;
 
-      console.log(uniqueEmail)
+      console.log(uniqueEmail);
 
-      // Check if both input fields have valid data
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, uniqueEmail, password);
+        const user = userCredential.user;
 
-        createUserWithEmailAndPassword(auth, uniqueEmail, password)
-          .then((userCredential) => {
-            // Signed up
-            const user = userCredential.user;
+        // Send users info to Firestore
+        // const userRef = doc(database, "users/", user.uid);
+        const userRef = doc(database, `users/${user.uid}`);
+        await setDoc(userRef, {
+          email: uniqueEmail,
+          username: username,
+          counter: counter,
+        }, { merge: true });
 
-            // Send users info to real time database
-            set(ref(database, "users/students" + user.uid), {
-              email: uniqueEmail,
-              username: username,
-              counter: counter,
-            });
+        const studentRef = doc(database, `studentdb/${user.uid}`);
+        await setDoc(studentRef, {
+          email: uniqueEmail,
+          username: username,
+          counter: counter,
+        }, { merge: true });
 
-            // Insert redirect after sign-up here!
-            alert("Student Added!");
-            // window.location.href = "student_overview_parent_tvt.html";
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            alert(errorMessage);
-          });
+        // Insert redirect after sign-up here!
+        alert("Student Added!");
+        window.location.href = "student_overview_parent_tvt.html";
+      } catch (error) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        alert(errorMessage);
       }
-    );
+    });
   } else {
-    
     // User is signed out
     window.location.href = "login_parent_tvt.html";
   }

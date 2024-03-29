@@ -36,15 +36,51 @@
             <option value="average">Average</option>
             <option value="hard">Hard</option>
         </select>
-    </div>
-      <div id="questions"></div>
-      <button id="add-question-button">Add another question</button>
-      <div></div>
-      <label for="remove-question-id-input">Remove a question by id:</label>
-      <input type="text" id="remove-question-id-input" placeholder="Question ID" />
-      <button id="remove-question-button">Remove question</button>
-      <button type="submit">Submit</button>
-    </form>
+    
+        <div id="questions">
+            <div id="question-0" class="question">
+              <h2>Question 1</h2>
+              <div>
+                <input type="hidden" name="questions[0][id]" value="0">
+                <label for="question-0-title">Question:</label>
+                <input type="text" id="question-0-title" name="questions[0][title]" placeholder="Question" required>
+    
+                <p>Question type:</p>
+                <select id="question-0-type" name="questions[0][type]" required>
+                  <option value="">Select question type</option>
+                  <option value="single-choice">Single choice</option>
+                  <option value="multiple-choice">Multiple choice</option>
+                </select>
+    
+                <div id="question-0-options" class="question-options d-flex my-4"></div>
+    
+                <button type="button" id="add-option-button-0">Add option</button>
+    
+                <div class="correct-answer-container">
+                  <p>Correct option:</p>
+                  <input type="hidden" id="question-0-correct-answer-input" name="questions[0][correct_answer]" />
+                  <div id="question-0-correct-answer-display" class="correct-answer"></div>
+                </div>
+    
+                <button type="button" id="select-correct-option-button-0">Select correct option</button>
+    
+                <button type="button" id="remove-question-button-0">Remove question</button>
+              </div>
+            </div>
+          </div>
+    
+          <button type="button" id="add-question-button">Add question</button>
+    
+          <div class="mt-4 d-flex">
+            <div class="mr-auto">
+              <input type="text" id="remove-question-id-input" placeholder="Enter question ID">
+              <button id="remove-question-button">Remove question</button>
+            </div>
+    
+            <button type="submit">Submit quiz</button>
+          </div>
+    
+        </form>
     <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
@@ -71,27 +107,27 @@ console.log("db:", db);
 
 const quizForm = document.getElementById('quiz-form');
 const questionsContainer = document.getElementById('questions');
-document.getElementById("add-question-button").addEventListener("click", addQuestion());
+document.getElementById("add-question-button").addEventListener("click", addQuestion);
 
 
 // This code is responsible for handling the image upload related to the banner image
-const banner = document.getElementById('banner');
-banner.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            document.getElementById('banner-preview').appendChild(img);
-        };
-        reader.readAsDataURL(file);
-    } else {
-        const img = document.createElement('img');
-        img.src = 'MeerDanBijles-Logo.png';
-        document.getElementById('banner-preview').appendChild(img);
-    }
-});
+// const banner = document.getElementById('banner');
+// banner.addEventListener('change', (event) => {
+//     const file = event.target.files[0];
+//     if (file) {
+//         const reader = new FileReader();
+//         reader.onload = (e) => {
+//             const img = document.createElement('img');
+//             img.src = e.target.result;
+//             document.getElementById('banner-preview').appendChild(img);
+//         };
+//         reader.readAsDataURL(file);
+//     } else {
+//         const img = document.createElement('img');
+//         img.src = 'MeerDanBijles-Logo.png';
+//         document.getElementById('banner-preview').appendChild(img);
+//     }
+// });
 
 //Responsible for generating a GroupID for the quiz based on the selected group
 const groupIdSubject = document.getElementById('group-id-subject').value;
@@ -110,153 +146,239 @@ getDoc(groupRef).then((doc) => {
   }
 });
 
-// This code is responsible for dynamically adding new questions input fields
-quizForm.questionId = questionId;
+document.addEventListener('DOMContentLoaded', () => {
+  addQuestion();
 
-function addQuestion() {
-    let questionId = questionsContainer.children.length + 1;
-    const question = document.createElement('div');
-    question.id = `question-${questionId}`;
-    question.innerHTML = `
+  // Add an event listener to the "Add Question" button
+  document.getElementById('add-question-button').addEventListener('click', () => {
+    addQuestion();
+  });
+
+  // Add an event listener to the "Select Correct Option" button
+  document.getElementById('select-correct-option-button-0').addEventListener('click', () => {
+    selectCorrectOption(0);
+  });
+
+  // Add an event listener to the "Add Option" button
+  document.getElementById('add-option-button-0').addEventListener('click', () => {
+    addOption(0);
+  });
+
+  // Add an event listener to the "Remove Question" button
+  document.getElementById('remove-question-button-0').addEventListener('click', () => {
+    removeQuestion(0);
+  });
+
+  
+});
+
+// This code is responsible for dynamically adding new questions input fields
+let questionId = 1;
+
+// Add event listener to the "Add another question" button
+document.getElementById('add-question-button').addEventListener('click', () => {
+  addQuestion(questionId);
+  questionId++;
+});
+
+function addQuestion(questionId) {
+  const question = document.createElement('div');
+  question.id = `question-${questionId}`;
+  question.innerHTML = `
     <h2>Question ${questionId}</h2>
-    <label for="question-type">Question title</label>
-    <input type="text" id="question-text-${questionId}" placeholder="Question text" required />
+    <label for="question-title-${questionId}">Question title</label>
+    <input type="text" id="question-title-${questionId}" placeholder="Question text" required />
     <select id="question-type-${questionId}" required>
-    //     <option>Choose Question Type</option>
-    //     <option value="multiple-choice">Multiple Choice</option>
-    //     <option value="true-or-false">True or False</option>
+      <option value="multiple-choice">Multiple Choice</option>
+      <option value="true-or-false">True or False</option>
     </select>
     <div id="question-options-${questionId}"></div>
     <button type="button" id="add-option-button-${questionId}">Add Option</button>
+    <button type="button" id="select-correct-option-button-${questionId}">Select correct option</button>
+    <input type="text" id="question-correct-option-text-${questionId}" placeholder="Correct option text" required>
     <input type="text" id="question-hint-${questionId}" placeholder="Hint" required />
-    <button id="add-question-button">Add another question</button>
     <button type="button" id="remove-question-button-${questionId}">Remove Question</button>
-
   `;
-    questionsContainer.appendChild(question);
-    addOption(questionId);
-    questionId++;
 
-    // Add event listeners to the "Add Option" and "Remove Question" buttons
-    document.getElementById(`add-option-button-${questionId}`).addEventListener('click', () => {
-        addOption(questionId);
-    });
-    document.getElementById(`remove-question-button-${questionId}`).addEventListener('click', () => {
-        removeQuestion(questionId);
-    });
+  console.log(question.innerHTML);
+
+  questionsContainer.appendChild(question);
+  addOption(questionId);
+  addRemoveQuestionButton(questionId);
 }
+
+function addRemoveQuestionButton(questionId) {
+  const removeQuestionButton = document.getElementById(`remove-question-button-${questionId}`);
+  removeQuestionButton.addEventListener('click', () => {
+    removeQuestion(questionId);
+    questionId--;
+  });
+}
+
+// Add an event listener to the "Add Option" button
+document.getElementById(`add-option-button-${questionId}`).addEventListener('click', () => {
+  addOption(questionId);
+});
+
+function removeQuestion(questionId) {
+  const question = document.getElementById(`question-${questionId}`);
+  questionsContainer.removeChild(question);
+}
+
 function addOption(questionId) {
-    const question = document.getElementById(`question-${questionId}`);
-    const optionsContainer = document.getElementById(`question-options-${questionId}`);
-    const option = document.createElement('div');
-    option.innerHTML = `
+  const question = document.getElementById(`question-${questionId}`);
+  const optionsContainer = document.getElementById(`question-options-${questionId}`);
+  const option = document.createElement('div');
+  option.innerHTML = `
     <input type="text" id="question-option-text-${questionId}-0" placeholder="Option text" required />
     <input type="radio" name="question-option-correct-${questionId}" value="0" required />
   `;
-    for (let i = 1; i < 4; i++) {
-        option.innerHTML += `
+  optionsContainer.appendChild(option);
+  for (let i = 1; i < 3; i++) {
+    option.innerHTML += `
       <input type="text" id="question-option-text-${questionId}-${i}" placeholder="Option text" />
       <input type="radio" name="question-option-correct-${questionId}" value="${i}" />
     `;
+  }
+  addOptionRemoveButton(questionId);
+}
+
+function addOptionRemoveButton(questionId) {
+  const removeOptionButton = document.createElement('button');
+  removeOptionButton.textContent = 'Remove Option';
+  removeOptionButton.addEventListener('click', () => {
+    removeOption(questionId);
+  });
+  const optionsContainer = document.getElementById(`question-options-${questionId}`);
+  optionsContainer.appendChild(removeOptionButton);
+}
+
+function removeOption(questionId) {
+  const question = document.getElementById(`question-${questionId}`);
+  const optionsContainer = document.getElementById(`question-options-${questionId}`);
+  const options = optionsContainer.getElementsByTagName('div');
+  if (options.length > 1) {
+    optionsContainer.removeChild(options[options.length - 1]);
+  }
+}
+
+document.getElementById(`select-correct-option-button-${questionId}`).addEventListener('click', () => {
+  // Update the correct option radio input and text field
+  // ...
+
+  // Remove the "required" attribute from the "Select correct option" button
+  document.getElementById(`select-correct-option-button-${questionId}`).removeAttribute('required');
+});
+
+document.querySelector('form#quiz-form').addEventListener('submit', (event) => {
+  // Check if a correct option is selected for each question
+  for (const questionId of questionsAndIds) {
+    const correctOptionSelected = document.querySelector(`input[name="question-option-correct-${questionId}"]:checked`);
+    if (!correctOptionSelected) {
+      // Display an error message to the user
+      event.preventDefault();
+      document.getElementById(`select-correct-option-button-${questionId}`).setCustomValidity('Please select a correct option for this question');
+      document.getElementById(`select-correct-option-button-${questionId}`).reportValidity();
+      break;
     }
-    optionsContainer.appendChild(option);
-}
+  }
+});
 
-function removeQuestion(questionId) {
-    // Remove the question element from the DOM
-    const question = document.getElementById(`question-${questionId}`);
-    question.remove();
+// // function removeQuestion(questionId) {
+// //     // Remove the question element from the DOM
+// //     const question = document.getElementById(`question-${questionId}`);
+// //     question.remove();
 
-    // Remove the corresponding question, options, and hint from the Firestore database
-    const quizRef = db.collection('quizzes').doc(quizId);
-    const questionRef = quizRef.collection('questions').doc(`question-${questionId}`);
-    questionRef.delete().then(() => {
-        console.log(`Question ${questionId} deleted from database`);
-    }).catch((error) => {
-        console.error(`Error deleting Question ${questionId} from database: `, error);
-    });
+// //     // Remove the corresponding question, options, and hint from the Firestore database
+// //     const quizRef = db.collection('quizzes').doc(quizId);
+// //     const questionRef = quizRef.collection('questions').doc(`question-${questionId}`);
+// //     questionRef.delete().then(() => {
+// //         console.log(`Question ${questionId} deleted from database`);
+// //     }).catch((error) => {
+// //         console.error(`Error deleting Question ${questionId} from database: `, error);
+// //     });
 
-    // Remove the corresponding question, options, and hint from the `questions` and `options` arrays
-    const questionIndex = questions.findIndex(q => q.id === questionId);
-    questions.splice(questionIndex, 1);
+// //     // Remove the corresponding question, options, and hint from the `questions` and `options` arrays
+// //     const questionIndex = questions.findIndex(q => q.id === questionId);
+// //     questions.splice(questionIndex, 1);
 
-    // Remove the corresponding options from the `options` array
-    const optionsToRemove = options.filter(option => option.questionId === questionId);
-    optionsToRemove.forEach(option => {
-        const optionIndex = options.indexOf(option);
-        options.splice(optionIndex, 1);
-    });
-}
+// //     // Remove the corresponding options from the `options` array
+// //     const optionsToRemove = options.filter(option => option.questionId === questionId);
+// //     optionsToRemove.forEach(option => {
+// //         const optionIndex = options.indexOf(option);
+// //         options.splice(optionIndex, 1);
+// //     });
+// // }
      
-// Check if the user is logged in
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log('Current User Email:', user.email);
+// // Check if the user is logged in
+// onAuthStateChanged(auth, (user) => {
+//     if (user) {
+//         console.log('Current User Email:', user.email);
 
-        const quizForm = document.getElementById('quiz-form');
+//         const quizForm = document.getElementById('quiz-form');
 
-// This addEventListner is responsible for uploading the quiz data to Firestore
-quizForm.addEventListener('submit', (e) => {
-  e.preventDefault();
+// // This addEventListner is responsible for uploading the quiz data to Firestore
+// quizForm.addEventListener('submit', (e) => {
+//   e.preventDefault();
 
-  const title = document.getElementById('title');
-  const groupId = document.getElementById('group-id-subject');
-  const banner = document.getElementById('banner');
-  const quillContainer = document.getElementById('quill-container');
-  const difficulty = document.getElementById('difficulty');
+//   const title = document.getElementById('title');
+//   const groupId = document.getElementById('group-id-subject');
+//   const banner = document.getElementById('banner');
+//   const quillContainer = document.getElementById('quill-container');
+//   const difficulty = document.getElementById('difficulty');
 
-  const titleError = document.getElementById(`title-error`);
-  const groupIdError = document.getElementById(`group-id-error`);
-  const bannerError = document.getElementById(`banner-error`);
-  const quillError = document.getElementById(`quill-error`);
-  const difficultyError = document.getElementById(`difficulty-error`);
+//   const titleError = document.getElementById(`title-error`);
+//   const groupIdError = document.getElementById(`group-id-error`);
+//   const bannerError = document.getElementById(`banner-error`);
+//   const quillError = document.getElementById(`quill-error`);
+//   const difficultyError = document.getElementById(`difficulty-error`);
 
-  if (title.value.trim() === '') {
-    titleError.innerText = 'Title is required';
-  } else {
-    titleError.innerText = '';
-  }
+//   if (title.value.trim() === '') {
+//     titleError.innerText = 'Title is required';
+//   } else {
+//     titleError.innerText = '';
+//   }
 
-  if (groupId.value === '') {
-    groupIdError.innerText = 'Group ID is required';
-  } else {
-    groupIdError.innerText = '';
-  }
+//   if (groupId.value === '') {
+//     groupIdError.innerText = 'Group ID is required';
+//   } else {
+//     groupIdError.innerText = '';
+//   }
 
-  if (banner.files.length === 0) {
-    bannerError.innerText = 'Banner is required';
-  }
+//   if (banner.files.length === 0) {
+//     bannerError.innerText = 'Banner is required';
+//   }
 
-  if (quillContainer.innerHTML.trim() === '') {
-    quillError.innerText = 'Embedded text is required';
-  }
+//   if (quillContainer.innerHTML.trim() === '') {
+//     quillError.innerText = 'Embedded text is required';
+//   }
 
-  if (difficulty.value.trim() === '') {
-    difficultyError.innerText = 'Difficulty is required';
-  }
+//   if (difficulty.value.trim() === '') {
+//     difficultyError.innerText = 'Difficulty is required';
+//   }
 
-  quizForm.addEventListener('submit', (event) => {
-  event.preventDefault();
+//   quizForm.addEventListener('submit', (event) => {
+//   event.preventDefault();
 
-  if (
-    title.value.trim() !== '' &&
-    groupId.value !== '' &&
-    banner.files.length > 0 &&
-    quillContainer.innerHTML.trim() !== '' &&
-    difficulty.value.trim() !== ''
-  ) {
-    quizForm.submit();
-  } else {
-    alert('Please fill out all required fields.');
-  }
-});
-});
+//   if (
+//     title.value.trim() !== '' &&
+//     groupId.value !== '' &&
+//     banner.files.length > 0 &&
+//     quillContainer.innerHTML.trim() !== '' &&
+//     difficulty.value.trim() !== ''
+//   ) {
+//     quizForm.submit();
+//   } else {
+//     alert('Please fill out all required fields.');
+//   }
+// });
+// });
 
-    } else {
-        // Redirect the user to the 'login_parent_tvt.html' page if the user is not logged in
-        window.location.href = "login_parent_tvt.html";
-    }
-});
+//     } else {
+//         // Redirect the user to the 'login_parent_tvt.html' page if the user is not logged in
+//         window.location.href = "login_parent_tvt.html";
+//     }
+// });
 
     </script>
     <!-- <script src="quiz_creation.js"></script> -->

@@ -64,10 +64,10 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-      import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+      // import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
       import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
+      import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
     
       // Your web app's Firebase configuration
       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -86,56 +86,47 @@
       const app = initializeApp(firebaseConfig);
       const analytics = getAnalytics(app);
       const auth = getAuth();
-      const database = getDatabase(app);
+      const database = getFirestore(app);
 
       //Sign-up logic
-      addEventListener("change",(e) => {
+addEventListener("change", (e) => {
+  var emailInput = document.getElementById("email-user-signup");
+  var usernameInput = document.getElementById("email-user-signup");
+  var passwordInput = document.getElementById("password-user-signup");
 
-        var emailInput = document.getElementById("email-user-signup");
-        var usernameInput = document.getElementById("email-user-signup");
-        var passwordInput = document.getElementById("password-user-signup");
+  if (emailInput.value && passwordInput.value) {
+    var email = emailInput.value;
+    var username = usernameInput.value;
+    var password = passwordInput.value;
 
-      //   Checks if both fields are empty (unfinished) (Works in the wrong way))
-      //   addEventListener("onsubmit",(e) => {
-      //   // Check if all input fields have valid data
-      //   if (!emailInput.value || !passwordInput.value || !usernameInput.value) {
-      //   alert("One or both of the login fields are empty.");
-      //   return;
-      //   }
-      // });
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
+        // Signed up 
+        const user = userCredential.user;
 
-        // Check if both input fields have valid data
-        if (emailInput.value && passwordInput.value) {
-          var email = emailInput.value;
-          var username =usernameInput.value;
-          var password = passwordInput.value;
+        // Send users info to Firestore
+        const userRef = doc(database, "users", user.uid);
+        // const usersRef = collection(database, "users");
+        // const parentRef = doc(usersRef, "users", user.uid);
 
-        createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Signed up 
-          const user = userCredential.user;
+        await setDoc(userRef, {
+          uid: user.uid,
+          email: email,
+          username: username,
+        });
 
-          // Send users info to real time database
-          set (ref(database, "users/" + user.uid),{
-            uid: user.uid,
-            email: email,
-            username: username,
-          })
+        // Insert redirect after sign-up here!
+        alert("User Created!");
+        window.location.href = "login_parent_tvt.html";
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
 
-          // Insert redirect after sign-up here!
-          alert("User Created!");
-          window.location.href = "login_parent_tvt.html";
-          // ...
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-
-          alert(errorMessage);
-           // ..
-          });
-        
-      }});
+        alert(errorMessage);
+      });
+  }
+});
     </script>
 
     
