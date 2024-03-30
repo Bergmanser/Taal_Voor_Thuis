@@ -33,7 +33,13 @@ const db = getFirestore(app);
 console.log("db:", db);
 
 // Contains test data for 2 quizes
-const date = new Date();
+const creationDate = new Date();
+const modificationDate = new Date();
+
+// Update the modification date before saving the quiz to Firestore
+modificationDate.setSeconds(modificationDate.getSeconds() + 1);
+// newQuiz.modificationDate = modificationDate;
+
 const quizzes = [
     {
         id: 0,
@@ -43,8 +49,8 @@ const quizzes = [
         Banner: 'https://example.com/programming-banner.jpg',
         embedded_text: '<p>This quiz covers the basics of programming, including variables, data types, and control flow.</p>',
         Difficulty: 'Beginner',
-        Created_at: date,
-        Modified_at: date,
+        Created_at: creationDate,
+        Modified_at: modificationDate,
         GroupId_Subject: '1001',
         Questions: [
             {
@@ -87,8 +93,8 @@ const quizzes = [
         Banner: 'https://example.com/programming-banner.jpg',
         embedded_text: '<p>This quiz covers intermediate programming concepts, including functions, arrays, and objects.</p>',
         Difficulty: 'Intermediate',
-        Created_at: date,
-        Modified_at: date,
+        Created_at: creationDate,
+        Modified_at: modificationDate,
         GroupId_Subject: '1002',
         Questions: [
             {
