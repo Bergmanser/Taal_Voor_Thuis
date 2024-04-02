@@ -25,9 +25,10 @@
       <label for="banner">Voeg een afbeelding toe als quiz banner</label>
       <div></div>
       <input type="file" id="banner" accept="image/jpeg,image/png,image/jpg" />
-      <div></div>
-      <label for="quill-container">Voeg in deze sectie de text voor de quiz toe</label>
+      <div>
+      <label>Voeg in deze sectie de text voor de quiz toe</label>
       <div id="quill-container"></div>
+      </div>
       <label for="difficulty">Difficulty:</label>
       <div>
         <select id="difficulty" name="difficulty">
@@ -149,6 +150,27 @@ let questionId = 1;
 //   }
 // });
 
+function initializeQuestion(questionId) {
+  const addOptionButton = document.getElementById(`add-option-button-${questionId}`);
+  const selectCorrectOptionButton = document.getElementById(`select-correct-option-button-${questionId}`);
+  const correctOptionSelect = document.getElementById(`question-correct-option-select-${questionId}`);
+
+  if (addOptionButton) {
+    addOptionButton.addEventListener('click', () => {
+      addOption(questionId);
+      addOptionRemoveButton(questionId);
+    });
+  }
+
+  if (selectCorrectOptionButton) {
+    selectCorrectOptionButton.addEventListener('click', () => {
+      selectCorrectOption(questionId, correctOptionSelect);
+    });
+  }
+
+  removeQuestion(questionId);
+};
+
 // Add a question
 function addQuestion() {
   const question = document.createElement('div');
@@ -162,10 +184,10 @@ function addQuestion() {
       <option value="true-or-false">True or False</option>
     </select>
     <div id="question-options-${questionId}"></div>
+    <select id="question-correct-option-select-${questionId}" required></select>
+    <input type="text" id="question-hint-${questionId}" placeholder="Hint" required />
     <button type="button" id="add-option-button-${questionId}">Add Option</button>
     <button type="button" id="select-correct-option-button-${questionId}">Select correct option</button>
-    <input type="text" id="question-correct-option-text-${questionId}" placeholder="Correct option text" required>
-    <input type="text" id="question-hint-${questionId}" placeholder="Hint" required />
     <button type="button" id="remove-question-button-${questionId}">Remove Question</button>
   `;
 
@@ -175,32 +197,7 @@ function addQuestion() {
   initializeQuestion(questionId);
 
   questionId++;
-};
-
-// Initialize a question
-function initializeQuestion(questionId) {
-  const addOptionButton = document.getElementById(`add-option-button-${questionId}`);
-  const selectCorrectOptionButton = document.getElementById(`select-correct-option-button-${questionId}`);
-
-  addOptionButton.addEventListener('click', () => {
-    addOption(questionId);
-  });
-
-  selectCorrectOptionButton.addEventListener('click', () => {
-    selectCorrectOption(questionId);
-  });
-
-  addRemoveQuestionButton(questionId);
-};
-
-// Add a remove question button
-function addRemoveQuestionButton(questionId) {
-  const removeQuestionButton = document.getElementById(`remove-question-button-${questionId}`);
-  removeQuestionButton.addEventListener('click', () => {
-    removeQuestion(questionId);
-    questionId--;
-  });
-};
+}
 
 // Add an option
 function addOption(questionId) {
@@ -208,54 +205,98 @@ function addOption(questionId) {
   const optionsContainer = document.getElementById(`question-options-${questionId}`);
 
   const option = document.createElement('div');
+  option.className = 'option';
   option.innerHTML = `
-    <input type="text" id="question-option-text-${questionId}-0" placeholder="Option text" required />
-    <input type="radio" name="question-option-correct-${questionId}" value="0" required />
+    <input type="radio" name="question-options-${questionId}" class="question-option-input" value="${optionsContainer.children.length}" required>
+    <label for="question-option-text-${questionId}-${optionsContainer.children.length}" class="question-option-text-label">
+      <input type="text" id="question-option-text-${questionId}-${optionsContainer.children.length}" placeholder="Option text" required>
+    </label>
+    <input type="hidden" id="question-option-correct-${questionId}-${optionsContainer.children.length}" value="">
+    <button type="button" class="remove-option-button">Remove Option</button>
   `;
-
-  for (let i = 1; i < 1; i++) {
-    option.innerHTML += `
-      <input type="text" id="question-option-text-${questionId}-${i}" placeholder="Option text" />
-      <input type="radio" name="question-option-correct-${questionId}" value="${i}" />
-    `;
-  }
 
   optionsContainer.appendChild(option);
 
-  addOptionRemoveButton(questionId);
-};
-
-// Add a remove option button
-function addOptionRemoveButton(questionId) {
-  const removeOptionButton = document.createElement('button');
-  removeOptionButton.textContent = 'Remove Option';
+  const removeOptionButton = option.querySelector('.remove-option-button');
   removeOptionButton.addEventListener('click', () => {
-    removeOption(questionId);
+    removeOption(questionId, option);
   });
 
-  const optionsContainer = document.getElementById(`question-options-${questionId}`);
-  optionsContainer.appendChild(removeOptionButton);
-};
+  const correctOptionSelect = question.querySelector(`select#question-correct-option-select-${questionId}`);
+  const correctOptionIndex = Array.from(questionOptions).findIndex(option => option.value === `${optionsContainer.children.length}`);
+
+  if (correctOptionIndex !== -1) {
+    correctOptionSelect.selectedIndex = correctOptionIndex;
+  }
+}
+
+// // Add a remove option button
+// function addOptionRemoveButton(questionId) {
+//   const removeOptionButton = document.createElement('button');
+//   removeOptionButton.textContent = 'Remove Option';
+//   removeOptionButton.addEventListener('click', () => {
+//     removeOption(questionId);
+//   });
+
+//   const optionsContainer = document.getElementById(`question-options-${questionId}`);
+//   optionsContainer.appendChild(removeOptionButton);
+// };
+
+// // Remove an option
+// function removeOption(questionId) {
+//   const question = document.getElementById(`question-${questionId}`);
+//   const optionsContainer = document.getElementById(`question-options-${questionId}`);
+
+//   if (optionsContainer.children.length > 1) {
+//     optionsContainer.removeChild(optionsContainer.lastChild);
+//   }
+// };
 
 // Remove an option
-function removeOption(questionId) {
+function removeOption(questionId, option) {
   const question = document.getElementById(`question-${questionId}`);
   const optionsContainer = document.getElementById(`question-options-${questionId}`);
+  const correctOptionContainer = document.getElementById(`question-correct-option-container-${questionId}`);
+  const correctOptionSelect = correctOptionContainer.querySelector(`select[id="question-correct-option-${questionId}"]`);
 
-  if (optionsContainer.children.length > 1) {
-    optionsContainer.removeChild(optionsContainer.lastChild);
+  if (optionsContainer.contains(option)) {
+    optionsContainer.removeChild(option);
+
+    const correctOptionIndex = Array.from(correctOptionSelect.options).findIndex(option => option.value === `${option.querySelector('input[type="radio"]').value}`);
+
+    if (correctOptionIndex !== -1) {
+      correctOptionSelect.selectedIndex = correctOptionIndex;
+    }
+
+    const lastOption = optionsContainer.lastChild;
+
+    if (lastOption) {
+      lastOption.querySelector('input[type="radio"]').value = optionsContainer.children.length;
+    }
   }
 };
 
 // Select a correct option
 function selectCorrectOption(questionId) {
-  // Update the correct option radio input and text field
+  const correctOptionSelect = document.getElementById(`question-correct-option-select-${questionId}`);
+  const questionOptions = document.getElementsByName(`question-options-${questionId}`);
+
+  for (const option of questionOptions) {
+    if (option.checked) {
+      const correctOptionText = option.nextElementSibling;
+      correctOptionSelect.value = option.value;
+      correctOptionText.value = option.value;
+      break;
+    }
+  }
 }
 
 // Remove a question
 function removeQuestion(questionId) {
   const question = document.getElementById(`question-${questionId}`);
-  questionsContainer.removeChild(question);
+  if (question) {
+    questionsContainer.removeChild(question);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
