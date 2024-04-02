@@ -9,6 +9,8 @@
 }
 
 body {
+  background-image: url("../images/temp-background.jpeg");
+  background-size: contain;
   height: 100vh;
   display: grid;
   place-items: center;

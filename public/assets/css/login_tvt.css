@@ -12,8 +12,8 @@ body {
   height: 100vh;
   display: grid;
   place-items: center;
-  /* background-image: url("../images/temp-background.jpeg");
-  background-size: contain; */
+  background-image: url("../images/temp-background.jpeg");
+  background-size: contain;
   background-color: #f1f1f1;
   font-weight: 300;
   padding: 0 24px;
