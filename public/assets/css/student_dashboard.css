@@ -1,3 +1,27 @@
+/* CSS sources:
+https://personal-portfolio.freecodecamp.rocks */
+
+/* Custom properties/variables  */
+:root {
+  --main-white: #f0f0f0;
+  --main-red: #be3144;
+  --main-blue: #45567d;
+  --main-gray: #303841;
+}
+
+/* Base reset */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* box-sizing and font sizing */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -6,18 +30,69 @@ body {
     padding: 0;
   }
   
-  header {
+  /* header {
     background-color: #4CAF50;
     padding: 1rem;
     text-align: center;
     color: white;
-  }
+  } */
   
   main {
     padding: 2rem;
   }
   
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+ul {
+  list-style: none;
+}
+
+/* nav */
+
+.nav {
+  display: flex;
+  justify-content: flex-end;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: var(--main-red);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.nav-list {
+  display: flex;
+  margin-right: 2rem;
+}
+
+@media (max-width: 28.75em) {
+  .nav {
+    justify-content: center;
+  }
+
+  .nav-list {
+    margin: 0 1rem;
+  }
+}
+
+.nav-list a {
+  display: block;
+  font-size: 1.2rem;
+  padding: 2rem;
+  color: var(--main-white);
+}
+
+.nav-list a:hover {
+  background: var(--main-blue);
+}
+
+
   .hero {
+    margin-top: 2rem;
     background-color: #4CAF50;
     color: white;
     padding: 2rem;
@@ -32,6 +107,7 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     overflow: hidden;
+    background-color: #cdcdcd;
   }
   
   .card-img-top {

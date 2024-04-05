@@ -25,34 +25,48 @@ const quizzesCollection = collection(db, "quizzes");
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log('Current User Email:', user.email);
-        async function fetchQuizzes() {
-            const querySnapshot = await getDocs(collection(db, "quizzes"));
-            let cards = "";
-            querySnapshot.forEach((doc) => {
-                console.log("Document data:", doc.data())
-                const quizData = doc.data();
-                cards += `
-              <div class="card">
-                <img class="card-img-top" src="${quizData.Banner}" alt="Quiz banner">
-                <div class="card-body">
-                  <h5 class="card-title">${quizData.Title}</h5>
-                  <p class="card-text">Score: <span id="quiz-score-${doc.id}">Hidden</span></p>
-                  <a href="#" class="btn btn-primary" onclick="redirectToQuiz('${doc.id}')">Start Quiz</a>
-                </div>
-              </div>
-            `;
-            });
-            document.getElementById("quizzes").innerHTML = cards;
-        }
-
-        function redirectToQuiz(quizId) {
-            // Redirect to the individual quiz page
-            //   window.location.href = `/quiz/${quizId}`;
-        }
-
-        fetchQuizzes();
+        fetchQuizzes(); // Call fetchQuizzes function
     } else {
         // Redirect the user to the 'login_student_tvt.html'
         window.location.href = "login_student_tvt.html";
     }
 });
+
+async function fetchQuizzes() {
+    const querySnapshot = await getDocs(collection(db, "quizzes"));
+    let cards = "";
+    querySnapshot.forEach((doc) => {
+        console.log("Document data:", doc.data())
+        const quizData = doc.data();
+        cards += `
+            <div class="card">
+                <img class="card-img-top" src="${quizData.Banner}" alt="Quiz banner">
+                <div class="card-body">
+                    <h5 class="card-title">${quizData.Title}</h5>
+                    <p class="card-text">Score: <span id="quiz-score-${doc.id}">Hidden</span></p>
+                    <button class="btn btn-primary card-btn" data-quiz-id="${doc.id}">Start Quiz</button>
+                </div>
+            </div>
+        `;
+    });
+
+    // Render quiz cards to the DOM
+    document.getElementById("quizzes").innerHTML = cards;
+
+    // Attach event listeners to quiz buttons
+    const quizButtons = document.querySelectorAll(".card-btn");
+    console.log("Number of quiz buttons:", quizButtons.length);
+    quizButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const quizId = button.dataset.quizId;
+            console.log("Quiz ID:", quizId);
+            redirectToQuiz(quizId);
+        });
+    });
+}
+
+function redirectToQuiz(quizId) {
+    // Redirect to the individual quiz page
+    window.location.href = `quiz.html?id=${quizId}`;
+}
+

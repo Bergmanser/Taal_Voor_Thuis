@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");
 
+
 * {
   margin: 0;
   padding: 0;
@@ -11,7 +12,19 @@ input {
   font-family: "Poppins", sans-serif;
 }
 
-.container {
+.nav {
+  display: flex;
+  justify-content: flex-end;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: var(--main-red);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  }
+
+/* .container {
   position: relative;
   width: 100%;
   background-color: #fff;
@@ -100,7 +113,7 @@ form.sign-in-form {
 .input-field input::placeholder {
   color: #aaa;
   font-weight: 500;
-}
+} */
 
 /* .social-text {
   padding: 0.7rem 0;

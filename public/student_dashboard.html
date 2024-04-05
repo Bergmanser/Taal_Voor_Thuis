@@ -8,6 +8,20 @@
       </head>
   <body>
     <header>
+      <nav id="navbar" class="nav">
+        <ul class="nav-list">
+          <li>
+            <a href="#welcome-section">About</a>
+          </li>
+          <li>
+            <a href="#projects">Work</a>
+          </li>
+          <li>
+            <a href="#contact">Contact</a>
+          </li>
+        </ul>
+      </nav>
+
         <h1>Quiz Site</h1>
       </header>
       <main>
@@ -21,7 +35,7 @@
                 <div class="card-body">
                   <h5 class="card-title">Quiz Title</h5>
                   <p class="card-text">Score: <span class="quiz-score">Hidden</span></p>
-                  <a href="individual-quiz-page-url" class="btn btn-primary">Start Quiz</a>
+                  <button id="card-btn" class="btn btn-primary" data-quiz-id="${doc.id}">Start Quiz</button>
                 </div>
               </div>
         </section>
