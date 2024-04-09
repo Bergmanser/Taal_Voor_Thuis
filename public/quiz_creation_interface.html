@@ -6,15 +6,15 @@
     <link rel="stylesheet" href="./assets/css/quiz_creation_interface.css"/>
   </head>
   <body>
-    <h1>Create a Quiz</h1>
+    <h1>Maak een quiz aan</h1>
     
     <form id="quiz-form">
-    <label for="title">Quiz tiltle</label>
+    <label for="title">Vul hier de titel van de toets in</label>
       <input type="text" id="title" name="title" placeholder="Title" required />
       <div>
-        <label for="group-id-subject">Group ID/Subject:</label>
+        <label for="group-id-subject">Selecteer het niveau van de groep</label>
         <select id="group-id-subject">
-          <option value="">Selecteer groep id</option>
+          <option value="">Selecteer een groep niveau bij deze toets</option>
           <option value="3000">3000</option>
           <option value="4000">4000</option>
           <option value="5000">5000</option>
@@ -23,16 +23,28 @@
           <option value="8000">8000</option>
         </select>
       </div>
-      <label for="banner">Voeg een afbeelding toe als quiz banner</label>
+      <label for="banner">Upload een afbeelding om te gebruiken de banner van deze toets</label>
       <div></div>
       <input type="file" id="banner" accept="image/jpeg,image/png,image/jpg" />
       <div></div>
-      <label>Voeg in deze sectie de text voor de quiz toe</label>
+      <label>Voeg hier de bijhoren toets tekst toe</label>
       <div id="quill-container"></div>
-      <label for="difficulty">Difficulty:</label>
+      <label for="quiz-type">Selecteer de type van de toets</label>
+      <div>
+        <select id="quiz-type" name="quiz-type">
+          <option value="">Select the type of test</option>
+          <option value="Tekstbegrip">Tekstbegrip</option>
+          <option value="Woordenschat">Woordenschat</option>
+          <option value="Samenvatten">Samenvatten</option>
+          <option value="Verwijswoorden&Signaalwoorden">Verwijs- en signaalwoorden</option>
+          <option value="Grammatica">Grammatica</option>
+          <option value="Anders">Anders</option>
+      </select>
+      </div>
+      <label for="difficulty">Selecteer een moeilijkheidsgraad bij deze toets:</label>
       <div>
         <select id="difficulty" name="difficulty">
-            <option value="">Select difficulty</option>
+            <option value="">Select a difficulty</option>
             <option value="easy">Easy</option>
             <option value="average">Average</option>
             <option value="hard">Hard</option>
@@ -67,17 +79,17 @@
     
                 <button type="button" id="remove-question-button-0">Remove question</button>
               </div> -->
-              <button id="add-option-button-">Add Option</button>
+              <!-- <button id="add-option-button-">Add Option</button> -->
             </div>
           </div>
     
           <button type="button" id="add-question-button">Add question</button>
     
           <div class="mt-4 d-flex">
-            <div class="mr-auto">
+            <!-- <div class="mr-auto">
               <input type="text" id="remove-question-id-input" placeholder="Enter question ID">
               <button id="remove-question-button">Remove question</button>
-            </div>
+            </div> -->
     
             <button type="submit">Submit quiz</button>
           </div>

@@ -26,6 +26,32 @@ const questionsContainer = document.getElementById('questions');
 // This code is responsible for dynamically adding new questions input fields
 let questionId = 1;
 
+// Check if the user is logged in
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log('Current User Email:', user.email);
+
+    } else {
+        // Redirect the user to the 'login_parent_tvt.html' page if the user is not logged in
+        window.location.href = "login_parent_tvt.html";
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    addQuestion();
+
+    // Add an event listener to the "Add Question" button
+    document.getElementById('add-question-button').addEventListener('click', () => {
+        addQuestion();
+    });
+
+    // Add event listeners for the existing questions
+    for (let i = 0; i < 2; i++) {
+        initializeQuestion(i);
+    }
+});
+
+
 // This code is responsible for handling the image upload related to the banner image
 // const banner = document.getElementById('banner');
 // banner.addEventListener('change', (event) => {
@@ -67,257 +93,315 @@ function addQuestion() {
     const question = document.createElement('div');
     question.id = `question-${questionId}`;
     question.innerHTML = `
-    <h2>Question ${questionId}</h2>
-    <label for="question-title-${questionId}">Question title</label>
-    <input type="text" id="question-title-${questionId}" placeholder="Question text" required />
-    <select id="question-type-${questionId}" required>
-      <option value="multiple-choice">Multiple Choice</option>
-      <option value="true-or-false">True or False</option>
-    </select>
-    <div id="question-options-${questionId}"></div>
-    <button type="button" id="add-option-button-${questionId}">Add Option</button>
-    <button type="button" id="select-correct-option-button-${questionId}">Select correct option</button>
-    <input type="text" id="question-correct-option-text-${questionId}" placeholder="Correct option text" required>
-    <input type="text" id="question-hint-${questionId}" placeholder="Hint" required />
-    <button type="button" id="remove-question-button-${questionId}">Remove Question</button>
-  `;
+        <h2>Question ${questionId}</h2>
+        <label for="question-title-${questionId}">Question title</label>
+        <input type="text" id="question-title-${questionId}" placeholder="Question ${questionId} text" required />
+        <div id="question-options-${questionId}"></div>
+        <select id="correct-option-dropdown-${questionId}">
+            <option value="" disabled selected>Select correct option</option>
+        </select>
+        <button type="button" id="add-option-button-${questionId}">Add Option</button>
+        <input type="text" id="question-hint-${questionId}" placeholder="The hint for ${questionId}" required />
+        <button type="button" id="remove-question-button-${questionId}">Remove Question</button>
+    `;
 
     questionsContainer.appendChild(question);
 
-    // Initialize the question
-    initializeQuestion(questionId);
+    // Initialize the question only if it's not the first one
+    if (questionId !== 1) {
+        initializeQuestion(questionId);
+    }
+
+    console.log(`Question ${questionId} added.`);
 
     questionId++;
 };
 
+
 // Initialize a question
 function initializeQuestion(questionId) {
+    console.log(`Initializing question ${questionId}`);
     const addOptionButton = document.getElementById(`add-option-button-${questionId}`);
-    const selectCorrectOptionButton = document.getElementById(`select-correct-option-button-${questionId}`);
-    const correctOptionSelect = document.getElementById(`question-correct-option-select-${questionId}`);
-
     if (addOptionButton) {
         addOptionButton.addEventListener('click', () => {
             addOption(questionId);
-            addOptionRemoveButton(questionId);
         });
     }
 
-    if (selectCorrectOptionButton) {
-        selectCorrectOptionButton.addEventListener('click', () => {
-            selectCorrectOption(questionId, correctOptionSelect);
-        });
-    }
-
-    // Call addRemoveQuestionButton after the remove-question-button-${questionId} element has been created
-    addRemoveQuestionButton(questionId);
-};
-
-// Add a remove question button
-function addRemoveQuestionButton(questionId) {
     const removeQuestionButton = document.getElementById(`remove-question-button-${questionId}`);
     if (removeQuestionButton) {
         removeQuestionButton.addEventListener('click', () => {
             removeQuestion(questionId);
-            questionId--;
         });
-    };
-};
-
-// Add an option
-function addOption(questionId) {
-    const question = document.getElementById(`question-${questionId}`);
-    const optionsContainer = document.getElementById(`question-options-${questionId}`);
-
-    const option = document.createElement('div');
-    option.innerHTML = `
-    <input type="text" id="question-option-text-${questionId}-0" placeholder="Option text" required />
-    <input type="radio" name="question-option-correct-${questionId}" value="0" required />
-  `;
-
-    for (let i = 1; i < 1; i++) {
-        option.innerHTML += `
-      <input type="text" id="question-option-text-${questionId}-${i}" placeholder="Option text" />
-      <input type="radio" name="question-option-correct-${questionId}" value="${i}" />
-    `;
-    }
-
-    optionsContainer.appendChild(option);
-
-    addOptionRemoveButton(questionId);
-};
-
-// Add a remove option button
-function addOptionRemoveButton(questionId) {
-    const removeOptionButton = document.createElement('button');
-    removeOptionButton.textContent = 'Remove Option';
-    removeOptionButton.addEventListener('click', () => {
-        removeOption(questionId);
-    });
-
-    const optionsContainer = document.getElementById(`question-options-${questionId}`);
-    optionsContainer.appendChild(removeOptionButton);
-};
-
-// Remove an option
-function removeOption(questionId) {
-    const question = document.getElementById(`question-${questionId}`);
-    const optionsContainer = document.getElementById(`question-options-${questionId}`);
-
-    if (optionsContainer.children.length > 1) {
-        optionsContainer.removeChild(optionsContainer.lastChild);
     }
 };
 
-// Select a correct option
-function selectCorrectOption(questionId) {
-    // Update the correct option radio input and text field
-}
 
 // Remove a question
 function removeQuestion(questionId) {
     const question = document.getElementById(`question-${questionId}`);
-    questionsContainer.removeChild(question);
+    if (question) {
+        questionsContainer.removeChild(question);
+
+        // Update the ID and title of the remaining questions
+        for (let i = questionId + 1; i < questionsContainer.children.length + 1; i++) {
+            const remainingQuestion = document.getElementById(`question-${i}`);
+            if (remainingQuestion) {
+                remainingQuestion.id = `question-${i - 1}`;
+
+                // Update the title input
+                const titleInput = remainingQuestion.querySelector(`#question-title-${i}`);
+                if (titleInput) {
+                    titleInput.id = `question-title-${i - 1}`;
+                    titleInput.name = `questions[${i - 1}].title`;
+                    titleInput.placeholder = `Question ${i - 1} text`;
+                    titleInput.value = ""; // Clear the value of the title input
+                    console.log(`Updated title input with ID: question-title-${i - 1}`);
+                }
+
+                // Update the remove button ID
+                const removeButton = remainingQuestion.querySelector(`#remove-question-button-${i}`);
+                if (removeButton) {
+                    removeButton.id = `remove-question-button-${i - 1}`;
+                    console.log(`Updated remove button with ID: remove-question-button-${i - 1}`);
+                }
+            }
+        }
+
+        console.log(`Question ${questionId} removed.`);
+    } else {
+        console.log(`Question ${questionId} does not exist.`);
+    }
+
+    // Log the current IDs of the questions
+    console.log("Current IDs of questions:");
+    for (let i = 0; i < questionsContainer.children.length; i++) {
+        console.log(`Question ${i + 1}: ${questionsContainer.children[i].id}`);
+    }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    addQuestion();
+// Add an option
+function addOption(questionId) {
+    const optionsContainer = document.getElementById(`question-options-${questionId}`);
 
-    // Add an event listener to the "Add Question" button
-    document.getElementById('add-question-button').addEventListener('click', () => {
-        addQuestion();
+    // Create a section for the option
+    const optionSection = document.createElement('div');
+    optionSection.classList.add('option-section');
+
+    // Create an input field for the option text
+    const optionInput = document.createElement('input');
+    optionInput.type = 'text';
+    optionInput.placeholder = 'Option text';
+    optionInput.required = true;
+
+    // Create a remove button for the option section
+    const removeOptionButton = document.createElement('button');
+    removeOptionButton.textContent = 'Remove Option';
+    removeOptionButton.addEventListener('click', () => {
+        removeOption(optionSection);
     });
 
-    // Add event listeners for the existing questions
-    for (let i = 0; i < 2; i++) {
-        initializeQuestion(i);
-    }
-});
+    // Append input field and remove button to the option section
+    optionSection.appendChild(optionInput);
+    optionSection.appendChild(removeOptionButton);
 
+    // Append the option section to the options container
+    optionsContainer.appendChild(optionSection);
 
+    // Populate the correct option dropdown
+    populateCorrectOptionDropdown(questionId);
 
-// Check if the user is logged in
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log('Current User Email:', user.email);
+    // Initialize the correct option dropdown
+    initializeCorrectOptionDropdown(questionId);
+};
 
-        const quizForm = document.getElementById('quiz-form');
-
-        // This addEventListener is responsible for uploading the quiz data to Firestore
-        quizForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const title = document.getElementById('title');
-            const groupId = document.getElementById('group-id-subject');
-            const banner = document.getElementById('banner');
-            const quillContainer = document.getElementById('quill-container');
-            const difficulty = document.getElementById('difficulty');
-
-            const titleError = document.getElementById(`title-error`);
-            const groupIdError = document.getElementById(`group-id-error`);
-            const bannerError = document.getElementById(`banner-error`);
-            const quillError = document.getElementById(`quill-error`);
-            const difficultyError = document.getElementById(`difficulty-error`);
-
-            if (title.value.trim() === '') {
-                titleError.innerText = 'Title is required';
-            } else {
-                titleError.innerText = '';
-            }
-
-            if (groupId.value === '') {
-                groupIdError.innerText = 'Group ID is required';
-            } else {
-                groupIdError.innerText = '';
-            }
-
-            if (banner.files.length === 0) {
-                bannerError.innerText = 'Banner is required';
-            }
-
-            if (quillContainer.innerHTML.trim() === '') {
-                quillError.innerText = 'Embedded text is required';
-            }
-
-            if (difficulty.value.trim() === '') {
-                difficultyError.innerText = 'Difficulty is required';
-            }
-
-            if (
-                title.value.trim() !== '' &&
-                groupId.value !== '' &&
-                banner.files.length > 0 &&
-                quillContainer.innerHTML.trim() !== '' &&
-                difficulty.value.trim() !== ''
-            ) {
-                // Collect question data
-                const questionsData = [];
-                for (const questionId of questionsAndIds) {
-                    const correctOptionSelected = document.querySelector(`input[name="question-option-correct-${questionId}"]:checked`);
-                    if (!correctOptionSelected) {
-                        // Display an error message to the user
-                        document.getElementById(`select-correct-option-button-${questionId}`).setCustomValidity('Please select a correct option for this question');
-                        document.getElementById(`select-correct-option-button-${questionId}`).reportValidity();
-                        return;
-                    }
-
-                    const questionTitle = document.getElementById(`question-title-${questionId}`).value;
-                    const questionType = document.getElementById(`question-type-${questionId}`).value;
-                    const correctOptionText = document.getElementById(`question-correct-option-text-${questionId}`).value;
-                    const correctOptionIndex = Array.from(document.getElementsByName(`question-option-correct-${questionId}`)).findIndex(option => option.checked);
-
-                    const questionOptions = [];
-                    for (let i = 0; i < 3; i++) {
-                        const optionInput = document.getElementById(`question-option-text-${questionId}-${i}`);
-                        const isCorrect = i === correctOptionIndex;
-                        if (optionInput) {
-                            questionOptions.push({
-                                text: optionInput.value,
-                                isCorrect
-                            });
-                        }
-                    }
-
-                    questionsData.push({
-                        title: questionTitle,
-                        type: questionType,
-                        options: questionOptions,
-                        correctOption: {
-                            text: correctOptionText,
-                            index: correctOptionIndex
-                        }
-                    });
-                };
-
-                const creationDate = new Date();
-                const modificationDate = new Date();
-
-                // Update the modification date before saving the quiz to Firestore
-                modificationDate.setSeconds(modificationDate.getSeconds() + 1); newQuiz.modificationDate = modificationDate;
-
-                // Create a new quiz object
-                const newQuiz = {
-                    title: title.value,
-                    groupId: groupId.value,
-                    banner: banner.files[0],
-                    quillContainer: quillContainer.innerHTML,
-                    difficulty: difficulty.value,
-                    questions: questionsData,
-                    creationDate,
-                    modificationDate
-                };
-
-                // Save the new quiz to Firestore
-                saveQuizToFirestore(newQuiz);
-
-            } else {
-                alert('Please fill out all required fields.');
+// Populate the correct option dropdown
+function populateCorrectOptionDropdown(questionId) {
+    const correctOptionDropdown = document.getElementById(`correct-option-dropdown-${questionId}`);
+    if (correctOptionDropdown) {
+        const optionsContainer = document.getElementById(`question-options-${questionId}`);
+        correctOptionDropdown.innerHTML = `
+            <option value="" disabled selected>Select correct option</option>
+        `;
+        optionsContainer.querySelectorAll('input[type="text"]').forEach((input, index) => {
+            const optionText = input.value.trim();
+            if (optionText) {
+                const option = document.createElement('option');
+                option.text = optionText;
+                option.value = index;
+                correctOptionDropdown.appendChild(option);
             }
         });
+    }
+}
+
+// Initialize the correct option dropdown
+function initializeCorrectOptionDropdown(questionId) {
+    populateCorrectOptionDropdown(questionId);
+
+    const optionsContainer = document.getElementById(`question-options-${questionId}`);
+    if (optionsContainer) {
+        optionsContainer.addEventListener('input', () => {
+            populateCorrectOptionDropdown(questionId);
+        });
+    }
+
+    const correctOptionDropdown = document.getElementById(`correct-option-dropdown-${questionId}`);
+    if (correctOptionDropdown) {
+        correctOptionDropdown.addEventListener('change', () => {
+            const selectedOptionIndex = correctOptionDropdown.value;
+            console.log(`Question ${questionId}: Correct option selected: ${selectedOptionIndex}`);
+            // Save the selected option as the correct option for the question
+        });
+    }
+}
+
+// This addEventListener is responsible for uploading the quiz data to Firestore
+quizForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById('title');
+    const groupId = document.getElementById('group-id-subject');
+    const banner = document.getElementById('banner');
+    const quillContainer = document.getElementById('quill-container');
+    const difficulty = document.getElementById('difficulty');
+
+    const titleError = document.getElementById(`title-error`);
+    const groupIdError = document.getElementById(`group-id-error`);
+    const bannerError = document.getElementById(`banner-error`);
+    const quillError = document.getElementById(`quill-error`);
+    const difficultyError = document.getElementById(`difficulty-error`);
+
+    if (title.value.trim() === '') {
+        titleError.innerText = 'Title is required';
+    } else {
+        titleError.innerText = '';
+    }
+
+    if (groupId.value === '') {
+        groupIdError.innerText = 'Group ID is required';
+    } else {
+        groupIdError.innerText = '';
+    }
+
+    if (banner.files.length === 0) {
+        bannerError.innerText = 'Banner is required';
+    }
+
+    if (quillContainer.innerHTML.trim() === '') {
+        quillError.innerText = 'Embedded text is required';
+    }
+
+    if (difficulty.value.trim() === '') {
+        difficultyError.innerText = 'Difficulty is required';
+    }
+
+    // Check if all option fields are filled
+    const optionInputs = document.querySelectorAll('input[type="text"][id^="question-option-text"]');
+    let allOptionsFilled = true;
+    optionInputs.forEach(input => {
+        if (input.value.trim() === '') {
+            allOptionsFilled = false;
+        }
+    });
+
+    if (!allOptionsFilled) {
+        alert('Please fill out all option fields.');
+        return;
+    }
+
+    // Check if all question titles are filled
+    const questionTitleInputs = document.querySelectorAll('input[type="text"][id^="question-title"]');
+    let allTitlesFilled = true;
+    questionTitleInputs.forEach(input => {
+        if (input.value.trim() === '') {
+            allTitlesFilled = false;
+        }
+    });
+
+    if (!allTitlesFilled) {
+        alert('Please fill out all question titles.');
+        return;
+    }
+
+    // Check if a correct option is selected for each question
+    const allCorrectOptionsSelected = Array.from(document.querySelectorAll('[id^="question-option-correct-"]')).every(correctOption => correctOption.checked);
+    if (!allCorrectOptionsSelected) {
+        alert('Please select a correct option for each question.');
+        return;
+    }
+
+    // Collect question data
+    const questionsData = [];
+    for (const questionId of questionsAndIds) {
+        // Extract hint field value
+        const hint = document.getElementById(`question-hint-${questionId}`).value;
+
+        // Extract question title
+        const questionTitle = document.getElementById(`question-title-${questionId}`).value;
+
+        // Extract question type
+        const questionType = document.getElementById(`question-type-${questionId}`).value;
+
+        // Extract correct option text
+        const correctOptionText = document.getElementById(`question-correct-option-text-${questionId}`).value;
+
+        // Extract options
+        const options = [];
+        const optionInputs = document.querySelectorAll(`#question-options-${questionId} input[type="text"]`);
+        optionInputs.forEach((input, index) => {
+            options.push({
+                text: input.value,
+                isCorrect: index === parseInt(correctOptionText)  // Assuming correctOptionText contains the index of the correct option
+            });
+        });
+
+        // Construct question data object
+        const questionData = {
+            title: questionTitle,
+            type: questionType,
+            options: options,
+            correctOption: {
+                text: correctOptionText,
+                index: parseInt(correctOptionText)  // Assuming correctOptionText contains the index of the correct option
+            },
+            hint: hint
+        };
+
+        // Push question data to the array
+        questionsData.push(questionData);
+    }
+
+    if (
+        title.value.trim() !== '' &&
+        groupId.value !== '' &&
+        banner.files.length > 0 &&
+        quillContainer.innerHTML.trim() !== '' &&
+        difficulty.value.trim() !== ''
+    ) {
+        const creationDate = new Date();
+        const modificationDate = new Date();
+
+        // Update the modification date before saving the quiz to Firestore
+        modificationDate.setSeconds(modificationDate.getSeconds() + 1); newQuiz.modificationDate = modificationDate;
+
+        // Create a new quiz object
+        const newQuiz = {
+            title: title.value,
+            groupId: groupId.value,
+            banner: banner.files[0],
+            quillContainer: quillContainer.innerHTML,
+            difficulty: difficulty.value,
+            questions: questionsData,
+            creationDate,
+            modificationDate
+        };
+
+        // Save the new quiz to Firestore
+        saveQuizToFirestore(newQuiz);
 
     } else {
-        // Redirect the user to the 'login_parent_tvt.html' page if the user is not logged in
-        window.location.href = "login_parent_tvt.html";
+        alert('Please fill out all required fields.');
     }
 });
 

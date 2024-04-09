@@ -40,7 +40,7 @@ const quizzes = [
         Difficulty: 'Beginner',
         Created_at: creationDate,
         Modified_at: modificationDate,
-        GroupId_Subject: '1001',
+        GroupId_Subject: 'Reading Exersise',
         Questions: [
             {
                 QuestionId: '1',
@@ -84,7 +84,7 @@ const quizzes = [
         Difficulty: 'Intermediate',
         Created_at: creationDate,
         Modified_at: modificationDate,
-        GroupId_Subject: '1002',
+        GroupId_Subject: 'Reading Exersise',
         Questions: [
             {
                 QuestionId: 1,

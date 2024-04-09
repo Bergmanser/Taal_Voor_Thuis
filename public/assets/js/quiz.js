@@ -40,6 +40,7 @@ const quizDocSnap = await getDoc(quizDocRef);
 
 if (!quizDocSnap.exists()) {
     console.log("No such document!");
+    window.location.href = "student_dashboard.html";
 } else {
     console.log("Document data:", quizDocSnap.data());
     const quizData = quizDocSnap.data();
