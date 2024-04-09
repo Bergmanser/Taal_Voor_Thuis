@@ -20,76 +20,58 @@ const analytics = getAnalytics(app);
 const auth = getAuth();
 const db = getFirestore(app);
 
-// Define a function to initialize the page
-function initializePage() {
-    // Check if the user is logged in
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log('Current User Email:', user.email);
+// Check if the user is logged in
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log('Current User Email:', user.email);
 
-            // Get a reference to the "child-users-table" element
-            const tableBody = document.getElementById('child-users-table').getElementsByTagName('tbody')[0];
 
-            // Define a function to fetch child users based on the parent user's email
-            function getChildUsers(parentEmail) {
-                // Extract the base email from the parent email
-                const baseEmail = parentEmail.split('+')[0];
+        // Get a reference to the "child-users-table" element
+        const tableBody = document.getElementById('child-users-table').getElementsByTagName('tbody')[0];
 
-                // Create a regex pattern for the parent email with a + and any number
-                const parentEmailWithPlus = `${baseEmail}+*`;
+        // Define a function to fetch child users based on the parent user's email
+        function getChildUsers(parentEmail) {
+            // Extract the base email from the parent email
+            const baseEmail = parentEmail.split('+')[0];
 
-                // Query the "studentdb" collection for documents where the email field matches the parentEmailWithPlus regex pattern
-                return db.collection('studentdb')
-                    .where('email', 'regex', parentEmailWithPlus)
-                    .get()
-                    .then((querySnapshot) => {
-                        const childUsers = [];
-                        querySnapshot.forEach((doc) => {
-                            childUsers.push({ id: doc.id, ...doc.data() });
-                        });
-                        return childUsers;
-                    })
-                    .catch((error) => {
-                        console.error('Error getting child users:', error);
-                        return [];
+            // Create a regex pattern for the parent email with a + and any number
+            const parentEmailWithPlus = `${baseEmail}+*`;
+
+            // Query the "studentdb" collection for documents where the email field matches the parentEmailWithPlus regex pattern
+            return db.collection('studentdb')
+                .where('email', 'regex', parentEmailWithPlus)
+                .get()
+                .then((querySnapshot) => {
+                    const childUsers = [];
+                    querySnapshot.forEach((doc) => {
+                        childUsers.push({ id: doc.id, ...doc.data() });
                     });
-            }
-
-            // Fetch child users based on the parent user's email
-            getChildUsers(user.email).then((childUsers) => {
-                // Log the number of child users
-                console.log("Number of child users:", childUsers.length);
-
-                // Render the child users in the table
-                let childUsersHtml = '';
-                childUsers.forEach((childUser) => {
-                    childUsersHtml += `<tr>
-                                            <td>${childUser.username}</td>
-                                            <td>${childUser.email}</td>
-                                            <td>${childUser.customizable}</td>
-                                        </tr>`;
+                    return childUsers;
+                })
+                .catch((error) => {
+                    console.error('Error getting child users:', error);
+                    return [];
                 });
-                tableBody.innerHTML = childUsersHtml;
-
-                // Add event listeners to the table rows
-                const rows = document.getElementsByTagName('tr');
-                for (let i = 0; i < rows.length; i++) {
-                    rows[i].addEventListener('click', () => {
-                        const docId = rows[i].getElementsByTagName('td')[0].getAttribute('data-doc-id');
-                        window.location.href = `child-info.html?id=${docId}`;
-                    });
-                }
-            });
-
-        } else {
-            // Redirect the user to the 'login_student_tvt.html'
-            window.location.href = "login_parent_tvt.html";
         }
-    });
-}
 
-// Call the initializePage function when the page loads
-window.onload = initializePage;
+        // Define a function to initialize the page
+
+
+        // Add an event listener to the "run-btn" element
+        const runBtn = document.getElementById("run-btn");
+        runBtn.addEventListener("click", () => {
+            window.location.href = "add_students_tvt.html";
+        });
+
+        // Call the init function when the page loads
+        window.onload = init;
+
+    } else {
+        // Redirect the user to the 'login_student_tvt.html'
+        window.location.href = "login_parent_tvt.html";
+    }
+});
+
 function init() {
     // Get the current user's email
     const user = auth.currentUser;

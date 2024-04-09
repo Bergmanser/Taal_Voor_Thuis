@@ -26,8 +26,6 @@ const questionsContainer = document.getElementById('questions');
 // This code is responsible for dynamically adding new questions input fields
 let questionId = 1;
 
-
-
 // This code is responsible for handling the image upload related to the banner image
 // const banner = document.getElementById('banner');
 // banner.addEventListener('change', (event) => {
