@@ -2,6 +2,7 @@
   "name": "project-plato",
   "version": "1.0.0",
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "firebase": "^10.8.0",
     "quill-image-uploader": "^1.3.0"
   },

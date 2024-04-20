@@ -1,34 +1,113 @@
 <!DOCTYPE html>
-<htmllang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="./assets/css/quiz.css">
-        <title>Quiz Student Dashboard</title>
-      </head>
-  <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./assets/css/quiz.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <title>Singular Quiz Page</title>
+</head>
+<body>
     <header>
-      <nav id="navbar" class="nav">
-        <ul class="nav-list">
-          <li>
-            <a href="#welcome-section">About</a>
-          </li>
-          <li>
-            <a href="#projects">Work</a>
-          </li>
-          <li>
-            <a href="#contact">Contact</a>
-          </li>
-        </ul>
-      </nav>
+        <nav id="navbar" class="nav">
+            <ul class="nav-list">
+                <li>
+                    <a href="student_dashboard.html">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">Profile</a>
+                </li>
+                <li>
+                    <a href="#">Logout</a>
+                </li>
+            </ul>
+        </nav>
 
-        <h1>Quiz Site</h1>
-      </header>
-      <main>
-       
-      </main>
-       <script type="module" src="../public/assets/js/quiz.js"></script>
-  </body>
+        <h1></h1>
+    </header>
+    <!-- <header class="navbar navbar-expand-lg navbar-light bg-danger">
+        <div class="container-fluid">
+          <a class="navbar-brand text-white" href="#">Quiz Interface</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link text-white" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="#">About</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="#">Contact</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </header> -->
+
+      <main class="container">
+        <div class="row">
+            <div class="col-md-4" id="left-container">
+                <div class="embedded-text-container">
+                    <div class="embedded-text"></div>
+                </div>
+            </div>
+            <div class="col-md-8" id="right-container">
+                <div id="inner-container" class="card-container">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="question">
+                                <h2 class="question-text"></h2>
+                                <div class="answer-container"></div>
+                            </div>
+                            <div class="navigation">
+                                <button class="prev-question-btn" disabled>Previous</button>
+                                <span class="hint-icon" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="right" title="Hint: Hover over me!">?</span>
+                                <button class="next-question-btn" disabled>Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- <main class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="text-section">
+                <div class="embedded-text-container">
+                    <div class="embedded-text"></div>
+                </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="question-section">
+                <div class="quiz-question-container">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="question">
+                                <h2 class="question-text"></h2>
+                                <div class="answer-container"></div>
+                            </div>
+                            <div class="navigation">
+                                <button class="prev-question-btn" disabled>Previous</button>
+                                <span class="hint hint-icon" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="right" title="Hint: Hover over me!">?</span>
+                                <button class="next-question-btn" disabled>Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </main> -->
+   
+    <script type="module" src="../public/assets/js/quiz.js"></script>
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { tooltipTriggerEl.tooltip() })
+    </script>
+</body>
 </html>
-
-

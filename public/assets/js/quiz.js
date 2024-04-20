@@ -45,50 +45,202 @@ if (!quizDocSnap.exists()) {
     console.log("Document data:", quizDocSnap.data());
     const quizData = quizDocSnap.data();
 
-    // Create the quiz container
-    const quizContainerElement = document.createElement("div");
-    quizContainerElement.id = "quiz-container";
-    document.body.appendChild(quizContainerElement);
-
-    // Create the embedded text container
-    const embeddedTextElement = document.createElement("div");
-    embeddedTextElement.classList.add("embedded-text");
-    embeddedTextElement.innerHTML = quizData.embedded_text;
-    quizContainerElement.appendChild(embeddedTextElement);
-
-    // Create the quiz question container
-    const quizQuestionElement = document.createElement("div");
-    quizQuestionElement.id = "quiz-question";
-    quizContainerElement.appendChild(quizQuestionElement);
-
-    // Create the quiz answers container
-    const quizAnswersElement = document.createElement("div");
-    quizAnswersElement.id = "quiz-answers";
-    quizContainerElement.appendChild(quizAnswersElement);
+    // set the title and embedded text from the quiz data
+    document.querySelector('header h1').innerText = quizData.title;
+    document.querySelector('main .embedded-text').innerText = quizData.embedded_text;
 
     // Generate the quiz question and answers
-    quizData.Questions.forEach((question, questionIndex) => {
-        const questionElement = document.createElement("div");
-        questionElement.classList.add("quiz-question");
 
-        const questionTitleElement = document.createElement("h2");
-        questionTitleElement.innerText = question.Text;
-        questionElement.appendChild(questionTitleElement);
+    let currentQuestionIndex = 0;
+    const questionContainer = document.querySelector('.question-container');
+    console.log(questionContainer);
+    const questionText = document.querySelector('.question-text');
+    const answerContainer = document.querySelector('.answer-container');
+    const prevQuestionBtn = document.querySelector('.prev-question-btn');
+    const nextQuestionBtn = document.querySelector('.next-question-btn');
+    const hint = document.querySelector('.hint');
 
-        const questionImageElement = document.createElement("img");
-        questionImageElement.src = quizData.Banner;
-        questionElement.appendChild(questionImageElement);
+    const totalQuestions = quizData.Questions.length;
+    let currentQuestionNum = currentQuestionIndex + 1;
 
-        quizQuestionElement.appendChild(questionElement);
+    const updateQuestion = () => {
+        const question = quizData.Questions[currentQuestionIndex];
+        const questionElement = document.createElement('div');
+        questionElement.classList.add('question');
+        questionElement.innerHTML = `<div class="question-number">${currentQuestionNum} / ${totalQuestions}</div>`;
+        questionElement.appendChild(questionText);
+        answerContainer.innerHTML = '';
 
-        question.Options.forEach((option, optionIndex) => {
-            const answerButtonElement = document.createElement("button");
-            answerButtonElement.classList.add("answer-btn");
-            answerButtonElement.id = `answer-${questionIndex + 1}-${optionIndex + 1}`;
-            answerButtonElement.innerText = option;
-            quizAnswersElement.appendChild(answerButtonElement);
+        question.Options.forEach((option, index) => {
+            const optionElement = document.createElement('div');
+            optionElement.classList.add('option');
+            optionElement.innerHTML = `<input type="radio" name="option" id="option-${index + 1}" value="${option}"><label for="option-${index + 1}">${option}</label>`;
+            answerContainer.appendChild(optionElement);
         });
+
+        hint.innerText = question.Hint;
+    };
+
+    const nextQuestion = () => {
+        currentQuestionIndex++;
+        currentQuestionNum++;
+        updateQuestion();
+    };
+
+    const prevQuestion = () => {
+        currentQuestionIndex--;
+        currentQuestionNum--;
+        updateQuestion();
+    };
+
+    nextQuestionBtn.addEventListener('click', nextQuestion);
+    prevQuestionBtn.addEventListener('click', prevQuestion);
+
+    updateQuestion();
+
+    const submitQuizBtn = document.querySelector('.submit-quiz-btn');
+    submitQuizBtn.addEventListener('click', async () => {
+        const selectedOption = document.querySelector('input[name="option"]:checked');
+        if (!selectedOption) {
+            alert('Please select an option.');
+            return;
+        }
+
+        const correctOption = quizData.Questions[currentQuestionIndex].Correct;
+        if (selectedOption.value === correctOption) {
+            alert('Correct answer!');
+        } else {
+            alert('Incorrect answer.');
+        }
+
+        const quizResultsCollection = collection(db, "quiz_results");
+        const userRef = doc(db, "users", user.uid);
+        const quizResultRef = doc(quizResultsCollection);
+        await setDoc(quizResultRef, {
+            quizId: quizId,
+            user: userRef,
+            score: currentQuestionIndex + 1,
+            timestamp: Date.now()
+        });
+
+        window.location.href = "student_dashboard.html";
     });
 }
 
 
+
+
+
+
+// const quizDocRef = doc(db, "quizzes", quizId);
+// const quizDocSnap = await getDoc(quizDocRef);
+
+// if (!quizDocSnap.exists()) {
+//     console.log("No such document!");
+//     window.location.href = "student_dashboard.html";
+// } else {
+//     console.log("Document data:", quizDocSnap.data());
+//     const quizData = quizDocSnap.data();
+
+//     // set the title and embedded text from the quiz data
+//     document.querySelector('header h1').innerText = quizData.title;
+//     document.querySelector('main .embedded-text').innerText = quizData.embedded_text;
+
+//     // Generate the quiz question and answers
+
+//     let currentQuestionIndex = 0;
+//     const questionContainer = document.querySelector('.question-container');
+//     console.log(questionContainer);
+//     const questionText = document.querySelector('.question-text');
+//     const answerContainer = document.querySelector('.answer-container');
+//     const prevQuestionBtn = document.querySelector('.prev-question-btn');
+//     const nextQuestionBtn = document.querySelector('.next-question-btn');
+//     const hint = document.querySelector('.hint');
+
+//     const totalQuestions = quizData.Questions.length;
+//     let currentQuestionNum = currentQuestionIndex + 1;
+
+//     const updateQuestion = () => {
+//         const question = quizData.Questions[currentQuestionIndex];
+//         const questionElement = document.createElement('div');
+//         questionElement.classList.add('question');
+//         questionElement.innerHTML = `<div class="question-number">${currentQuestionNum} / ${totalQuestions}</div>`;
+//         questionElement.appendChild(questionText);
+//         answerContainer.innerHTML = '';
+
+//         question.Options.forEach((option, index) => {
+//             const answerButton = document.createElement("input");
+//             answerButton.type = "radio";
+//             answerButton.name = `question-${currentQuestionIndex}`;
+//             answerButton.value = option;
+//             answerButton.id = `answer-${currentQuestionIndex}-${index}`;
+//             answerButton.classList.add("answer-option");
+//             answerContainer.appendChild(answerButton);
+
+//             const label = document.createElement("label");
+//             label.htmlFor = `answer-${currentQuestionIndex}-${index}`;
+//             label.innerText = option;
+//             answerContainer.appendChild(label);
+//         });
+
+//         questionContainer.appendChild(questionElement);
+
+//         if (currentQuestionIndex > 0) {
+//             prevQuestionBtn.classList.remove('disabled');
+//         } else {
+//             prevQuestionBtn.classList.add('disabled');
+//         }
+
+//         if (currentQuestionIndex < totalQuestions - 1) {
+//             nextQuestionBtn.classList.remove('disabled');
+//         } else {
+//             nextQuestionBtn.classList.add('disabled');
+//         }
+//     };
+
+//     updateQuestion();
+
+//     // Handle next and previous button clicks
+//     nextQuestionBtn.addEventListener('click', () => {
+//         const selectedAnswer = document.querySelector('input[name="question-' + currentQuestionIndex + '"]:checked');
+//         if (!selectedAnswer) {
+//             return;
+//         }
+
+//         const question = quizData.Questions[currentQuestionIndex];
+//         if (question.Hint && !selectedAnswer.correct) {
+//             hint.innerText = question.Hint;
+//             hint.style.display = 'block';
+
+//             // Disable the selected wrong answer
+//             selectedAnswer.disabled = true;
+//             selectedAnswer.style.opacity = 0.5;
+
+//             // Move to the next question
+//             currentQuestionIndex++;
+//             currentQuestionNum++;
+//             updateQuestion();
+
+//             // Reset the hint display
+//             setTimeout(() => {
+//                 hint.innerText = '';
+//                 hint.style.display = 'none';
+//             }, 2000);
+
+//             return;
+//         }
+
+//         // Move to the next question
+//         currentQuestionIndex++;
+//         currentQuestionNum++;
+//         updateQuestion();
+//     });
+
+//     prevQuestionBtn.addEventListener('click', () => {
+//         currentQuestionIndex--;
+//         currentQuestionNum--;
+//         updateQuestion();
+//     });
+
+//     // Submit quiz to Firestore, update quiz status and show score if finished
+// }

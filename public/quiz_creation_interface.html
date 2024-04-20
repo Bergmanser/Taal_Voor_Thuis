@@ -4,31 +4,53 @@
     <title>Upload een Quiz</title>
     <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script>
     <link rel="stylesheet" href="./assets/css/quiz_creation_interface.css"/>
+    <!-- Theme included stylesheets -->
+    <link
+      href="https://cdn.quilljs.com/1.3.6/quill.snow.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/quill-image-uploader@1.2.4/dist/quill.imageUploader.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script src="https://unpkg.com/quill-image-uploader@1.2.4/dist/quill.imageUploader.min.js"></script>
   </head>
   <body>
     <h1>Maak een quiz aan</h1>
     
     <form id="quiz-form">
-    <label for="title">Vul hier de titel van de toets in</label>
-      <input type="text" id="title" name="title" placeholder="Title" required />
+      <div>
+        <label for="title">Vul hier de titel van de toets in</label>
+        <input type="text" id="title" name="title" placeholder="Title" required />
+        <div id="title-error"></div>
+      </div>
+      <div>
+        <label for="description">Geef een korte beschrijving over de toets (optioneel)</label>
+        <textarea id="description" name="description" placeholder="Deze toets gaat over het volgende onderwerp..." rows="4" style="width: 755px; height: 60px;" maxlength="300"></textarea>
+        <div id="description-error"></div>
+      </div>
       <div>
         <label for="group-id-subject">Selecteer het niveau van de groep</label>
         <select id="group-id-subject">
           <option value="">Selecteer een groep niveau bij deze toets</option>
-          <option value="3000">3000</option>
-          <option value="4000">4000</option>
-          <option value="5000">5000</option>
-          <option value="6000">6000</option>
-          <option value="7000">7000</option>
-          <option value="8000">8000</option>
+          <option value="3000">Groep 3</option>
+          <option value="4000">Groep 4</option>
+          <option value="5000">Groep 5</option>
+          <option value="6000">Groep 6</option>
+          <option value="7000">Groep 7</option>
+          <option value="8000">Groep 8</option>
         </select>
+        <div id="group-id-error"></div>
       </div>
       <label for="banner">Upload een afbeelding om te gebruiken de banner van deze toets</label>
       <div></div>
       <input type="file" id="banner" accept="image/jpeg,image/png,image/jpg" />
+      <div id="banner-error"></div>
       <div></div>
-      <label>Voeg hier de bijhoren toets tekst toe</label>
+      <label>Voeg hier de bijhorende toets tekst toe</label>
       <div id="quill-container"></div>
+      <div id="quill-error"></div>
       <label for="quiz-type">Selecteer de type van de toets</label>
       <div>
         <select id="quiz-type" name="quiz-type">
@@ -40,6 +62,7 @@
           <option value="Grammatica">Grammatica</option>
           <option value="Anders">Anders</option>
       </select>
+      <div id="quiz-type-error"></div>
       </div>
       <label for="difficulty">Selecteer een moeilijkheidsgraad bij deze toets:</label>
       <div>
@@ -49,7 +72,8 @@
             <option value="average">Average</option>
             <option value="hard">Hard</option>
         </select>
-    
+        <div id="difficulty-error"></div>
+      </div>
         <div id="questions">
             <!-- <div id="question-0" class="question">
               <h2>Question 1</h2>
@@ -95,8 +119,21 @@
           </div>
     
         </form>
-    <script type="module" src="../public/assets/js/quiz_creation.js"></script>
-    <!-- <script src="quiz_creation.js"></script> -->
+        <script>
+            // Initialize the Quill container
+          ClassicEditor
+            .create( document.querySelector( '#quill-container' ) )
+            .then( editor => {
+                console.log( 'Editor was initialized', editor );
+            } )
+            .catch( error => {
+                console.error( 'Error during editor initialization', error );
+            } );
+        </script>
+        <script type="module" src="../public/assets/js/quill_container.js"></script>   
+        <script type="module" src="../public/assets/js/quiz_creation.js"></script>
+    
+    
     
     <!-- <script src="quill-image-uploader.js"></script> -->
     <!-- <script>
@@ -162,17 +199,17 @@
       </script> -->
 
 
-    <script>
+    <!-- <script>
       // Sources:
       // https://github.com/NoelOConnell/quill-image-uploader
       // https://codesandbox.io/p/sandbox/mutable-tdd-lrsvh?file=%2Findex.html%3A16%2C7
 
-      ClassicEditor.create(document.querySelector('#quill-container'), {
-        // Add any desired options here
-      })
-      .catch(error => {
-        console.error(error);
-      });
+      // ClassicEditor.create(document.querySelector('#quill-container'), {
+      //   // Add any desired options here
+      // })
+      // .catch(error => {
+      //   console.error(error);
+      // });
 
     //   Quill.register("modules/imageUploader", ImageUploader);
   
@@ -223,6 +260,6 @@
   
     //       console.log(quill);
     //     });
-    </script>
+    </script> -->
   </body>
 </html>

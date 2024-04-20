@@ -52,24 +52,141 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// This code is responsible for handling the image upload related to the banner image
-// const banner = document.getElementById('banner');
-// banner.addEventListener('change', (event) => {
-//     const file = event.target.files[0];
-//     if (file) {
-//         const reader = new FileReader();
-//         reader.onload = (e) => {
-//             const img = document.createElement('img');
-//             img.src = e.target.result;
-//             document.getElementById('banner-preview').appendChild(img);
-//         };
-//         reader.readAsDataURL(file);
-//     } else {
-//         const img = document.createElement('img');
-//         img.src = 'MeerDanBijles-Logo.png';
-//         document.getElementById('banner-preview').appendChild(img);
-//     }
-// });
+// This code is responsible for handling the image upload related to the banner image (preview)
+const banner = document.getElementById('banner');
+
+// Create the banner preview and quiz card preview elements
+const bannerPreview = document.createElement('div');
+bannerPreview.id = 'banner-preview';
+document.body.appendChild(bannerPreview);
+
+const quizCardPreview = document.createElement('div');
+quizCardPreview.id = 'quiz-card-preview';
+document.body.appendChild(quizCardPreview);
+
+banner.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            // bannerPreview.innerHTML = '';
+            // bannerPreview.appendChild(img);
+
+            // Create a new quiz card preview element
+            const quizCard = document.createElement('div');
+            quizCard.classList.add('card');
+
+            // Create a new img element with the card-img-top class
+            const cardImg = document.createElement('img');
+            cardImg.classList.add('card-img-top');
+            cardImg.src = e.target.result;
+            quizCard.appendChild(cardImg);
+
+            // Create a new card body element
+            const cardBody = document.createElement('div');
+            cardBody.classList.add('card-body');
+
+            // Create a new h5 element for the quiz title
+            const quizTitle = document.createElement('h5');
+            quizTitle.classList.add('card-title');
+            quizTitle.textContent = 'Quiz Title';
+            cardBody.appendChild(quizTitle);
+
+            // Create a new p element for the quiz description
+            const quizDescription = document.createElement('p');
+            quizDescription.classList.add('card-text');
+            quizDescription.textContent = 'Quiz Description';
+            cardBody.appendChild(quizDescription);
+
+            // Append the card body to the quiz card
+            quizCard.appendChild(cardBody);
+
+            // Replace the existing quiz card preview with the new one
+            quizCardPreview.innerHTML = '';
+            quizCardPreview.appendChild(quizCard);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // bannerPreview.innerHTML = '';
+        // const img = document.createElement('img');
+        // img.src = 'MeerDanBijles-Logo.png';
+        // bannerPreview.appendChild(img);
+
+        quizCardPreview.innerHTML = '';
+        const quizCard = document.createElement('div');
+        quizCard.classList.add('card');
+        quizCardPreview.appendChild(quizCard);
+
+        // Create a new img element with the card-img-top class
+        const cardImg = document.createElement('img');
+        cardImg.classList.add('card-img-top');
+        cardImg.src = 'MeerDanBijles-Logo.png';
+        quizCard.appendChild(cardImg);
+
+        // Create a new card body element
+        const cardBody = document.createElement('div');
+        cardBody.classList.add('card-body');
+
+        // Create a new h5 element for the quiz title
+        const quizTitle = document.createElement('h5');
+        quizTitle.classList.add('card-title');
+        quizTitle.textContent = 'Quiz Title';
+        cardBody.appendChild(quizTitle);
+
+        // Create a new p element for the quiz description
+        const quizDescription = document.createElement('p');
+        quizDescription.classList.add('card-text');
+        quizDescription.textContent = 'Quiz Description';
+        cardBody.appendChild(quizDescription);
+
+        // Append the card body to the quiz card
+        quizCard.appendChild(cardBody);
+    }
+});
+// Add this function to upload the image to Firestore
+async function uploadImage(dataUrl, filename) {
+    return new Promise(function (resolve, reject) {
+        const blob = dataURLToBlob(dataUrl);
+        const storageRef = firebase.storage().ref();
+        const task = storageRef.child(`quizzes/${filename}`).put(blob);
+
+        task.on('state_changed', null, reject, function () {
+            task.snapshot.ref.getDownloadURL().then(resolve);
+        });
+
+        if (file.name === 'default-banner.png') {
+            resolve('MeerDanBijles-Logo.png');
+        }
+    });
+}
+
+// Add this function to convert a Data URL to a Blob
+function dataURLToBlob(dataURL) {
+    const BASE64_MARKER = ';base64,';
+    if (dataURL.indexOf(BASE64_MARKER) === -1) {
+        const parts = dataURL.split(',');
+        const contentType = parts[0].split(':')[1];
+        const raw = parts[1];
+
+        return new Blob([raw], { type: contentType });
+    }
+
+    const parts = dataURL.split(BASE64_MARKER);
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+
+    const uInt8Array = new Uint8Array(rawLength);
+
+    for (let i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    return new Blob([uInt8Array], { type: contentType });
+}
+
 
 // //Responsible for generating a GroupID for the quiz based on the selected group
 // const groupIdSubject = document.getElementById('group-id-subject').value;
@@ -194,11 +311,16 @@ function addOption(questionId) {
     optionInput.placeholder = 'Option text';
     optionInput.required = true;
 
+    // Add an input event listener to stop propagation
+    optionInput.addEventListener('input', (event) => {
+        event.stopPropagation();
+    });
+
     // Create a remove button for the option section
     const removeOptionButton = document.createElement('button');
     removeOptionButton.textContent = 'Remove Option';
-    removeOptionButton.addEventListener('click', () => {
-        removeOption(optionSection);
+    removeOptionButton.addEventListener('click', (event) => {
+        removeOption(event);
     });
 
     // Append input field and remove button to the option section
@@ -213,7 +335,17 @@ function addOption(questionId) {
 
     // Initialize the correct option dropdown
     initializeCorrectOptionDropdown(questionId);
-};
+}
+
+
+// Remove an option
+function removeOption(event) {
+    if (event.target.tagName.toLowerCase() === 'button') {
+        const optionsContainer = event.target.parentNode.parentNode;
+        optionsContainer.removeChild(event.target.parentNode);
+    }
+}
+
 
 // Populate the correct option dropdown
 function populateCorrectOptionDropdown(questionId) {
@@ -237,12 +369,12 @@ function populateCorrectOptionDropdown(questionId) {
 
 // Initialize the correct option dropdown
 function initializeCorrectOptionDropdown(questionId) {
-    populateCorrectOptionDropdown(questionId);
-
     const optionsContainer = document.getElementById(`question-options-${questionId}`);
     if (optionsContainer) {
-        optionsContainer.addEventListener('input', () => {
-            populateCorrectOptionDropdown(questionId);
+        optionsContainer.addEventListener('input', (event) => {
+            if (event.target.tagName.toLowerCase() === 'input' && event.key !== 'Enter') {
+                populateCorrectOptionDropdown(questionId);
+            }
         });
     }
 
@@ -256,174 +388,259 @@ function initializeCorrectOptionDropdown(questionId) {
     }
 }
 
+const title = document.getElementById('title');
+const titleError = document.getElementById(`title-error`);
+const description = document.getElementById('description')
+const descriptionError = document.getElementById('description-error')
+const groupId = document.getElementById('group-id-subject');
+const groupIdError = document.getElementById(`group-id-error`);
+const bannerError = document.getElementById(`banner-error`);
+const quillContainer = document.getElementById('quill-container');
+const quillError = document.getElementById(`quill-error`);
+const quizType = document.getElementById('quiz-type');
+const quizTypeError = document.getElementById('quiz-type-error')
+const difficulty = document.getElementById('difficulty');
+const difficultyError = document.getElementById(`difficulty-error`);
+
 // This addEventListener is responsible for uploading the quiz data to Firestore
-quizForm.addEventListener('submit', (e) => {
+quizForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const title = document.getElementById('title');
-    const groupId = document.getElementById('group-id-subject');
-    const banner = document.getElementById('banner');
-    const quillContainer = document.getElementById('quill-container');
-    const difficulty = document.getElementById('difficulty');
+    // Show a confirmation popup
+    const confirmUpload = confirm('Are you sure you want to upload this quiz? You can edit this quiz later through a different interface.');
 
-    const titleError = document.getElementById(`title-error`);
-    const groupIdError = document.getElementById(`group-id-error`);
-    const bannerError = document.getElementById(`banner-error`);
-    const quillError = document.getElementById(`quill-error`);
-    const difficultyError = document.getElementById(`difficulty-error`);
+    if (confirmUpload) {
 
-    if (title.value.trim() === '') {
-        titleError.innerText = 'Title is required';
-    } else {
-        titleError.innerText = '';
-    }
-
-    if (groupId.value === '') {
-        groupIdError.innerText = 'Group ID is required';
-    } else {
-        groupIdError.innerText = '';
-    }
-
-    if (banner.files.length === 0) {
-        bannerError.innerText = 'Banner is required';
-    }
-
-    if (quillContainer.innerHTML.trim() === '') {
-        quillError.innerText = 'Embedded text is required';
-    }
-
-    if (difficulty.value.trim() === '') {
-        difficultyError.innerText = 'Difficulty is required';
-    }
-
-    // Check if all option fields are filled
-    const optionInputs = document.querySelectorAll('input[type="text"][id^="question-option-text"]');
-    let allOptionsFilled = true;
-    optionInputs.forEach(input => {
-        if (input.value.trim() === '') {
-            allOptionsFilled = false;
-        }
-    });
-
-    if (!allOptionsFilled) {
-        alert('Please fill out all option fields.');
-        return;
-    }
-
-    // Check if all question titles are filled
-    const questionTitleInputs = document.querySelectorAll('input[type="text"][id^="question-title"]');
-    let allTitlesFilled = true;
-    questionTitleInputs.forEach(input => {
-        if (input.value.trim() === '') {
-            allTitlesFilled = false;
-        }
-    });
-
-    if (!allTitlesFilled) {
-        alert('Please fill out all question titles.');
-        return;
-    }
-
-    // Check if a correct option is selected for each question
-    const allCorrectOptionsSelected = Array.from(document.querySelectorAll('[id^="question-option-correct-"]')).every(correctOption => correctOption.checked);
-    if (!allCorrectOptionsSelected) {
-        alert('Please select a correct option for each question.');
-        return;
-    }
-
-    // Collect question data
-    const questionsData = [];
-    for (const questionId of questionsAndIds) {
-        // Extract hint field value
-        const hint = document.getElementById(`question-hint-${questionId}`).value;
-
-        // Extract question title
-        const questionTitle = document.getElementById(`question-title-${questionId}`).value;
-
-        // Extract question type
-        const questionType = document.getElementById(`question-type-${questionId}`).value;
-
-        // Extract correct option text
-        const correctOptionText = document.getElementById(`question-correct-option-text-${questionId}`).value;
-
-        // Extract options
-        const options = [];
-        const optionInputs = document.querySelectorAll(`#question-options-${questionId} input[type="text"]`);
-        optionInputs.forEach((input, index) => {
-            options.push({
-                text: input.value,
-                isCorrect: index === parseInt(correctOptionText)  // Assuming correctOptionText contains the index of the correct option
-            });
-        });
-
-        // Construct question data object
-        const questionData = {
-            title: questionTitle,
-            type: questionType,
-            options: options,
-            correctOption: {
-                text: correctOptionText,
-                index: parseInt(correctOptionText)  // Assuming correctOptionText contains the index of the correct option
-            },
-            hint: hint
-        };
-
-        // Push question data to the array
-        questionsData.push(questionData);
-    }
-
-    if (
-        title.value.trim() !== '' &&
-        groupId.value !== '' &&
-        banner.files.length > 0 &&
-        quillContainer.innerHTML.trim() !== '' &&
-        difficulty.value.trim() !== ''
-    ) {
-        const creationDate = new Date();
-        const modificationDate = new Date();
-
-        // Update the modification date before saving the quiz to Firestore
-        modificationDate.setSeconds(modificationDate.getSeconds() + 1); newQuiz.modificationDate = modificationDate;
-
-        // Create a new quiz object
-        const newQuiz = {
-            title: title.value,
-            groupId: groupId.value,
-            banner: banner.files[0],
-            quillContainer: quillContainer.innerHTML,
-            difficulty: difficulty.value,
-            questions: questionsData,
-            creationDate,
-            modificationDate
-        };
+        validateForm();
+        // Create a new quiz object based on the form data
+        const newQuiz = createQuizFromForm();
 
         // Save the new quiz to Firestore
-        saveQuizToFirestore(newQuiz);
+        const quizId = await saveQuizToFirestore(newQuiz);
 
+        // Clear the form fields
+        title.value = '';
+        description.value = '';
+        groupId.value = '';
+        banner.value = '';
+        quillContainer.innerHTML = '';
+        quizType.value = '';
+        difficulty.value = '';
+
+        // Clear the error messages
+        titleError.innerText = '';
+        descriptionError.innerText = '';
+        groupIdError.innerText = '';
+        bannerError.innerText = '';
+        quillError.innerText = '';
+        quizTypeError.innerText = '';
+        difficultyError.innerText = '';
+
+        // Clear the questions container
+        questionsContainer.innerHTML = '';
+
+        // Display a success message
+        alert(`Quiz uploaded successfully! Quiz ID: ${quizId}`);
     } else {
-        alert('Please fill out all required fields.');
+        // Do nothing or redirect the user back to the previous page
     }
 });
 
-async function saveQuizToFirestore(quiz) {
-    // Get a reference to the Firestore collection
-    const quizCollection = firebase.firestore().collection('quizzes');
+function validateForm() {
+    // Reset the error messages
+    titleError.innerText = '';
+    description.innerText = '';
+    groupIdError.innerText = '';
+    bannerError.innerText = '';
+    quillError.innerText = '';
+    quizTypeError.innerText = '';
+    difficultyError.innerText = '';
 
-    // Create a new quiz document in the Firestore collection
-    const quizDocument = await quizCollection.add({
-        title: quiz.title,
-        description: quiz.description,
-        questions: Object.values(quiz.questions).map(question => ({
-            id: question.id,
-            text: question.text,
-            correctOption: question.correctOption,
-            options: question.options.map(option => ({
-                id: option.id,
-                text: option.text,
+    // Check for empty or invalid fields
+    const titleValid = validateTitle();
+    const descriptionValid = validateDescription();
+    const groupIdValid = validateGroupId();
+    const bannerValid = validateBanner();
+    const quillValid = validateQuill();
+    const quizTypeValid = validateQuizType();
+    const difficultyValid = validateDifficulty();
+
+    return titleValid && descriptionValid && groupIdValid && bannerValid && quillValid && quizTypeValid && difficultyValid;
+}
+
+function validateTitle() {
+    const title = title.value.trim();
+    if (title === '') {
+        titleError.innerText = 'Title is required';
+        return false;
+    }
+    return true;
+}
+
+function validateDescription(description) {
+    // if (!description) {
+    //     alert("Beschrijving mag niet leeg zijn.");
+    //     return false;
+    // }
+
+    const wordCount = description.split(' ').length;
+    if (wordCount > 80) {
+        alert("Beschrijving mag maximaal 80 woorden bevatten.");
+        return false;
+    }
+
+    const regex = /[<>[\]{}|`~!@#$%^&*()_+={}:";',./<>?\\]/;
+    const allowedSpecialCharacters = ['?', '!', ':', ',', ' ', '.', '/', '@', '&', '%'];
+    if (regex.test(description)) {
+        alert("Beschrijving bevat ongeldige tekens.");
+        return false;
+    }
+
+    for (let i = 0; i < description.length; i++) {
+        const character = description[i];
+        if (regex.test(character) && !allowedSpecialCharacters.includes(character)) {
+            alert("Beschrijving bevat ongeldige tekens.");
+            return false;
+        }
+    }
+    return true;
+}
+
+function validateGroupId() {
+    const groupId = groupId.value.trim();
+    if (groupId === '') {
+        groupIdError.innerText = 'Group ID is required';
+        return false;
+    }
+    return true;
+}
+
+// There should always be a banner, if one is not selected by a user then a standard filler image should be used
+function validateBanner() {
+    const bannerFile = banner.files[0];
+
+    if (!bannerFile) {
+        // Set a default banner image if no file is selected
+        const defaultBannerImage = 'MeerDanBijles-Logo.png';
+        const defaultBannerFile = new File([defaultBannerImage], 'default-banner.png', {
+            type: 'image/png',
+        });
+        banner.files = [defaultBannerFile];
+    }
+
+    return true;
+}
+
+function validateQuill() {
+    const quillText = quillContainer.querySelector('.ql-editor').innerHTML;
+    if (quillText === '') {
+        quillError.innerText = 'Quiz description is required';
+        return false;
+    }
+    return true;
+}
+
+function validateQuizType() {
+    const quizType = quizType.value;
+    if (quizType === '') {
+        quizTypeError.innerText = 'Quiz type is required';
+        return false;
+    }
+    return true;
+}
+
+function validateDifficulty() {
+    const difficulty = difficulty.value;
+    if (difficulty === '') {
+        difficultyError.innerText = 'Difficulty is required';
+        return false;
+    }
+    return true;
+}
+
+async function createQuizFromForm() {
+
+    const questionsAndIds = Array.from(document.querySelectorAll('.question-row'))
+        .map((question, index) => ({ id: question.id.split('-')[1], index }));
+
+    // Declare the variables
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const groupId = document.getElementById('group-id').value.trim();
+    const banner = document.getElementById('banner').files[0];
+    const quizText = quillContainer.querySelector('.ql-editor').innerHTML;
+    const quizType = document.getElementById('quiz-type').value;
+    const difficulty = document.getElementById('difficulty').value;
+
+    // Select the questions container
+    const questionsContainer = document.getElementById('questions');
+
+    // Check if the questions container exists
+    if (!questionsContainer) {
+        console.error('Questions container not found');
+        return;
+    }
+
+    const bannerFile = banner.files[0];
+    if (bannerFile.name === 'default-banner.png') {
+        // Use the default banner image
+        banner = 'MeerDanBijles-Logo.png';
+    } else {
+        // Upload the user-selected banner image to Firestore
+        banner = await uploadImage(bannerFile);
+    }
+    // Create a new quiz object
+    const quiz = {
+        title: title,
+        quiz_description: description,
+        category_description: `A ${difficulty} quiz of type: ${quizType} for ${groupId}`,
+        banner: banner,
+        quillText: quizText,
+        questions: {},
+    };
+
+    // Extract the questions and ids data from the form
+    questionsAndIds.forEach(({ id, index }) => {
+        const questionTitle = document.getElementById(`question-title-${index}`).value.trim();
+        const questionType = document.getElementById(`question-type-${index}`).value;
+        const correctOptionText = document.getElementById(`question-correct-option-text-${index}`).value;
+        const correctOptionIndex = parseInt(correctOptionText, 10);
+
+        const options = Array.from(document.querySelectorAll(`#question-options-${index} input[type="text"]`))
+            .map(input => input.value.trim())
+            .filter(text => text !== '');
+
+        const questionData = {
+            id: index,
+            text: questionTitle,
+            type: questionType,
+            correctOption: {
+                text: options[correctOptionIndex],
+                index: correctOptionIndex,
+            },
+            options: options.map((option, optionIndex) => ({
+                text: option,
+                index: optionIndex,
             })),
-        })),
+        };
+
+        quiz.questions[index] = questionData;
     });
 
-    // Return the Firestore document ID
-    return quizDocument.id;
-};
+    return quiz;
+}
+
+function saveQuizToFirestore(quiz, user) {
+    const quizRef = doc(collection(db, "quizzes"));
+    return setDoc(quizRef, {
+        ...quiz,
+        modificationDate: serverTimestamp(),
+        uploadDate: serverTimestamp(),
+        uploadedBy: user.email
+    }).then(() => {
+        const quizTypeRef = doc(collection(db, "quiz-types"), quiz.quizType);
+        return setDoc(quizTypeRef, { quizId: quizRef.id }).then(() => {
+            return quizRef.id;
+        });
+    });
+}
