@@ -2,7 +2,6 @@
 <html>
   <head>
     <title>Upload een Quiz</title>
-    <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script>
     <link rel="stylesheet" href="./assets/css/quiz_creation_interface.css"/>
     <!-- Theme included stylesheets -->
     <link
@@ -13,11 +12,15 @@
       href="https://unpkg.com/quill-image-uploader@1.2.4/dist/quill.imageUploader.min.css"
       rel="stylesheet"
     />
+    <script src="https://unpkg.com/@cloak/quill-toolbar@1.0.0/dist/quill-toolbar.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <script src="https://unpkg.com/quill-image-uploader@1.2.4/dist/quill.imageUploader.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
   </head>
   <body>
-    <h1>Maak een quiz aan</h1>
+    <h1>Maak een op deze pagina een nieuwe toets aan</h1>
     
     <form id="quiz-form">
       <div>
@@ -26,7 +29,7 @@
         <div id="title-error"></div>
       </div>
       <div>
-        <label for="description">Geef een korte beschrijving over de toets (optioneel)</label>
+        <label for="description">Geef een korte beschrijving over de toets (max 80 woorden)(optioneel)</label>
         <textarea id="description" name="description" placeholder="Deze toets gaat over het volgende onderwerp..." rows="4" style="width: 755px; height: 60px;" maxlength="300"></textarea>
         <div id="description-error"></div>
       </div>
@@ -49,28 +52,38 @@
       <div id="banner-error"></div>
       <div></div>
       <label>Voeg hier de bijhorende toets tekst toe</label>
-      <div id="quill-container"></div>
-      <div id="quill-error"></div>
+
+      <div id="embedded-text">
+        <button type="button" id="add-embedded-text-button">Add Embedded Text</button>
+        <div id="embedded-text-toolbar">
+          <div id="embedded-text-toolbar-content" style="display: none;">
+            <div id="quill-container"></div>
+            <div id="quill-error"></div>
+            <!-- The buttons will be added here -->
+          </div>
+        </div>
+      </div>
+
+
       <label for="quiz-type">Selecteer de type van de toets</label>
       <div>
-        <select id="quiz-type" name="quiz-type">
-          <option value="">Select the type of test</option>
-          <option value="Tekstbegrip">Tekstbegrip</option>
-          <option value="Woordenschat">Woordenschat</option>
-          <option value="Samenvatten">Samenvatten</option>
-          <option value="Verwijswoorden&Signaalwoorden">Verwijs- en signaalwoorden</option>
-          <option value="Grammatica">Grammatica</option>
-          <option value="Anders">Anders</option>
+        <select id="quiz-type" name="quiz-type" required>
+          <option value="">Selecteer een quiz type</option>
+          <option value="woordenschat">Woordenschat</option>
+          <option value="samenvatten">Samenvatten</option>
+          <option value="verwijswoorden&signaalwoorden">Verwijs- en signaalwoorden</option>
+          <option value="grammatica">Grammatica</option>
+          <option value="anders">Anders</option>
       </select>
       <div id="quiz-type-error"></div>
       </div>
       <label for="difficulty">Selecteer een moeilijkheidsgraad bij deze toets:</label>
       <div>
-        <select id="difficulty" name="difficulty">
-            <option value="">Select a difficulty</option>
-            <option value="easy">Easy</option>
-            <option value="average">Average</option>
-            <option value="hard">Hard</option>
+        <select id="difficulty" name="difficulty" required>
+          <option value="">Selecteer een moeilijkheidsgraad</option>
+          <option value="easy">Easy</option>
+          <option value="average">Average</option>
+          <option value="hard">Hard</option>
         </select>
         <div id="difficulty-error"></div>
       </div>
@@ -119,7 +132,7 @@
           </div>
     
         </form>
-        <script>
+        <!-- <script>
             // Initialize the Quill container
           ClassicEditor
             .create( document.querySelector( '#quill-container' ) )
@@ -129,137 +142,10 @@
             .catch( error => {
                 console.error( 'Error during editor initialization', error );
             } );
-        </script>
-        <script type="module" src="../public/assets/js/quill_container.js"></script>   
+        </script> -->
+        <!-- <script type="module" src="../public/assets/js/quill_container.js"></script>    -->
         <script type="module" src="../public/assets/js/quiz_creation.js"></script>
-    
-    
-    
-    <!-- <script src="quill-image-uploader.js"></script> -->
-    <!-- <script>
-        import { Quill } from "quill";
-        import { QuillImageUploader } from 'quill-image-uploader';
+        <script type="module" src="../public/assets/js/embedded_text_creation.js"></script>
 
-        const uploader = new QuillImageUploader({
-        uploadEndpoint: '/upload-image',
-        quill: quill,
-});
-
-    </script> -->
-    <!-- <script type="text/javascript">
-        Quill.register("modules/imageUploader", ImageUploader);
-  
-        console.log("script");
-        document.addEventListener("DOMContentLoaded", function () {
-          const fullToolbarOptions = [
-            [{ header: [1, 2, 3, false] }],
-            ["bold", "italic"],
-            ["clean"],
-            ["image"]
-          ];
-  
-          console.log("Dom loaded");
-  
-          var quill = new Quill("#editor", {
-            theme: "snow",
-            modules: {
-              toolbar: {
-                container: fullToolbarOptions
-              },
-              imageUploader: {
-                upload: (file) => {
-                  return new Promise((resolve, reject) => {
-                    const formData = new FormData();
-                    formData.append("image", file);
-  
-                    fetch(
-                      "https://api.imgbb.com/1/upload?key=d36eb6591370ae7f9089d85875e56b22",
-                      {
-                        method: "POST",
-                        body: formData
-                      }
-                    )
-                      .then((response) => response.json())
-                      .then((result) => {
-                        console.log(result);
-                        resolve(result.data.url);
-                      })
-                      .catch((error) => {
-                        reject("Upload failed");
-                        console.error("Error:", error);
-                      });
-                  });
-                }
-              }
-            }
-          });
-  
-          console.log(quill);
-        });
-      </script> -->
-
-
-    <!-- <script>
-      // Sources:
-      // https://github.com/NoelOConnell/quill-image-uploader
-      // https://codesandbox.io/p/sandbox/mutable-tdd-lrsvh?file=%2Findex.html%3A16%2C7
-
-      // ClassicEditor.create(document.querySelector('#quill-container'), {
-      //   // Add any desired options here
-      // })
-      // .catch(error => {
-      //   console.error(error);
-      // });
-
-    //   Quill.register("modules/imageUploader", ImageUploader);
-  
-    //     console.log("script");
-    //     document.addEventListener("DOMContentLoaded", function () {
-    //       const fullToolbarOptions = [
-    //         [{ header: [1, 2, 3, false] }],
-    //         ["bold", "italic"],
-    //         ["clean"],
-    //         ["image"]
-    //       ];
-  
-    //       console.log("Dom loaded");
-  
-    //       var quill = new Quill("#editor", {
-    //         theme: "snow",
-    //         modules: {
-    //           toolbar: {
-    //             container: fullToolbarOptions
-    //           },
-    //           imageUploader: {
-    //             upload: (file) => {
-    //               return new Promise((resolve, reject) => {
-    //                 const formData = new FormData();
-    //                 formData.append("image", file);
-  
-    //                 fetch(
-    //                   "https://api.imgbb.com/1/upload?key=d36eb6591370ae7f9089d85875e56b22",
-    //                   {
-    //                     method: "POST",
-    //                     body: formData
-    //                   }
-    //                 )
-    //                   .then((response) => response.json())
-    //                   .then((result) => {
-    //                     console.log(result);
-    //                     resolve(result.data.url);
-    //                   })
-    //                   .catch((error) => {
-    //                     reject("Upload failed");
-    //                     console.error("Error:", error);
-    //                   });
-    //               });
-    //             }
-    //           }
-    //         }
-    //       });
-  
-    //       console.log(quill);
-    //     });
-    </script> -->
   </body>
 </html>

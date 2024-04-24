@@ -32,92 +32,145 @@ modificationDate.setSeconds(modificationDate.getSeconds() + 1);
 const quizzes = [
     {
         id: 0,
-        QuizGroupId: '8001',
-        Title: 'Introduction to Programming Quiz',
-        Description: 'A quiz about the basics of programming',
-        Banner: 'https://example.com/programming-banner.jpg',
-        embedded_text: '<p>This quiz covers the basics of programming, including variables, data types, and control flow.</p>',
-        Difficulty: 'Beginner',
+        QuizGroupId: '8000',
+        Title: 'Draag jij ook zonnebrand crème in de winter',
+        Description: 'Een quiz over de effecten van zonnebrand crème',
+        Banner: 'temp-background.jpeg',
+        embedded_text:
+            `<p>In de zomer is zonnebrandcrème <b>onmisbaar</b>, je ziet veel mensen om je heen het gebruiken. Dat is ook logisch, want in de zomer schijnt de zon vaak en wil iedereen tijd buiten doorbrengen. We weten ook dat je van te lang in de zon spelen, kunt verbranden. Om <b>dat</b> te voorkomen gebruiken we zonnebrandcrème. Alleen hoe zit het dan met de dagen waarop de zon niet schijnt? Dan is zonnebrandcrème toch helemaal niet nodig, zou je denken...</p> <p>De zon is eigenlijk een soort ster, maar in plaats van 's nachts te twinkelen zoals de sterren die we aan de hemel zien, straalt de zon altijd fel licht en warmte uit. Naast licht en warmte zendt de zon <b>straling</b> uit. Deze bestaat eigenlijk uit kleine, onzichtbare deeltjes die van de zon afkomen en door de ruimte reizen, helemaal tot aan onze aarde! De zon zendt verschillende soorten stralen uit, waaronder UV-stralen. Deze stralen kunnen goed zijn voor ons omdat ze ons lichaam helpen vitamine D te maken, die belangrijk is voor onze botten en ons immuunsysteem. Maar te veel blootstelling aan UV-stralen kan schadelijk zijn voor onze huid en tot verbranding leiden.</p> <p>Om toch van de zon te genieten zonder te verbranden, kunnen we onszelf beschermen met zonnebrandcrème. Deze crème bevat speciale ingrediënten die een onzichtbare laag op je huid vormen en schadelijke UV-stralen van de zon tegenhouden. Het is hierbij wel belangrijk dat je minstens 30 minuten voordat je naar buiten gaat de zonnebrandcrème aanbrengt, zodat het goed kan intrekken. <b>Ook</b> zal je rekening moeten houden met het kiezen van de juiste zonnebrandcrème. Op elke zonnebrandcrème staat een <b>factor</b> vermeld. Dit is eigenlijk de sterkte waarmee de zonnebrandcrème je huid beschermt. Vaak wordt dit aangegeven in ‘SPF’, die staat voor ‘Sun Protection Factor’. De SPF is een getal dat aangeeft hoeveel langer je in de zon kunt blijven zonder te verbranden in vergelijking met wanneer je geen zonnebrandcrème gebruikt. Tot slot moet je niet vergeten om zonnebrandcrème om het paar uur opnieuw in te smeren!</p> <p>De zon zendt dus constant straling uit. Dat betekent dat je lichaam elke dag wordt blootgesteld aan UV-stralen, zelfs wanneer je de zon niet ziet schijnen of als het niet warm is. UV-stralen kunnen namelijk door bewolking en glas heen dringen. Het is dus belangrijk om dagelijks zonnebrandcrème te smeren om een gezonde huid te behouden. Dan is zonnebrandcrème in de winter toch niet zo gek als het klinkt!</p>`,
+        Difficulty: 'easy',
+        QuizType: 'anders',
         Created_at: creationDate,
         Modified_at: modificationDate,
-        GroupId_Subject: 'Reading Exersise',
         Questions: [
             {
                 QuestionId: '1',
-                Text: 'What is a variable in programming?',
-                Options: ['A container for data', 'A type of data', 'A function', 'A loop'],
-                CorrectOption: 0,
-                Type: 'Multiple Choice',
-                Hint: 'Think about how you store and manipulate data in a program',
-                ScoreWithoutHints: 0,
-                ScoreWithHints: 0
+                Text: 'Wat betekent ”onmisbaar” (alinea 1)?',
+                Options: ['Onnodig', 'Vermist', 'Noodzakelijk', 'Verplicht'],
+                CorrectOption: 2,
+                Hint: 'Vervang het woord ‘onmisbaar’ in de tekst door jouw gekozen antwoord.',
+                Type: 'Multiple Choice'
             },
             {
                 QuestionId: '2',
-                Text: 'Which of the following is a data type in JavaScript?',
-                Options: ['Number', 'String', 'Boolean', 'All of the above'],
-                CorrectOption: 3,
-                Type: 'Multiple Choice',
-                Hint: 'Consider the different types of data that can be used in a program',
-                ScoreWithoutHints: 0,
-                ScoreWithHints: 0
+                Text: 'Waar verwijst het woord “dat” naar in (alinea 1)?',
+                Options: ['Verbranden', 'In de zon spelen', 'Zonnebrandcréme', 'Te lang'],
+                CorrectOption: 0,
+                Hint: 'Wat klinkt het meest logisch?',
+                Type: 'Multiple Choice'
             },
             {
                 QuestionId: '3',
-                Text: 'What is a conditional statement in programming?',
-                Options: ['A statement that executes code based on a condition', 'A statement that loops through code', 'A statement that assigns a value to a variable', 'A statement that defines a function'],
+                Text: 'Welk tussenkopje past het beste boven alinea 2?',
+                Options: ['Straling', 'De grootste ster', 'De zon', 'UV-Straling'],
+                CorrectOption: 2,
+                Hint: 'Wat kun je voorkomen met zonnebrandcréme?',
+                Type: 'Multiple Choice'
+            },
+            {
+                QuestionId: '4',
+                Text: 'Welke betekenis past het beste bij “straling” (alinea 2)?',
+                Options: ['Warmte', 'Fel licht', 'Kleine, onzichtbare deeltjes die naar de aarde reizen.', 'Immuunsysteem'],
+                CorrectOption: 2,
+                Hint: 'Kies het juiste antwoord dat past bij de vraag.',
+                Type: 'Multiple Choice'
+            },
+            {
+                QuestionId: '5',
+                Text: 'Welke uitspraken over UV-stralingen zijn juist?',
+                Options: ['UV-straling komt van de zon.', 'Te veel UV-straling isgoed voor je lichaam.', 'De zon zendt alleen UV-straling uit.', 'UV-straling helpt je met een vitamine aanmaken en je weerstand.'],
                 CorrectOption: 0,
-                Type: 'Multiple Choice',
-                Hint: 'Think about how you make decisions in a program',
-                ScoreWithoutHints: 0,
-                ScoreWithHints: 0
+                Hint: 'Denk aan wat er in de alinea 2 wordt besproken. In die alinea wordt vooral gesproken over de zon en wat de zon is.',
+                Type: 'Multiple Choice'
+            },
+            {
+                QuestionId: '6',
+                Text: 'Welk tussenkopje past het beste boven alinea 3?',
+                Options: ['SPF', 'Waarom verbrand je door de zon?', 'Hoe werkt zonnebrandcrème?', 'Gevaren van de zon.'],
+                CorrectOption: 2,
+                Hint: 'Welk tussenkopje past het beste bij dat onderwerp?',
+                Type: 'Multiple Choice'
+            },
+            {
+                QuestionId: '7',
+                Text: 'Wat voor soort signaalwoord is het woord “ook” (alinea 3)?',
+                Options: ['Tegenstellend', 'Opsommend', 'Voorbeeld', 'Redengevend'],
+                CorrectOption: 1,
+                Hint: 'Lees de zin waarin het woord "ook" wordt gebruikt. Probeer te bedenken of het woord "ook" aangeeft: - Dat er iets tegenovergesteld wordt gezegd. (Tegenstellend) - Dat er iets wordt toegevoegd aan wat al eerder is genoemd. (Opsommend) - Dat er een voorbeeld wordt genoemd. (Voorbeeld) - Dat er wordt uitgelegd waarom iets is gebeurd. (Redengevend) Welke van de opties past het beste bij de rol van "ook"?',
+                Type: 'Multiple Choice'
+            },
+            {
+                QuestionId: '8',
+                Text: 'Wat wordt er bedoeld met “factor” (alinea 3)?',
+                Options: ['De sterkte waarmee zonnebrandcrème je huid beschermt.', 'Hoeveelheid', 'Een tv programma', 'Een zonnebrand merk'],
+                CorrectOption: 0,
+                Hint: 'In de tekst staat uitgelegd hoe zonnebrandcrème werkt en waarom het belangrijk is. Lees goed wat er wordt uitgelegd nadat het woord "factor" is genoemd.',
+                Type: 'Multiple Choice'
+            },
+            {
+                QuestionId: '9',
+                Text: 'Welk tussenkopje past het beste boven alinea 4?',
+                Options: ['Straling', 'Slecht weer', 'Een gezonde huid', 'Gebruik zonnebrandcrème elke dag!'],
+                CorrectOption: 3,
+                Hint: 'Bedenk welk tussenkopje past het beste bij dat onderwerp.',
+                Type: 'Multiple Choice'
+            },
+            {
+                QuestionId: '10',
+                Text: 'Lees de laatste zin: Dan is … het klinkt! (alinea 4)',
+                Options: ['Dat het normaal is om zonnebrandcrème te dragen op niet zonnige dagen.', 'Zonnebrandcrème geeft een gek geluid.', 'Het is gek om in de winter zonnebrandcrème te smeren.', 'Je moet alleen zonnebrandcrème in de winter dragen.'],
+                CorrectOption: 0,
+                Hint: 'Bedenk eerst waarom het gek is om zonnebrandcrème in de winter te smeren. Denk daarna aan wat er in alinea 4 wordt uitgelegd.',
+                Type: 'Multiple Choice'
             }
         ]
     },
-    {
-        id: 1,
-        QuizGroupId: '8002',
-        Title: 'Intermediate Programming Quiz',
-        Description: 'A quiz about intermediate programming concepts',
-        Banner: 'https://example.com/programming-banner.jpg',
-        embedded_text: '<p>This quiz covers intermediate programming concepts, including functions, arrays, and objects.</p>',
-        Difficulty: 'Intermediate',
-        Created_at: creationDate,
-        Modified_at: modificationDate,
-        GroupId_Subject: 'Reading Exersise',
-        Questions: [
-            {
-                QuestionId: 1,
-                Text: 'What is a function in programming?',
-                Options: ['A block of code that performs a specific task', 'A data type', 'A variable', 'A loop'],
-                CorrectOption: 0,
-                Type: 'Multiple Choice',
-                Hint: 'Think about how you can reuse code in a program',
-                ScoreWithoutHints: 0,
-                ScoreWithHints: 0
-            },
-            {
-                QuestionId: '2',
-                Text: 'What is an array in programming?',
-                Options: ['A collection of values', 'A data type', 'A function', 'A loop'],
-                CorrectOption: 0,
-                Type: 'Multiple Choice',
-                Hint: 'Think about how you can store and manipulate multiple values in a program',
-                ScoreWithoutHints: 0,
-                ScoreWithHints: 0
-            },
-            {
-                QuestionId: '3',
-                Text: 'What is an object in programming?',
-                Options: ['A collection of properties and methods', 'Adata type', 'A function', 'A loop'],
-                CorrectOption: 0,
-                Type: 'Multiple Choice',
-                Hint: 'Think about how you can represent complex data structures in a program',
-                ScoreWithoutHints: 0,
-                ScoreWithHints: 0
-            }
-        ]
-    }
+    // {
+    //     id: 1,
+    //     QuizGroupId: '8002',
+    //     Title: 'Intermediate Programming Quiz',
+    //     Description: 'A quiz about intermediate programming concepts',
+    //     Banner: 'https://example.com/programming-banner.jpg',
+    //     embedded_text: '<h1>Intermediate Programming Quiz</h1><p>This quiz covers intermediate programming concepts, including functions, arrays, and objects.</p>',
+    //     Difficulty: 'average',
+    //     ClassLevel: 'groep 4',
+    //     Created_at: creationDate,
+    //     Modified_at: modificationDate,
+    //     GroupId_Subject: 'Reading Exersise',
+    //     QuizType: 'samenvatten',
+    //     Questions: [
+    //         {
+    //             QuestionId: 1,
+    //             Text: 'What is a function in programming?',
+    //             Options: ['A block of code that performs a specific task', 'A data type', 'A variable', 'A loop'],
+    //             CorrectOption: 0,
+    //             ,
+    //             Hint: 'Think about how you can reuse code in a program',
+    //             ScoreWithoutHints: 0,
+    //             ScoreWithHints: 0
+    //         },
+    //         {
+    //             QuestionId: '2',
+    //             Text: 'What is an array in programming?',
+    //             Options: ['A collection of values', 'A data type', 'A function', 'A loop'],
+    //             CorrectOption: 0,
+    //             ,
+    //             Hint: 'Think about how you can store and manipulate multiple values in a program',
+    //             ScoreWithoutHints: 0,
+    //             ScoreWithHints: 0
+    //         },
+    //         {
+    //             QuestionId: '3',
+    //             Text: 'What is an object in programming?',
+    //             Options: ['A collection of properties and methods', 'Adata type', 'A function', 'A loop'],
+    //             CorrectOption: 0,
+    //             ,
+    //             Hint: 'Think about how you can represent complex data structures in a program',
+    //             ScoreWithoutHints: 0,
+    //             ScoreWithHints: 0
+    //         }
+    //     ]
+    // }
 ];
 
 // Temporary function for uploading a quiz filled with test data and sends it to Firestore

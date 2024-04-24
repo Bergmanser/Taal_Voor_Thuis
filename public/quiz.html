@@ -5,10 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./assets/css/quiz.css">
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
     <title>Singular Quiz Page</title>
 </head>
 <body>
-    <header>
+    <header class="sticky">
+        <!-- <div class="title">Quiz Title</div> -->
+        <nav id="navbar" class="nav">
+            <ul class="nav-list">
+                <li>
+                    <a href="student_dashboard.html">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">Profile</a>
+                </li>
+                <li>
+                    <a href="#">Logout</a>
+                </li>
+            </ul>
+        </nav>
+      </header>
+      <main>
+        <div class="hero" style="background-image: url(banner-image-url);">
+          <div class="title" id="quiz-title"></div>
+        </div>
+        <div class="embedded-text-section">
+          <!-- Embedded text section content will be populated dynamically -->
+          <div class="embedded-text"></div>
+        </div>
+        <div class="start-quiz-button btn btn-primary">Start quiz</div>
+        <div class="quiz-window" id="quiz-window">
+          <div class="quiz-window-header">
+            <div class="question-number"></div>
+            <div class="question-title"></div>
+            <button class="quiz-window-close btn btn-primary">X</button>
+          </div>
+          <div class="quiz-window-content">
+            <div class="quiz-container"></div>
+            <div class="next-question-btn btn btn-primary" id="next-question-btn">Next Question</div>
+            <div class="quiz-window-hint"></div>
+          </div>
+          <div class="quiz-window-controls"></div>
+        </div>
+      </main>
+
+      <!-- Add JavaScript and any other necessary files here -->
+    <!-- <header>
         <nav id="navbar" class="nav">
             <ul class="nav-list">
                 <li>
@@ -24,7 +68,7 @@
         </nav>
 
         <h1></h1>
-    </header>
+    </header> -->
     <!-- <header class="navbar navbar-expand-lg navbar-light bg-danger">
         <div class="container-fluid">
           <a class="navbar-brand text-white" href="#">Quiz Interface</a>
@@ -47,7 +91,7 @@
         </div>
       </header> -->
 
-      <main class="container">
+      <!-- <main class="container">
         <div class="row">
             <div class="col-md-4" id="left-container">
                 <div class="embedded-text-container">
@@ -72,7 +116,7 @@
                 </div>
             </div>
         </div>
-    </main>
+    </main> -->
     <!-- <main class="container">
         <div class="row">
             <div class="col-md-4">
