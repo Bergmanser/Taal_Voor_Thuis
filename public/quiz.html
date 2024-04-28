@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="./assets/css/quiz.css">
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
     <title>Singular Quiz Page</title>
@@ -31,122 +32,56 @@
         <div class="hero" style="background-image: url(banner-image-url);">
           <div class="title" id="quiz-title"></div>
         </div>
-        <div class="embedded-text-section">
-          <!-- Embedded text section content will be populated dynamically -->
+        <!-- <div class="embedded-text-section">
+          
           <div class="embedded-text"></div>
         </div>
         <div class="start-quiz-button btn btn-primary">Start quiz</div>
-        <div class="quiz-window" id="quiz-window">
-          <div class="quiz-window-header">
-            <div class="question-number"></div>
-            <div class="question-title"></div>
-            <button class="quiz-window-close btn btn-primary">X</button>
+        <div class="quiz-window-container">
+          <div class="quiz-window" id="quiz-window">
+            <div class="quiz-window-header">
+              <div class="question-number"></div>
+              <div class="question-title"></div>
+              <button class="quiz-window-close">X</button>
+            </div>
+            <div class="quiz-window-content">
+              <div class="quiz-container"></div>
+              <div class="next-question-btn btn" id="next-question-btn"></div>
+              <div class="quiz-window-hint"></div>
+            </div>
+            <div class="quiz-window-controls"></div>
           </div>
-          <div class="quiz-window-content">
-            <div class="quiz-container"></div>
-            <div class="next-question-btn btn btn-primary" id="next-question-btn">Next Question</div>
-            <div class="quiz-window-hint"></div>
+        </div> -->
+    
+        <div class="quiz-window-container">
+            <div class="quiz-window" id="quiz-window">
+              <div class="quiz-window-header" id="quiz-window-header">
+                <div class="question-number" id="question-number"></div>
+                <div class="question-window-title" id="question-window-title"></div>
+                <button class="quiz-window-close" id="quiz-window-close">X</button>
+              </div>
+              <div class="quiz-window-content">    
+                <!-- <div class="quiz-container" id="quiz-container"></div> -->
+                <div class="question-container" id="question-container"></div>
+                <div class="next-question-btn" id="next-question-btn"></div>
+                <div class="quiz-window-hint" id="quiz-window-hint"></div>
+                <div class="question-window-hint" id="question-window-hint"></div>
+                <div class="submit-quiz-btn" id="submit-quiz-btn"></div>
+              </div>
+              <div class="quiz-window-controls">
+                <button class="quiz-window-resize quiz-window-resize-sm">-</button>
+                <button class="quiz-window-resize quiz-window-resize-lg">+</button>
+              </div>
+            </div>
           </div>
-          <div class="quiz-window-controls"></div>
+          <div class="embedded-text-section">
+            <!-- Embedded text section content will be populated dynamically -->
+            <div class="embedded-text"></div>
+          </div>
+        <div>
+            <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
         </div>
       </main>
-
-      <!-- Add JavaScript and any other necessary files here -->
-    <!-- <header>
-        <nav id="navbar" class="nav">
-            <ul class="nav-list">
-                <li>
-                    <a href="student_dashboard.html">Dashboard</a>
-                </li>
-                <li>
-                    <a href="#">Profile</a>
-                </li>
-                <li>
-                    <a href="#">Logout</a>
-                </li>
-            </ul>
-        </nav>
-
-        <h1></h1>
-    </header> -->
-    <!-- <header class="navbar navbar-expand-lg navbar-light bg-danger">
-        <div class="container-fluid">
-          <a class="navbar-brand text-white" href="#">Quiz Interface</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link text-white" href="#">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link text-white" href="#">About</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link text-white" href="#">Contact</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </header> -->
-
-      <!-- <main class="container">
-        <div class="row">
-            <div class="col-md-4" id="left-container">
-                <div class="embedded-text-container">
-                    <div class="embedded-text"></div>
-                </div>
-            </div>
-            <div class="col-md-8" id="right-container">
-                <div id="inner-container" class="card-container">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="question">
-                                <h2 class="question-text"></h2>
-                                <div class="answer-container"></div>
-                            </div>
-                            <div class="navigation">
-                                <button class="prev-question-btn" disabled>Previous</button>
-                                <span class="hint-icon" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="right" title="Hint: Hover over me!">?</span>
-                                <button class="next-question-btn" disabled>Next</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main> -->
-    <!-- <main class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="text-section">
-                <div class="embedded-text-container">
-                    <div class="embedded-text"></div>
-                </div>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="question-section">
-                <div class="quiz-question-container">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="question">
-                                <h2 class="question-text"></h2>
-                                <div class="answer-container"></div>
-                            </div>
-                            <div class="navigation">
-                                <button class="prev-question-btn" disabled>Previous</button>
-                                <span class="hint hint-icon" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="right" title="Hint: Hover over me!">?</span>
-                                <button class="next-question-btn" disabled>Next</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </div>
-        </div>
-    </main> -->
    
     <script type="module" src="../public/assets/js/quiz.js"></script>
     <script>
