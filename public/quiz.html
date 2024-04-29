@@ -13,7 +13,6 @@
 </head>
 <body>
     <header class="sticky">
-        <!-- <div class="title">Quiz Title</div> -->
         <nav id="navbar" class="nav">
             <ul class="nav-list">
                 <li>
@@ -27,66 +26,46 @@
                 </li>
             </ul>
         </nav>
-      </header>
-      <main>
-        <div class="hero" style="background-image: url(banner-image-url);">
-          <div class="title" id="quiz-title"></div>
-        </div>
-        <!-- <div class="embedded-text-section">
-          
-          <div class="embedded-text"></div>
-        </div>
-        <div class="start-quiz-button btn btn-primary">Start quiz</div>
-        <div class="quiz-window-container">
-          <div class="quiz-window" id="quiz-window">
-            <div class="quiz-window-header">
-              <div class="question-number"></div>
-              <div class="question-title"></div>
-              <button class="quiz-window-close">X</button>
+    </header>
+    <main id="quiz-main">
+        <div class="quiz-container"> 
+            <div id="slider-container">
+                <div id="range-slider" class="custom-range-slider"></div>
             </div>
-            <div class="quiz-window-content">
-              <div class="quiz-container"></div>
-              <div class="next-question-btn btn" id="next-question-btn"></div>
-              <div class="quiz-window-hint"></div>
+            <div class="container-embedded-text-hero">
+                <div class="hero" style="background-image: url(banner-image-url);">
+                    <div class="title" id="quiz-title"></div>
+                </div>
+                <div class="embedded-text-section">
+                    <div class="embedded-text"></div>
+                </div>
+                <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
             </div>
-            <div class="quiz-window-controls"></div>
-          </div>
-        </div> -->
-    
-        <div class="quiz-window-container">
-            <div class="quiz-window" id="quiz-window">
-              <div class="quiz-window-header" id="quiz-window-header">
-                <div class="question-number" id="question-number"></div>
-                <div class="question-window-title" id="question-window-title"></div>
-                <button class="quiz-window-close" id="quiz-window-close">X</button>
-              </div>
-              <div class="quiz-window-content">    
-                <!-- <div class="quiz-container" id="quiz-container"></div> -->
-                <div class="question-container" id="question-container"></div>
-                <div class="next-question-btn" id="next-question-btn"></div>
-                <div class="quiz-window-hint" id="quiz-window-hint"></div>
-                <div class="question-window-hint" id="question-window-hint"></div>
-                <div class="submit-quiz-btn" id="submit-quiz-btn"></div>
-              </div>
-              <div class="quiz-window-controls">
-                <button class="quiz-window-resize quiz-window-resize-sm">-</button>
-                <button class="quiz-window-resize quiz-window-resize-lg">+</button>
-              </div>
-            </div>
-          </div>
-          <div class="embedded-text-section">
-            <!-- Embedded text section content will be populated dynamically -->
-            <div class="embedded-text"></div>
-          </div>
-        <div>
-            <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
+        
+            <div class="quiz-window-container hidden">
+                <div class="quiz-window" id="quiz-window">
+                    <!-- <div id="slider-container">
+                        <div id="range-slider"></div>
+                    </div> -->
+                    <div class="quiz-window-header" id="quiz-window-header">
+                        <div class="question-number" id="question-number"></div>
+                        <button class="quiz-window-close btn btn-primary" id="quiz-window-close">X</button>
+                    </div>
+                    <div class="quiz-window-content">
+                        <div class="question-window-title" id="question-window-title"></div>
+                        
+                        <div class="question-container" id="question-container">
+                            
+                        </div>
+                        <div class="quiz-window-hint" id="quiz-window-hint"></div>
+                        <div class="quiz-window-controls">
+                        
+                        </div>
+                    </div>
+                </div>
+            </div> 
         </div>
-      </main>
-   
+    </main>
     <script type="module" src="../public/assets/js/quiz.js"></script>
-    <script>
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { tooltipTriggerEl.tooltip() })
-    </script>
 </body>
 </html>

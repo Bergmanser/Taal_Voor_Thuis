@@ -49,7 +49,7 @@ const quizzes = [
                 Options: ['Onnodig', 'Vermist', 'Noodzakelijk', 'Verplicht'],
                 CorrectOption: 2,
                 Hint: 'Vervang het woord ‘onmisbaar’ in de tekst door jouw gekozen antwoord.',
-                Type: 'Multiple Choice'
+
             },
             {
                 QuestionId: '2',
@@ -57,7 +57,7 @@ const quizzes = [
                 Options: ['Verbranden', 'In de zon spelen', 'Zonnebrandcréme', 'Te lang'],
                 CorrectOption: 0,
                 Hint: 'Wat klinkt het meest logisch?',
-                Type: 'Multiple Choice'
+
             },
             {
                 QuestionId: '3',
@@ -65,7 +65,7 @@ const quizzes = [
                 Options: ['Straling', 'De grootste ster', 'De zon', 'UV-Straling'],
                 CorrectOption: 2,
                 Hint: 'Wat kun je voorkomen met zonnebrandcréme?',
-                Type: 'Multiple Choice'
+
             },
             {
                 QuestionId: '4',
@@ -73,7 +73,7 @@ const quizzes = [
                 Options: ['Warmte', 'Fel licht', 'Kleine, onzichtbare deeltjes die naar de aarde reizen.', 'Immuunsysteem'],
                 CorrectOption: 2,
                 Hint: 'Kies het juiste antwoord dat past bij de vraag.',
-                Type: 'Multiple Choice'
+
             },
             {
                 QuestionId: '5',
@@ -81,7 +81,7 @@ const quizzes = [
                 Options: ['UV-straling komt van de zon.', 'Te veel UV-straling isgoed voor je lichaam.', 'De zon zendt alleen UV-straling uit.', 'UV-straling helpt je met een vitamine aanmaken en je weerstand.'],
                 CorrectOption: 0,
                 Hint: 'Denk aan wat er in de alinea 2 wordt besproken. In die alinea wordt vooral gesproken over de zon en wat de zon is.',
-                Type: 'Multiple Choice'
+
             },
             {
                 QuestionId: '6',
@@ -89,7 +89,7 @@ const quizzes = [
                 Options: ['SPF', 'Waarom verbrand je door de zon?', 'Hoe werkt zonnebrandcrème?', 'Gevaren van de zon.'],
                 CorrectOption: 2,
                 Hint: 'Welk tussenkopje past het beste bij dat onderwerp?',
-                Type: 'Multiple Choice'
+
             },
             {
                 QuestionId: '7',
@@ -97,7 +97,7 @@ const quizzes = [
                 Options: ['Tegenstellend', 'Opsommend', 'Voorbeeld', 'Redengevend'],
                 CorrectOption: 1,
                 Hint: 'Lees de zin waarin het woord "ook" wordt gebruikt. Probeer te bedenken of het woord "ook" aangeeft: - Dat er iets tegenovergesteld wordt gezegd. (Tegenstellend) - Dat er iets wordt toegevoegd aan wat al eerder is genoemd. (Opsommend) - Dat er een voorbeeld wordt genoemd. (Voorbeeld) - Dat er wordt uitgelegd waarom iets is gebeurd. (Redengevend) Welke van de opties past het beste bij de rol van "ook"?',
-                Type: 'Multiple Choice'
+
             },
             {
                 QuestionId: '8',
@@ -105,7 +105,7 @@ const quizzes = [
                 Options: ['De sterkte waarmee zonnebrandcrème je huid beschermt.', 'Hoeveelheid', 'Een tv programma', 'Een zonnebrand merk'],
                 CorrectOption: 0,
                 Hint: 'In de tekst staat uitgelegd hoe zonnebrandcrème werkt en waarom het belangrijk is. Lees goed wat er wordt uitgelegd nadat het woord "factor" is genoemd.',
-                Type: 'Multiple Choice'
+
             },
             {
                 QuestionId: '9',
@@ -113,7 +113,7 @@ const quizzes = [
                 Options: ['Straling', 'Slecht weer', 'Een gezonde huid', 'Gebruik zonnebrandcrème elke dag!'],
                 CorrectOption: 3,
                 Hint: 'Bedenk welk tussenkopje past het beste bij dat onderwerp.',
-                Type: 'Multiple Choice'
+
             },
             {
                 QuestionId: '10',
@@ -121,7 +121,7 @@ const quizzes = [
                 Options: ['Dat het normaal is om zonnebrandcrème te dragen op niet zonnige dagen.', 'Zonnebrandcrème geeft een gek geluid.', 'Het is gek om in de winter zonnebrandcrème te smeren.', 'Je moet alleen zonnebrandcrème in de winter dragen.'],
                 CorrectOption: 0,
                 Hint: 'Bedenk eerst waarom het gek is om zonnebrandcrème in de winter te smeren. Denk daarna aan wat er in alinea 4 wordt uitgelegd.',
-                Type: 'Multiple Choice'
+
             }
         ]
     },
