@@ -36,7 +36,7 @@ const quizzes = [
         Title: 'Draag jij ook zonnebrand crème in de winter',
         Description: 'Een quiz over de effecten van zonnebrand crème',
         Banner: 'temp-background.jpeg',
-        embedded_text:
+        Embedded_text:
             `<p>In de zomer is zonnebrandcrème <b>onmisbaar</b>, je ziet veel mensen om je heen het gebruiken. Dat is ook logisch, want in de zomer schijnt de zon vaak en wil iedereen tijd buiten doorbrengen. We weten ook dat je van te lang in de zon spelen, kunt verbranden. Om <b>dat</b> te voorkomen gebruiken we zonnebrandcrème. Alleen hoe zit het dan met de dagen waarop de zon niet schijnt? Dan is zonnebrandcrème toch helemaal niet nodig, zou je denken...</p> <p>De zon is eigenlijk een soort ster, maar in plaats van 's nachts te twinkelen zoals de sterren die we aan de hemel zien, straalt de zon altijd fel licht en warmte uit. Naast licht en warmte zendt de zon <b>straling</b> uit. Deze bestaat eigenlijk uit kleine, onzichtbare deeltjes die van de zon afkomen en door de ruimte reizen, helemaal tot aan onze aarde! De zon zendt verschillende soorten stralen uit, waaronder UV-stralen. Deze stralen kunnen goed zijn voor ons omdat ze ons lichaam helpen vitamine D te maken, die belangrijk is voor onze botten en ons immuunsysteem. Maar te veel blootstelling aan UV-stralen kan schadelijk zijn voor onze huid en tot verbranding leiden.</p> <p>Om toch van de zon te genieten zonder te verbranden, kunnen we onszelf beschermen met zonnebrandcrème. Deze crème bevat speciale ingrediënten die een onzichtbare laag op je huid vormen en schadelijke UV-stralen van de zon tegenhouden. Het is hierbij wel belangrijk dat je minstens 30 minuten voordat je naar buiten gaat de zonnebrandcrème aanbrengt, zodat het goed kan intrekken. <b>Ook</b> zal je rekening moeten houden met het kiezen van de juiste zonnebrandcrème. Op elke zonnebrandcrème staat een <b>factor</b> vermeld. Dit is eigenlijk de sterkte waarmee de zonnebrandcrème je huid beschermt. Vaak wordt dit aangegeven in ‘SPF’, die staat voor ‘Sun Protection Factor’. De SPF is een getal dat aangeeft hoeveel langer je in de zon kunt blijven zonder te verbranden in vergelijking met wanneer je geen zonnebrandcrème gebruikt. Tot slot moet je niet vergeten om zonnebrandcrème om het paar uur opnieuw in te smeren!</p> <p>De zon zendt dus constant straling uit. Dat betekent dat je lichaam elke dag wordt blootgesteld aan UV-stralen, zelfs wanneer je de zon niet ziet schijnen of als het niet warm is. UV-stralen kunnen namelijk door bewolking en glas heen dringen. Het is dus belangrijk om dagelijks zonnebrandcrème te smeren om een gezonde huid te behouden. Dan is zonnebrandcrème in de winter toch niet zo gek als het klinkt!</p>`,
         Difficulty: 'easy',
         QuizType: 'anders',
@@ -49,7 +49,7 @@ const quizzes = [
                 Options: ['Onnodig', 'Vermist', 'Noodzakelijk', 'Verplicht'],
                 CorrectOption: 2,
                 Hint: 'Vervang het woord ‘onmisbaar’ in de tekst door jouw gekozen antwoord.',
-
+                CorrectOptionDescription: `In de zomer is het belangrijk om zonnebrandcrème te smeren, maar niet verplicht. Het woord noodzakelijk is een synoniem van onmisbaar.`
             },
             {
                 QuestionId: '2',
@@ -57,7 +57,7 @@ const quizzes = [
                 Options: ['Verbranden', 'In de zon spelen', 'Zonnebrandcréme', 'Te lang'],
                 CorrectOption: 0,
                 Hint: 'Wat klinkt het meest logisch?',
-
+                CorrectOptionDescription: `Het antwoord op de vraag ‘Wat kun je voorkomen met zonnebrandcrème?' is, verbranden. `
             },
             {
                 QuestionId: '3',
@@ -65,7 +65,7 @@ const quizzes = [
                 Options: ['Straling', 'De grootste ster', 'De zon', 'UV-Straling'],
                 CorrectOption: 2,
                 Hint: 'Wat kun je voorkomen met zonnebrandcréme?',
-
+                CorrectOptionDescription: `In deze alinea worden er verschillende punten van de zon beschreven. Het gehele thema is de zon en daarom past antwoord C het beste als het tussenkopje van alinea 2.`
             },
             {
                 QuestionId: '4',
@@ -73,7 +73,7 @@ const quizzes = [
                 Options: ['Warmte', 'Fel licht', 'Kleine, onzichtbare deeltjes die naar de aarde reizen.', 'Immuunsysteem'],
                 CorrectOption: 2,
                 Hint: 'Kies het juiste antwoord dat past bij de vraag.',
-
+                CorrectOptionDescription: `In de tekst staat dat de zon ook straling uitzendt. De zin erna beschrijft dat straling uit kleine onzichtbare deeltjes bestaat.`
             },
             {
                 QuestionId: '5',
@@ -81,7 +81,7 @@ const quizzes = [
                 Options: ['UV-straling komt van de zon.', 'Te veel UV-straling isgoed voor je lichaam.', 'De zon zendt alleen UV-straling uit.', 'UV-straling helpt je met een vitamine aanmaken en je weerstand.'],
                 CorrectOption: 0,
                 Hint: 'Denk aan wat er in de alinea 2 wordt besproken. In die alinea wordt vooral gesproken over de zon en wat de zon is.',
-
+                CorrectOptionDescription: `Uit de tekst blijkt dat UV-straling van de zon komt, maar dit is niet de enige straling die de zon uitzendt. UV-straling helpt je lichaam met de aanmaak van vitamine D en is goed voor je immuunsysteem. Alhoewel, te veel UV-straling leidt tot beschadiging van je huid.`
             },
             {
                 QuestionId: '6',
@@ -89,7 +89,7 @@ const quizzes = [
                 Options: ['SPF', 'Waarom verbrand je door de zon?', 'Hoe werkt zonnebrandcrème?', 'Gevaren van de zon.'],
                 CorrectOption: 2,
                 Hint: 'Welk tussenkopje past het beste bij dat onderwerp?',
-
+                CorrectOptionDescription: `In deze alinea worden er verschillende punten van zonnebrandcrème beschreven. Het gehele thema is werking van zonnebrandcrème en daarom past antwoord C het beste als het tussenkopje van alinea 3.`
             },
             {
                 QuestionId: '7',
@@ -97,7 +97,7 @@ const quizzes = [
                 Options: ['Tegenstellend', 'Opsommend', 'Voorbeeld', 'Redengevend'],
                 CorrectOption: 1,
                 Hint: 'Lees de zin waarin het woord "ook" wordt gebruikt. Probeer te bedenken of het woord "ook" aangeeft: - Dat er iets tegenovergesteld wordt gezegd. (Tegenstellend) - Dat er iets wordt toegevoegd aan wat al eerder is genoemd. (Opsommend) - Dat er een voorbeeld wordt genoemd. (Voorbeeld) - Dat er wordt uitgelegd waarom iets is gebeurd. (Redengevend) Welke van de opties past het beste bij de rol van "ook"?',
-
+                CorrectOptionDescription: `Het signaalwoord ook, geeft aan dat er meer dingen zijn. Het helpt ons begrijpen dat de schrijver een lijst maakt van verschillende dingen. In de tekst werden er meerdere dingen verteld over zonnebrandcrème. `
             },
             {
                 QuestionId: '8',
@@ -105,7 +105,7 @@ const quizzes = [
                 Options: ['De sterkte waarmee zonnebrandcrème je huid beschermt.', 'Hoeveelheid', 'Een tv programma', 'Een zonnebrand merk'],
                 CorrectOption: 0,
                 Hint: 'In de tekst staat uitgelegd hoe zonnebrandcrème werkt en waarom het belangrijk is. Lees goed wat er wordt uitgelegd nadat het woord "factor" is genoemd.',
-
+                CorrectOptionDescription: `In de tekst staat dat het woord factor op de verpakkingen van zonnebrandcrème staat. De zin erna beschrijft dat dit de sterkte is waarmee zonnebrandcrème je huid beschermt.`
             },
             {
                 QuestionId: '9',
@@ -113,7 +113,7 @@ const quizzes = [
                 Options: ['Straling', 'Slecht weer', 'Een gezonde huid', 'Gebruik zonnebrandcrème elke dag!'],
                 CorrectOption: 3,
                 Hint: 'Bedenk welk tussenkopje past het beste bij dat onderwerp.',
-
+                CorrectOptionDescription: `In deze alinea wordt uitgelegd waarom je op niet zonnige dagen zonnebrandcrème moet smeren. Het gehele thema is elke dag zonnebrandcrème smeren en daarom past antwoord D het beste als het tussenkopje van alinea 4.`
             },
             {
                 QuestionId: '10',
@@ -121,7 +121,7 @@ const quizzes = [
                 Options: ['Dat het normaal is om zonnebrandcrème te dragen op niet zonnige dagen.', 'Zonnebrandcrème geeft een gek geluid.', 'Het is gek om in de winter zonnebrandcrème te smeren.', 'Je moet alleen zonnebrandcrème in de winter dragen.'],
                 CorrectOption: 0,
                 Hint: 'Bedenk eerst waarom het gek is om zonnebrandcrème in de winter te smeren. Denk daarna aan wat er in alinea 4 wordt uitgelegd.',
-
+                CorrectOptionDescription: `De schrijver wilt met deze zin zeggen dat het niet raar is om op niet zonnige dagen zonnebrandcrème te dragen, zelfs niet in de winter.Dus de schrijver vindt het normaal om  elke dag zonnebrandcrème te smeren. `
             }
         ]
     },

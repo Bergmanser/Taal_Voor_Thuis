@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Parse the HTML content
             const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(quizData.embedded_text, 'text/html');
+            const htmlDoc = parser.parseFromString(quizData.Embedded_text, 'text/html');
 
             // Extract the text and HTML elements
             const textElements = htmlDoc.body.childNodes;
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const quizWindow = document.querySelector('.quiz-window');
         const quizWindowTitle = document.getElementById('question-window-title');
         const questionContainer = quizWindow.querySelector('.question-container');
-        const answerContainer = quizWindow.querySelector('.answer-container');
+        const answerContainer = quizWindow.querySelector('.quiz-window-answer');
         const questionNumber = quizWindow.querySelector('.question-number');
         const quizWindowContainer = document.querySelector('.quiz-window-container');
         const startQuizButton = document.getElementById("start-quiz-button");
@@ -169,8 +169,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             questionText.classList.add('question-text');
             questionText.innerText = question.Text;
 
+            // Create containers for hint and answer messages
+            const hintContainer = document.createElement('div');
+            hintContainer.classList.add('quiz-window-hint');
+
             const answerContainer = document.createElement('div');
-            answerContainer.classList.add('answer-container');
+            answerContainer.classList.add('quiz-window-answer');
 
             prevQuestionBtn.classList.add('prev-question-btn');
             prevQuestionBtn.innerText = 'Previous';
@@ -179,58 +183,98 @@ document.addEventListener('DOMContentLoaded', async () => {
             nextQuestionBtn.innerText = 'Next';
             nextQuestionBtn.disabled = currentQuestionIndex === quizData.Questions.length - 1;
 
-
             const hint = document.createElement('div');
             hint.classList.add('hint');
             hint.innerText = question.Hint;
             hint.style.display = 'none';
 
-            const quizWindowHint = quizWindow.querySelector('.quiz-window-hint');
-            if (quizWindowHint) {
-                quizWindowHint.innerText = hint.innerText;
-            } else {
-                console.log('quizWindowHint is null or undefined');
-            }
-
             quizWindowTitle.innerText = question.Text;
-            quizWindowHint.innerText = hint.innerText;
 
             questionContainer.innerHTML = '';
-            quizWindowHint.innerHTML = '';
+            hintContainer.innerHTML = '';
             answerContainer.innerHTML = '';
-
-            console.log(quizWindow)
-            console.log('quizWindowTitle:', quizWindowTitle);
-            console.log('question:', question);
-            console.log('hint:', hint);
-            console.log('quizWindowHint:', quizWindowHint);
 
             question.Options.forEach((option, index) => {
                 const optionElement = document.createElement('div');
                 optionElement.classList.add('option');
-                optionElement.innerText = option;
+
+                // Add alphabetical letter in front of option text
+                const optionLetter = String.fromCharCode(65 + index) + '.';
+                optionElement.innerText = optionLetter + ' ' + option;
+
                 optionElement.addEventListener('click', () => {
-                    if (option === question.Correct) {
-                        alert('Correct answer!');
-                    } else {
-                        alert('Incorrect answer.');
-                        hint.style.display = 'block';
-                    }
-                    nextQuestion();
+                    // if (option === question.Correct) {
+                    //     alert('Correct answer!');
+                    // } else {
+                    //     alert('Incorrect answer.');
+                    //     hint.style.display = 'block';
+                    // }
+                    // nextQuestion();
                 });
-                answerContainer.appendChild(optionElement);
+                answerContainer.appendChild(optionElement); // Append options to answer container
             });
 
+            // Find the correct option description for the current question
+            const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
+
+            // Create a new element to display the correct option description
+            const correctOptionDescriptionElement = document.createElement('div');
+            correctOptionDescriptionElement.classList.add('correct-option-description');
+            correctOptionDescriptionElement.innerText = correctOptionDescription;
+
+            questionContainer.appendChild(correctOptionDescriptionElement);
             questionContainer.appendChild(questionText);
-            questionContainer.appendChild(answerContainer);
+            questionContainer.appendChild(hintContainer); // Append hint container
+            questionContainer.appendChild(answerContainer); // Append answer container
             quizWindow.querySelector('.quiz-window-controls').appendChild(prevQuestionBtn);
             quizWindow.querySelector('.quiz-window-controls').appendChild(nextQuestionBtn);
-            quizWindow.querySelector('.quiz-window-hint').appendChild(hint);
 
             console.log('Question text:', quizWindowTitle.innerText);
-            console.log('Question hint:', quizWindowHint.innerText);
             console.log('Question options:', Array.from(answerContainer.children).map(child => child.innerText));
         };
+
+        // Declare variables to track scores
+        let scoreWithoutHints = 0;
+        let scoreWithHints = 0;
+
+        // Logic to handle user answer selection
+        function handleUserAnswer(selectedOption) {
+            const question = quizData.Questions[currentQuestionIndex];
+            const correctOptionId = question.CorrectOption;
+            const selectedOptionId = parseInt(selectedOption.getAttribute('data-option-id'));
+
+            // Find the correct option data for the answer field of the current question
+            const correctOptionIndex = quizData.Questions[currentQuestionIndex].CorrectOption;
+            const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex) + '.';
+            const correctOptionText = quizData.Questions[currentQuestionIndex].Options[correctOptionIndex];
+            const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
+
+            // Construct the message for the answer field
+            const answerMessage = `${correctOptionLetter} - ${correctOptionText}\n${correctOptionDescription}`;
+
+            if (selectedOptionId === correctOptionId) {
+                // Correct answer selected
+                scoreWithoutHints++; // Increment score without hints
+                scoreWithHints++; // Increment score with hints
+                // Proceed to next question or whatever your logic is
+            } else {
+                // Incorrect answer selected
+                if (selectedOption.classList.contains('attempted')) {
+                    // User attempted the question twice, show correct answer
+                    showCorrectAnswer(question.Options[correctOptionId], question.Hint);
+                    // Disable all options to prevent further selection
+                    disableOptions();
+                } else {
+                    // First attempt, show hint
+                    showHint(question.Hint);
+                    // Mark selected option as attempted
+                    selectedOption.classList.add('attempted');
+                }
+            }
+            // change the location of this to the answer window
+            alert(answerMessage)
+        }
+
 
         const generateNavigationButtons = () => {
             const prevQuestionBtn = document.querySelector('.prev-question-btn');
@@ -241,12 +285,49 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
+            function prevQuestion() {
+                currentQuestionIndex--;
+                updateQuestion();
+            }
+
+            function nextQuestion() {
+                currentQuestionIndex++;
+                updateQuestion();
+            }
+
             prevQuestionBtn.addEventListener('click', () => {
                 prevQuestion();
+                updateQuestionWindow(); // Update the question window when navigating
             });
 
             nextQuestionBtn.addEventListener('click', () => {
+                const selectedOption = document.querySelector('input[name="option"]:checked');
+
+                if (!selectedOption) {
+                    alert('Selecteer 1 van de antwoord opties voor dat je de vraag checked');
+                    return; // Do not allow a user to proceed if no option is selected
+                }
+
+                const selectedOptionId = parseInt(selectedOption.value); // Assuming option value is its ID
+                const correctOptionId = quizData.Questions[currentQuestionIndex].CorrectOption;
+
+                if (selectedOptionId === correctOptionId) {
+                    alert('Correct answer!');
+                    // Update scoring logic here if necessary
+                } else {
+                    alert('Incorrect answer.');
+                    // Grey out incorrect option
+                    selectedOption.disabled = true;
+                    selectedOption.parentElement.classList.add('incorrect-retry');
+                    // Display hint
+                    const hint = quizData.Questions[currentQuestionIndex].Hint;
+                    document.getElementById('quiz-window-hint').innerText = hint;
+                }
+
+                handleUserAnswer(selectedOptionId, correctOptionId);
+
                 nextQuestion();
+                updateQuestionWindow(); // Update the question window when navigating
             });
         };
 
@@ -292,9 +373,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log(`Option ${index + 1}: ${option.innerText}`);
         });
 
-        // console.log(quizWindow.querySelector('.prev-question-btn').innerText);
-        // console.log(quizWindow.querySelector('.next-question-btn').innerText);
-        // console.log(quizWindow.querySelector('.timer').innerText);
     };
 
     const quizWindowClose = document.querySelector('.quiz-window-close');
@@ -309,16 +387,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentQuestionIndex = 0;
 
     async function initializeQuiz() {
-        // const user = firebase.auth().currentUser;
-        // if (!user) {
-
-        // }
-        // else {
-        //     // Redirect the user to the 'login_student_tvt.html'
-        //     window.location.href = "login_student_tvt.html";
-        // }
-
-
         const quizWindow = document.querySelector('.quiz-window');
         quizWindow.querySelector('.quiz-window-title').innerText = quizData.Title;
 
@@ -357,6 +425,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             answerContainer.appendChild(optionElement);
         });
 
+
         questionContainer.appendChild(questionText);
         questionContainer.appendChild(answerContainer);
         quizWindow.querySelector('.quiz-window-controls').appendChild(prevQuestionBtn);
@@ -372,6 +441,70 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
+
+
+        // Function to calculate scores and display results upon quiz submission
+        function submitQuiz() {
+            const totalQuestions = quizData.Questions.length;
+            const scoreWithoutHintsPercentage = (scoreWithoutHints / totalQuestions) * 100;
+            const scoreWithHintsPercentage = (scoreWithHints / totalQuestions) * 100;
+
+            console.log('Score without hints:', scoreWithoutHints, '/', totalQuestions);
+            console.log('Score with hints:', scoreWithHints, '/', totalQuestions);
+
+            // Display overlay with scores
+            const overlay = document.createElement('div');
+            overlay.classList.add('overlay');
+            overlay.innerHTML = `
+                <div class="score-overlay">
+                    <h2>Quiz Results</h2>
+                    <p>Score without hints: ${scoreWithoutHintsPercentage}%</p>
+                    <p>Score with hints: ${scoreWithHintsPercentage}%</p>
+                    <button onclick="redirectToDashboard()">Go to Dashboard</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        // Function to redirect user to dashboard
+        function redirectToDashboard() {
+            window.location.href = "dashboard.html";
+        }
+
+        // Function to show hint in the hint field
+        function showHint(hint) {
+            const hintField = document.getElementById('quiz-window-hint');
+            hintField.innerText = hint;
+            hintField.style.display = 'block';
+        }
+
+        // Function to display correct answer along with hint
+        function showCorrectAnswer(answer, hint) {
+            const answerField = document.getElementById('quiz-window-answer');
+            answerField.innerText = `Hint: ${hint}\nCorrect Answer: ${answer}`;
+            answerField.style.display = 'block';
+        }
+
+        // Function to disable all options after showing correct answer
+        function disableOptions() {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.style.pointerEvents = 'none'; // Disable clicking on options
+                option.style.opacity = '0.5'; // Reduce opacity to visually indicate disabled state
+            });
+        }
+
+        // Logic to handle quiz submission
+        const submitQuizBtn = document.querySelector('.submit-quiz-btn');
+        if (submitQuizBtn) {
+            submitQuizBtn.addEventListener('click', () => {
+                submitQuiz();
+            });
+        } else {
+            console.error('submitQuizBtn not found');
+        }
+
+
         function checkSubmitButton() {
             if (answeredQuestions === quizData.Questions.length) {
                 const submitQuizBtn = document.querySelector('.submit-quiz-btn');
@@ -385,7 +518,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         checkSubmitButton();
 
-        const submitQuizBtn = document.querySelector('.submit-quiz-btn');
         if (submitQuizBtn) {
             submitQuizBtn.addEventListener('click', async () => {
                 const selectedOption = document.querySelector('input[name="option"]:checked');
@@ -424,15 +556,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    function prevQuestion() {
-        currentQuestionIndex--;
-        updateQuestion();
-    }
-
-    function nextQuestion() {
-        currentQuestionIndex++;
-        updateQuestion();
-    }
 
     function updateQuestion() {
         const quizWindow = document.querySelector('.quiz-window');
@@ -448,14 +571,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const optionElement = document.createElement('div');
             optionElement.classList.add('option');
             optionElement.innerText = option;
-            optionElement.addEventListener('click', () => {
-                if (option === quizData.Questions[currentQuestionIndex].Correct) {
-                    alert('Correct answer!');
-                } else {
-                    alert('Incorrect answer.');
-                }
-                nextQuestion();
-            });
+            // optionElement.addEventListener('click', () => {
+            //     if (option === quizData.Questions[currentQuestionIndex].Correct) {
+            //         alert('Correct answer!');
+            //     } else {
+            //         alert('Incorrect answer.');
+            //     }
+            //     nextQuestion();
+            // });
             answerContainer.appendChild(optionElement);
         });
 
@@ -511,25 +634,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('quiz-window-container').classList.remove('open');
     }
 });
-
-
-// Get the embedded text data from Firestore
-// const embeddedTextDoc = await embeddedTextCollection.doc(embeddedTextId).get();
-// const embeddedTextJson = embeddedTextDoc.data().data;
-
-// // Parse the JSON object
-// const embeddedTextData = JSON.parse(embeddedTextJson);
-
-// // Generate the HTML for the embedded text
-// const embeddedTextHtml = Handlebars.compile(embeddedTextData.html);
-
-// // Insert the HTML into the page
-// const embeddedTextContainer = document.querySelector("#embedded-text-container");
-// embeddedTextContainer.innerHTML = embeddedTextHtml;
-
-// // Apply the CSS preferences
-// const embeddedTextCss = embeddedTextData.css;
-// for (const key in embeddedTextCss) {
-//   embeddedTextContainer.style[key] = embeddedTextCss[key];
-// }
 
