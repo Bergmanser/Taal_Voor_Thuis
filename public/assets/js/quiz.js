@@ -194,6 +194,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             hintContainer.innerHTML = '';
             answerContainer.innerHTML = '';
 
+            let selectedOption = null;
+
             question.Options.forEach((option, index) => {
                 const optionElement = document.createElement('div');
                 optionElement.classList.add('option');
@@ -203,15 +205,52 @@ document.addEventListener('DOMContentLoaded', async () => {
                 optionElement.innerText = optionLetter + ' ' + option;
 
                 optionElement.addEventListener('click', () => {
-                    // if (option === question.Correct) {
-                    //     alert('Correct answer!');
-                    // } else {
-                    //     alert('Incorrect answer.');
-                    //     hint.style.display = 'block';
-                    // }
-                    // nextQuestion();
+                    if (selectedOption) {
+                        selectedOption.classList.remove('selected');
+                    }
+                    selectedOption = optionElement;
+                    selectedOption.classList.add('selected');
                 });
+
                 answerContainer.appendChild(optionElement); // Append options to answer container
+            });
+
+            // Add an event listener to the answer container to handle clicks on options
+            answerContainer.addEventListener('click', (event) => {
+                if (event.target.tagName === 'DIV' && event.target.classList.contains('option')) {
+                    console.log('Option clicked:', event.target);
+                    const radioButtons = event.target.querySelectorAll('input[type="radio"]');
+                    radioButtons.forEach((radioButton) => {
+                        if (radioButton.checked) {
+                            radioButton.checked = false;
+                        } else {
+                            radioButton.checked = true;
+                        }
+                    });
+                    if (selectedOption) {
+                        selectedOption.classList.remove('selected');
+                    }
+                    selectedOption = event.target;
+                    selectedOption.classList.add('selected');
+                }
+            });
+
+            // Add an event listener to the answer container to handle clicks on options
+            answerContainer.addEventListener('click', (event) => {
+                if (event.target.tagName === 'INPUT' && event.target.type === 'radio') {
+                    event.target.checked = true;
+                    const radioButtons = answerContainer.querySelectorAll('input[type="radio"]');
+                    radioButtons.forEach((radioButton) => {
+                        if (radioButton !== event.target) {
+                            radioButton.checked = false;
+                        }
+                    });
+                    if (selectedOption) {
+                        selectedOption.classList.remove('selected');
+                    }
+                    selectedOption = event.target.parentElement;
+                    selectedOption.classList.add('selected');
+                }
             });
 
             // Find the correct option description for the current question
@@ -222,7 +261,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             correctOptionDescriptionElement.classList.add('correct-option-description');
             correctOptionDescriptionElement.innerText = correctOptionDescription;
 
-            questionContainer.appendChild(correctOptionDescriptionElement);
+            // questionContainer.appendChild(correctOptionDescriptionElement);
             questionContainer.appendChild(questionText);
             questionContainer.appendChild(hintContainer); // Append hint container
             questionContainer.appendChild(answerContainer); // Append answer container
@@ -238,21 +277,53 @@ document.addEventListener('DOMContentLoaded', async () => {
         let scoreWithHints = 0;
 
         // Logic to handle user answer selection
-        function handleUserAnswer(selectedOption) {
+        // function handleUserAnswer(selectedOption) {
+        //     const question = quizData.Questions[currentQuestionIndex];
+        //     const correctOptionId = question.CorrectOption;
+        //     const selectedOptionId = parseInt(selectedOption.getAttribute('data-option-id'));
+
+        //     // Find the correct option data for the answer field of the current question
+        //     const correctOptionIndex = quizData.Questions[currentQuestionIndex].CorrectOption;
+        //     const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex) + '.';
+        //     const correctOptionText = quizData.Questions[currentQuestionIndex].Options[correctOptionIndex];
+        //     const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
+
+        //     // Construct the message for the answer field
+        //     const answerMessage = `${correctOptionLetter} - ${correctOptionText}\n${correctOptionDescription}`;
+
+        //     if (selectedOptionId === correctOptionId) {
+        //         // Correct answer selected
+        //         scoreWithoutHints++; // Increment score without hints
+        //         scoreWithHints++; // Increment score with hints
+        //         // Proceed to next question or whatever your logic is
+        //     } else {
+        //         // Incorrect answer selected
+        //         if (selectedOption.classList.contains('attempted')) {
+        //             // User attempted the question twice, show correct answer
+        //             showCorrectAnswer(question.Options[correctOptionId], question.Hint);
+        //             // Disable all options to prevent further selection
+        //             disableOptions();
+        //         } else {
+        //             // First attempt, show hint
+        //             showHint(question.Hint);
+        //             // Mark selected option as attempted
+        //             selectedOption.classList.add('attempted');
+        //         }
+        //     }
+        //     // change the location of this to the answer window
+        //     alert(answerMessage)
+        // }
+
+
+        function handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription) {
+            console.log('Selected option:', selectedOption);
+            console.log('Correct option letter:', correctOptionLetter);
+            console.log('Correct option text:', correctOptionText);
+            console.log('Correct option description:', correctOptionDescription);
+
             const question = quizData.Questions[currentQuestionIndex];
-            const correctOptionId = question.CorrectOption;
-            const selectedOptionId = parseInt(selectedOption.getAttribute('data-option-id'));
 
-            // Find the correct option data for the answer field of the current question
-            const correctOptionIndex = quizData.Questions[currentQuestionIndex].CorrectOption;
-            const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex) + '.';
-            const correctOptionText = quizData.Questions[currentQuestionIndex].Options[correctOptionIndex];
-            const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
-
-            // Construct the message for the answer field
-            const answerMessage = `${correctOptionLetter} - ${correctOptionText}\n${correctOptionDescription}`;
-
-            if (selectedOptionId === correctOptionId) {
+            if (selectedOption.value === question.CorrectOption.toString()) {
                 // Correct answer selected
                 scoreWithoutHints++; // Increment score without hints
                 scoreWithHints++; // Increment score with hints
@@ -261,7 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Incorrect answer selected
                 if (selectedOption.classList.contains('attempted')) {
                     // User attempted the question twice, show correct answer
-                    showCorrectAnswer(question.Options[correctOptionId], question.Hint);
+                    showCorrectAnswer(correctOptionLetter, correctOptionText, correctOptionDescription);
                     // Disable all options to prevent further selection
                     disableOptions();
                 } else {
@@ -271,10 +342,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     selectedOption.classList.add('attempted');
                 }
             }
-            // change the location of this to the answer window
-            alert(answerMessage)
+            // Change the location of this to the answer window
+            alert(`${correctOptionLetter} - ${correctOptionText}\n${correctOptionDescription}`);
         }
-
 
         const generateNavigationButtons = () => {
             const prevQuestionBtn = document.querySelector('.prev-question-btn');
@@ -308,23 +378,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return; // Do not allow a user to proceed if no option is selected
                 }
 
-                const selectedOptionId = parseInt(selectedOption.value); // Assuming option value is its ID
-                const correctOptionId = quizData.Questions[currentQuestionIndex].CorrectOption;
+                // const selectedOptionId = parseInt(selectedOption.value); // Assuming option value is its ID
+                // const correctOptionId = quizData.Questions[currentQuestionIndex].CorrectOption;
 
-                if (selectedOptionId === correctOptionId) {
-                    alert('Correct answer!');
-                    // Update scoring logic here if necessary
-                } else {
-                    alert('Incorrect answer.');
-                    // Grey out incorrect option
-                    selectedOption.disabled = true;
-                    selectedOption.parentElement.classList.add('incorrect-retry');
-                    // Display hint
-                    const hint = quizData.Questions[currentQuestionIndex].Hint;
-                    document.getElementById('quiz-window-hint').innerText = hint;
-                }
+                const correctOptionIndex = quizData.Questions[currentQuestionIndex].CorrectOption;
+                const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex) + '.';
+                const correctOptionText = quizData.Questions[currentQuestionIndex].Options[correctOptionIndex];
+                const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
 
-                handleUserAnswer(selectedOptionId, correctOptionId);
+
+                // if (selectedOptionId === correctOptionId) {
+                //     alert('Correct answer!');
+                //     // Update scoring logic here if necessary
+                // } else {
+                //     alert('Incorrect answer.');
+                //     // Grey out incorrect option
+                //     selectedOption.disabled = true;
+                //     selectedOption.parentElement.classList.add('incorrect-retry');
+                //     // Display hint
+                //     const hint = quizData.Questions[currentQuestionIndex].Hint;
+                //     document.getElementById('quiz-window-hint').innerText = hint;
+                // }
+
+                // handleUserAnswer(selectedOptionId, correctOptionId);
+                handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription);
 
                 nextQuestion();
                 updateQuestionWindow(); // Update the question window when navigating

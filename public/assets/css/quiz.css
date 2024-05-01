@@ -241,7 +241,8 @@ ul {
 .quiz-question-container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 5rem;
+  width: 100%;
 }
 
 .quiz-question {
@@ -465,7 +466,7 @@ ul {
   margin-bottom: 1rem;
 }
 
-.quiz-window-answers {
+/* .quiz-window-answers {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -475,7 +476,7 @@ ul {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
+} */
 
 .quiz-window-answer-btn {
   border: none;
@@ -534,13 +535,20 @@ ul {
 
 /* CSS class for the correct answer field (new) */
 .quiz-window-answer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 50%; /* Adjust this value as needed */
+  overflow-y: auto;
   margin-top: 10px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: #f8f9fa;
+  /* background-color: #f8f9fa;
   font-size: 14px;
-  color: #6c757d;
+  color: #6c757d; */
 }
 
 /* CSS class for the container of question options */
@@ -557,6 +565,19 @@ ul {
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.option:hover {
+  border-color: blue;
+  transition: border-color 0.3s ease;
+}
+
+.option.selected:hover {
+  border-color: blue; /* Add this line */
 }
 
 .option input[type="radio"] {
@@ -564,6 +585,7 @@ ul {
   opacity: 0;
   width: 0;
   height: 0;
+  outline: none;
 }
 
 .option label {
@@ -575,7 +597,7 @@ ul {
 }
 
 .option label::before {
-  content: "";
+  /* content: ""; */
   position: absolute;
   left: 0;
   top: 50%;
@@ -588,12 +610,11 @@ ul {
 }
 
 .option input[type="radio"]:checked + label::before {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
+  display: none;
 }
 
 .option input[type="radio"]:checked + label::after {
-  content: "";
+  /* content: ""; */
   position: absolute;
   left: 50%;
   top: 50%;
@@ -602,6 +623,10 @@ ul {
   height: 10px;
   border-radius: 50%;
   background-color: #fff;
+}
+
+.option.selected {
+  border-color: blue; /* Add this line */
 }
 
 .option input[type="radio"]:disabled + label {
@@ -620,10 +645,16 @@ ul {
 
 /* CSS for styling the selected option */
 .selected {
-  background-color: #e9ecef;
+  background-color: beige;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   border-radius: 4px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+.selected:active {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transform: translateY(2px);
+}
 
 .incorrect-retry {
   background-color: #f8f9fa;
@@ -707,25 +738,3 @@ ul {
   line-height: 1.5;
 }
 
-@media (max-width: 767.98px) {
-  .quiz-container {
-    grid-template-columns: 1fr;
-  }
-
-  .quiz-window-container {
-    width: 100%;
-  }
-
-  .quiz-window {
-    width: 100%;
-    height: 100%;
-  }
-
-  .embedded-text-section {
-    width: 100%;
-  }
-
-  .embedded-text {
-    width: 100%;
-  }
-}
