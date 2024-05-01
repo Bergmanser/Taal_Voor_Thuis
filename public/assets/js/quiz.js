@@ -59,6 +59,75 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
+// Declare variables to track scores
+let scoreWithoutHints = 0;
+let scoreWithHints = 0;
+
+// Logic to handle user answer selection
+function handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription) {
+    console.log('Selected option:', selectedOption);
+    console.log('Correct option letter:', correctOptionLetter);
+    console.log('Correct option text:', correctOptionText);
+    console.log('Correct option description:', correctOptionDescription);
+
+    const question = quizData.Questions[currentQuestionIndex];
+
+    if (selectedOption.value === question.CorrectOption.toString()) {
+        // Correct answer selected
+        scoreWithoutHints++; // Increment score without hints
+        scoreWithHints++; // Increment score with hints
+        // Proceed to next question or whatever your logic is
+    } else {
+        // Incorrect answer selected
+        if (selectedOption.classList.contains('attempted')) {
+            // User attempted the question twice, show correct answer
+            showCorrectAnswer(correctOptionLetter, correctOptionText, correctOptionDescription);
+            // Disable all options to prevent further selection
+            disableOptions();
+        } else {
+            // First attempt, show hint
+            showHint(question.Hint);
+            // Mark selected option as attempted
+            selectedOption.classList.add('attempted');
+        }
+    }
+    // Change the location of this to the answer window
+    alert(`${correctOptionLetter} - ${correctOptionText}\n${correctOptionDescription}`);
+}
+
+// Function to show hint
+function showHint(hint) {
+    const hintContainer = document.querySelector('.hint-container');
+    hintContainer.innerHTML = '';
+    const hintParagraph = document.createElement('p');
+    hintParagraph.innerText = hint;
+    hintContainer.appendChild(hintParagraph);
+    hintContainer.style.display = 'block';
+}
+
+// Function to show correct answer
+function showCorrectAnswer(correctOptionLetter, correctOptionText, correctOptionDescription) {
+    const answerContainer = document.querySelector('.answer-container');
+    const correctAnswerElement = document.createElement('div');
+    correctAnswerElement.classList.add('correct-answer');
+    correctAnswerElement.innerHTML = `<p>Correct answer: ${correctOptionLetter} - ${correctOptionText}</p><p>${correctOptionDescription}</p>`;
+    answerContainer.appendChild(correctAnswerElement);
+    answerContainer.style.display = 'block';
+}
+
+// Function to disable options
+function disableOptions() {
+    const options = document.querySelectorAll('.option');
+    options.forEach((option) => {
+        option.disabled = true;
+    });
+}
+
+let quizData
+let currentQuestionIndex = 0;
+let answeredQuestions = 0
+let result
+
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const quizId = urlParams.get('id');
@@ -72,11 +141,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("No such document!");
         window.location.href = "student_dashboard.html";
     } else {
-        const quizData = quizDocSnap.data();
+        quizData = quizDocSnap.data();
 
         if (quizData) {
             console.log("Document data:", quizData);
             document.querySelector('.title').innerText = quizData.Title;
+
+            initializeQuiz();
 
             // Parse the HTML content
             const parser = new DOMParser();
@@ -140,11 +211,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const quizWindow = document.querySelector('.quiz-window');
         const quizWindowTitle = document.getElementById('question-window-title');
         const questionContainer = quizWindow.querySelector('.question-container');
-        const answerContainer = quizWindow.querySelector('.quiz-window-answer');
+        const answerDescriptionContainer = quizWindow.querySelector('.quiz-window-answer');
+        const hintContainer = quizWindow.querySelector(".quiz-window-hint")
         const questionNumber = quizWindow.querySelector('.question-number');
         const quizWindowContainer = document.querySelector('.quiz-window-container');
         const startQuizButton = document.getElementById("start-quiz-button");
-        let currentQuestionIndex = 0; // Initialize currentQuestionIndex here
         const prevQuestionBtn = document.createElement('button');
         const nextQuestionBtn = document.createElement('button');
 
@@ -200,20 +271,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const optionElement = document.createElement('div');
                 optionElement.classList.add('option');
 
-                // Add alphabetical letter in front of option text
                 const optionLetter = String.fromCharCode(65 + index) + '.';
                 optionElement.innerText = optionLetter + ' ' + option;
 
-                optionElement.addEventListener('click', () => {
-                    if (selectedOption) {
-                        selectedOption.classList.remove('selected');
-                    }
-                    selectedOption = optionElement;
-                    selectedOption.classList.add('selected');
-                });
+                const radioButton = document.createElement('input');
+                radioButton.type = 'radio';
+                radioButton.name = 'option';
+                radioButton.value = index.toString();
+
+                optionElement.appendChild(radioButton);
 
                 answerContainer.appendChild(optionElement); // Append options to answer container
             });
+
 
             // Add an event listener to the answer container to handle clicks on options
             answerContainer.addEventListener('click', (event) => {
@@ -265,86 +335,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             questionContainer.appendChild(questionText);
             questionContainer.appendChild(hintContainer); // Append hint container
             questionContainer.appendChild(answerContainer); // Append answer container
-            quizWindow.querySelector('.quiz-window-controls').appendChild(prevQuestionBtn);
-            quizWindow.querySelector('.quiz-window-controls').appendChild(nextQuestionBtn);
 
             console.log('Question text:', quizWindowTitle.innerText);
             console.log('Question options:', Array.from(answerContainer.children).map(child => child.innerText));
         };
 
-        // Declare variables to track scores
-        let scoreWithoutHints = 0;
-        let scoreWithHints = 0;
-
-        // Logic to handle user answer selection
-        // function handleUserAnswer(selectedOption) {
-        //     const question = quizData.Questions[currentQuestionIndex];
-        //     const correctOptionId = question.CorrectOption;
-        //     const selectedOptionId = parseInt(selectedOption.getAttribute('data-option-id'));
-
-        //     // Find the correct option data for the answer field of the current question
-        //     const correctOptionIndex = quizData.Questions[currentQuestionIndex].CorrectOption;
-        //     const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex) + '.';
-        //     const correctOptionText = quizData.Questions[currentQuestionIndex].Options[correctOptionIndex];
-        //     const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
-
-        //     // Construct the message for the answer field
-        //     const answerMessage = `${correctOptionLetter} - ${correctOptionText}\n${correctOptionDescription}`;
-
-        //     if (selectedOptionId === correctOptionId) {
-        //         // Correct answer selected
-        //         scoreWithoutHints++; // Increment score without hints
-        //         scoreWithHints++; // Increment score with hints
-        //         // Proceed to next question or whatever your logic is
-        //     } else {
-        //         // Incorrect answer selected
-        //         if (selectedOption.classList.contains('attempted')) {
-        //             // User attempted the question twice, show correct answer
-        //             showCorrectAnswer(question.Options[correctOptionId], question.Hint);
-        //             // Disable all options to prevent further selection
-        //             disableOptions();
-        //         } else {
-        //             // First attempt, show hint
-        //             showHint(question.Hint);
-        //             // Mark selected option as attempted
-        //             selectedOption.classList.add('attempted');
-        //         }
-        //     }
-        //     // change the location of this to the answer window
-        //     alert(answerMessage)
-        // }
-
-
-        function handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription) {
-            console.log('Selected option:', selectedOption);
-            console.log('Correct option letter:', correctOptionLetter);
-            console.log('Correct option text:', correctOptionText);
-            console.log('Correct option description:', correctOptionDescription);
-
-            const question = quizData.Questions[currentQuestionIndex];
-
-            if (selectedOption.value === question.CorrectOption.toString()) {
-                // Correct answer selected
-                scoreWithoutHints++; // Increment score without hints
-                scoreWithHints++; // Increment score with hints
-                // Proceed to next question or whatever your logic is
-            } else {
-                // Incorrect answer selected
-                if (selectedOption.classList.contains('attempted')) {
-                    // User attempted the question twice, show correct answer
-                    showCorrectAnswer(correctOptionLetter, correctOptionText, correctOptionDescription);
-                    // Disable all options to prevent further selection
-                    disableOptions();
-                } else {
-                    // First attempt, show hint
-                    showHint(question.Hint);
-                    // Mark selected option as attempted
-                    selectedOption.classList.add('attempted');
-                }
-            }
-            // Change the location of this to the answer window
-            alert(`${correctOptionLetter} - ${correctOptionText}\n${correctOptionDescription}`);
-        }
 
         const generateNavigationButtons = () => {
             const prevQuestionBtn = document.querySelector('.prev-question-btn');
@@ -357,12 +352,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             function prevQuestion() {
                 currentQuestionIndex--;
-                updateQuestion();
+                updateQuestionWindow();
             }
 
             function nextQuestion() {
                 currentQuestionIndex++;
-                updateQuestion();
+                updateQuestionWindow();
             }
 
             prevQuestionBtn.addEventListener('click', () => {
@@ -378,36 +373,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return; // Do not allow a user to proceed if no option is selected
                 }
 
-                // const selectedOptionId = parseInt(selectedOption.value); // Assuming option value is its ID
-                // const correctOptionId = quizData.Questions[currentQuestionIndex].CorrectOption;
-
+                // If an option is selected, proceed with checking the answer and navigating to the next question
                 const correctOptionIndex = quizData.Questions[currentQuestionIndex].CorrectOption;
                 const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex) + '.';
                 const correctOptionText = quizData.Questions[currentQuestionIndex].Options[correctOptionIndex];
                 const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
 
-
-                // if (selectedOptionId === correctOptionId) {
-                //     alert('Correct answer!');
-                //     // Update scoring logic here if necessary
-                // } else {
-                //     alert('Incorrect answer.');
-                //     // Grey out incorrect option
-                //     selectedOption.disabled = true;
-                //     selectedOption.parentElement.classList.add('incorrect-retry');
-                //     // Display hint
-                //     const hint = quizData.Questions[currentQuestionIndex].Hint;
-                //     document.getElementById('quiz-window-hint').innerText = hint;
-                // }
-
-                // handleUserAnswer(selectedOptionId, correctOptionId);
                 handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription);
 
                 nextQuestion();
                 updateQuestionWindow(); // Update the question window when navigating
+
             });
         };
-
         const generateTimer = () => {
             const timer = document.createElement('div');
             timer.classList.add('timer');
@@ -460,22 +438,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         startQuizButton.style.display = 'block';
     });
 
+    function prevQuestion() {
+        currentQuestionIndex--;
+        updateQuestionWindow();
+    }
 
-    let currentQuestionIndex = 0;
+    function nextQuestion() {
+        currentQuestionIndex++;
+        updateQuestionWindow();
+    }
+
+    function checkSubmitButton() {
+        const quizWindow = document.querySelector('.quiz-window');
+        const submitQuizBtn = quizWindow.querySelector('.submit-quiz-btn');
+        return submitQuizBtn;
+    }
 
     async function initializeQuiz() {
+        if (!quizData) {
+            console.error('quizData not found');
+            return;
+        }
+
         const quizWindow = document.querySelector('.quiz-window');
-        quizWindow.querySelector('.quiz-window-title').innerText = quizData.Title;
-
-        const prevQuestionBtn = document.createElement('button');
-        prevQuestionBtn.classList.add('prev-question-btn');
-        prevQuestionBtn.innerText = 'Previous';
-        prevQuestionBtn.disabled = true;
-
-        const nextQuestionBtn = document.createElement('button');
-        nextQuestionBtn.classList.add('next-question-btn');
-        nextQuestionBtn.innerText = 'Next';
-        nextQuestionBtn.disabled = currentQuestionIndex === quizData.Questions.length - 1;
+        const prevQuestionBtn = quizWindow.querySelector('.prev-question-btn');
+        const nextQuestionBtn = quizWindow.querySelector('.next-question-btn');
+        const submitQuizBtn = quizWindow.querySelector('.submit-quiz-btn');
 
         const questionContainer = document.querySelector('.question-container');
         const questionText = document.createElement('div');
@@ -484,6 +472,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const answerContainer = document.createElement('div');
         answerContainer.classList.add('answer-container');
+
+        const hintContainer = document.createElement('div');
+        answerContainer.classList.add('hint-container');
 
         quizWindow.querySelector('.quiz-window-header .question-number').innerText = `${currentQuestionIndex + 1} / ${quizData.Questions.length}`;
 
@@ -507,8 +498,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         questionContainer.appendChild(answerContainer);
         quizWindow.querySelector('.quiz-window-controls').appendChild(prevQuestionBtn);
         quizWindow.querySelector('.quiz-window-controls').appendChild(nextQuestionBtn);
-
-        let answeredQuestions = 0;
 
         const options = document.querySelectorAll('.option');
         options.forEach((option) => {
@@ -571,31 +560,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Logic to handle quiz submission
-        const submitQuizBtn = document.querySelector('.submit-quiz-btn');
-        if (submitQuizBtn) {
-            submitQuizBtn.addEventListener('click', () => {
-                submitQuiz();
-            });
-        } else {
-            console.error('submitQuizBtn not found');
-        }
-
-
-        function checkSubmitButton() {
-            if (answeredQuestions === quizData.Questions.length) {
-                const submitQuizBtn = document.querySelector('.submit-quiz-btn');
-                if (submitQuizBtn) {
-                    submitQuizBtn.style.display = 'block';
-                } else {
-                    console.error('submitQuizBtn not found');
-                }
-            }
-        }
-
         checkSubmitButton();
 
         if (submitQuizBtn) {
+            console.error('submitQuizBtn not found');
             submitQuizBtn.addEventListener('click', async () => {
                 const selectedOption = document.querySelector('input[name="option"]:checked');
                 if (!selectedOption) {
@@ -620,53 +588,76 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('submitQuizBtn not found');
         }
 
+        // updateQuestionWindow();
+
+        // Update the prev/next buttons
         prevQuestionBtn.addEventListener('click', () => {
             if (currentQuestionIndex > 0) {
                 prevQuestion();
+                nextQuestionBtn.disabled = false;
+                updateQuestionWindow(); // Update the question window when navigating
             }
         });
 
         nextQuestionBtn.addEventListener('click', () => {
             if (currentQuestionIndex < quizData.Questions.length - 1) {
                 nextQuestion();
+                prevQuestionBtn.disabled = false;
+                updateQuestionWindow(); // Update the question window when navigating
             }
         });
     }
 
 
-    function updateQuestion() {
+    const updateQuestionWindow = () => {
         const quizWindow = document.querySelector('.quiz-window');
         const questionText = quizWindow.querySelector('.question-text');
-        const answerContainer = quizWindow.querySelector('.answer-container');
-        const prevQuestionBtn = quizWindow.querySelector('.prev-question-btn');
-        const nextQuestionBtn = quizWindow.querySelector('.next-question-btn');
+        const answerContainer = quizWindow.querySelector('.quiz-window-answer');
+        const hintContainer = quizWindow.querySelector('.hint-container');
+        const correctAnswerContainer = quizWindow.querySelector('.correct-answer-container');
+        const questionNumber = quizWindow.querySelector('.question-number');
 
-        questionText.innerText = quizData.Questions[currentQuestionIndex].Question;
+        if (!quizWindow || !questionText || !answerContainer || !hintContainer || !correctAnswerContainer || !questionNumber) {
+            console.log('quizWindow, questionText, answerContainer, hintContainer, or correctAnswerContainer is null');
+            return;
+        }
+
+        // Clear the answer and hint containers
         answerContainer.innerHTML = '';
+        hintContainer.innerHTML = '';
+        correctAnswerContainer.innerHTML = '';
 
-        quizData.Questions[currentQuestionIndex].Options.forEach((option, index) => {
+        // Update the question number
+        questionNumber.innerText = `Vraag ${currentQuestionIndex + 1} van de ${quizData.Questions.length}`;
+
+        // Get the current question data
+        const questionData = quizData.Questions[currentQuestionIndex];
+
+        // Set the question text
+        questionText.innerText = questionData.Text;
+
+        // Set the answer options
+        questionData.Options.forEach((option, index) => {
             const optionElement = document.createElement('div');
             optionElement.classList.add('option');
             optionElement.innerText = option;
-            // optionElement.addEventListener('click', () => {
-            //     if (option === quizData.Questions[currentQuestionIndex].Correct) {
-            //         alert('Correct answer!');
-            //     } else {
-            //         alert('Incorrect answer.');
-            //     }
-            //     nextQuestion();
-            // });
+
+            // Add event listener to each option
+            optionElement.addEventListener('click', async () => {
+                const correctOptionIndex = quizData.Questions[currentQuestionIndex].CorrectOption;
+                const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex) + '.';
+                const correctOptionText = quizData.Questions[currentQuestionIndex].Options[correctOptionIndex];
+                const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
+
+                handleUserAnswer(optionElement, correctOptionLetter, correctOptionText, correctOptionDescription);
+
+                nextQuestion();
+                updateQuestionWindow(); // Update the question window when navigating
+            });
+
             answerContainer.appendChild(optionElement);
         });
-
-        prevQuestionBtn.disabled = currentQuestionIndex === 0;
-        nextQuestionBtn.disabled = currentQuestionIndex === quizData.Questions.length - 1;
-
-        quizWindow.querySelector('.quiz-window-header .question-number').innerText = `${currentQuestionIndex + 1} / ${quizData.Questions.length}`;
-    }
-
-    initializeQuiz();
-
+    };
 
     // the following code is reponsible for managaging the size of the quiz-window
     $(document).ready(function () {
@@ -674,6 +665,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             $(".quiz-container").toggleClass("layout-changed");
         });
     });
+
+    // Add a CSS class to the container when the quiz window is generated
+    function showQuizWindow() {
+        $('#quiz-window-container').addClass('open');
+    }
+
+    // Remove the CSS class from the container when the quiz window is closed
+    function closeQuizWindow() {
+        $('#quiz-window-container').removeClass('open');
+    }
+
+    // Generate the quiz window when the "Start Quiz" button is clicked
+    $("#start-quiz-button").on("click", function () {
+        showQuizWindow();
+    });
+
+    // Add event listener to close the quiz window
+    $(".close-quiz-window-button").on("click", function () {
+        closeQuizWindow();
+    });
+
+    // Generate the quiz window when the page loads
+    showQuizWindow();
+
+    // Update the question window when the quiz window is opened
+    updateQuestionWindow();
 
     $(document).ready(function () {
         const quizWindowContainer = $(".quiz-window-container");
@@ -699,16 +716,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Add a CSS class to the container when the quiz window is generated
-    function showQuizWindow() {
-        // ...
-        document.getElementById('quiz-window-container').classList.add('open');
-    }
+    // // Add a CSS class to the container when the quiz window is generated
+    // function showQuizWindow() {
+    //     // ...
+    //     document.getElementById('quiz-window-container').classList.add('open');
+    // }
 
-    // Remove the CSS class from the container when the quiz window is closed
-    function closeQuizWindow() {
-        // ...
-        document.getElementById('quiz-window-container').classList.remove('open');
-    }
+    // // Remove the CSS class from the container when the quiz window is closed
+    // function closeQuizWindow() {
+    //     // ...
+    //     document.getElementById('quiz-window-container').classList.remove('open');
+    // }
+
 });
-
