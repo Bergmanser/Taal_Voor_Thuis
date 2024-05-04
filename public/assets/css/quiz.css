@@ -361,11 +361,11 @@ ul {
 /* Question window */
 .quiz-window-container {
   /* position: fixed; */
+  /* background: #f5f5f5; */
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
   top: 0;
   right: 0;
   height: 100%;
-  /* background: #f5f5f5; */
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
   z-index: 101;
   display: none;
   transition: transform 0.3s ease-out;
@@ -723,6 +723,7 @@ ul {
 
 .embedded-text-b {
   font-weight: bold;
+  color: orange;
 }
 
 .embedded-text-strong {

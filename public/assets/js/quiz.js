@@ -48,6 +48,31 @@ const getCssClassForTag = (tag) => {
     }
 };
 
+const bElements = document.getElementsByTagName('b');
+for (let i = 0; i < bElements.length; i++) {
+    const strongElement = document.createElement('strong');
+    strongElement.textContent = bElements[i].textContent;
+    bElements[i].parentNode.replaceChild(strongElement, bElements[i]);
+}
+
+// function applyCssClasses(element) {
+//     if (element.nodeType === Node.TEXT_NODE) {
+//       const cssClass = getCssClassForTag(element.parentElement.tagName.toLowerCase());
+//       if (cssClass) {
+//         const span = document.createElement('span');
+//         span.className = cssClass;
+//         span.textContent = element.textContent;
+//         element.parentElement.replaceChild(span, element);
+//       }
+//     } else {
+//       const cssClass = getCssClassForTag(element.tagName.toLowerCase());
+//       if (cssClass) {
+//         element.classList.add(cssClass);
+//       }
+//       Array.prototype.forEach.call(element.childNodes, applyCssClasses);
+//     }
+//   }
+
 // Check if the user is logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -59,41 +84,150 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Declare variables to track scores
+// Declare variables to get and set al relevant quizData
+let quizData
+let currentQuestionIndex = 0;
+let answeredQuestions = 0
+let result
 let scoreWithoutHints = 0;
 let scoreWithHints = 0;
+let attempts = [];
+const nextQuestionBtn = document.getElementById('.next-question-btn');
 
-// Logic to handle user answer selection
 function handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription) {
-    console.log('Selected option:', selectedOption);
-    console.log('Correct option letter:', correctOptionLetter);
-    console.log('Correct option text:', correctOptionText);
-    console.log('Correct option description:', correctOptionDescription);
+    if (currentQuestionIndex === 0) { // First question
+        //...
+    } else { // For subsequent questions
+        //...
+        if (selectedOption.id === correctOptionLetter) {
+            //...
+        } else { // If the answer is incorrect
+            if (!attempts[currentQuestionIndex]) {
+                attempts[currentQuestionIndex] = {
+                    attemptCount: 0,
+                    userAnswer: null,
+                    hintShown: false,
+                    options: []
+                };
+            }
 
-    const question = quizData.Questions[currentQuestionIndex];
+            if (attempts[currentQuestionIndex].attemptCount === 1) {
+                // First attempt, add points to both scores
+                scoreWithoutHints++;
+                scoreWithHints++;
+            } else if (attempts[currentQuestionIndex].attemptCount === 2) {
+                // Second attempt, add points to scoreWithHints
+                scoreWithHints++;
+            }
 
-    if (selectedOption.value === question.CorrectOption.toString()) {
-        // Correct answer selected
-        scoreWithoutHints++; // Increment score without hints
-        scoreWithHints++; // Increment score with hints
-        // Proceed to next question or whatever your logic is
-    } else {
-        // Incorrect answer selected
-        if (selectedOption.classList.contains('attempted')) {
-            // User attempted the question twice, show correct answer
-            showCorrectAnswer(correctOptionLetter, correctOptionText, correctOptionDescription);
-            // Disable all options to prevent further selection
-            disableOptions();
-        } else {
-            // First attempt, show hint
-            showHint(question.Hint);
-            // Mark selected option as attempted
-            selectedOption.classList.add('attempted');
+            attempts[currentQuestionIndex].attemptCount++;
+            attempts[currentQuestionIndex].userAnswer = selectedOption.id;
+            attempts[currentQuestionIndex].options.forEach(option => {
+                if (option.id === selectedOption.id) {
+                    option.isSelected = true;
+                }
+            });
+
+            if (attempts[currentQuestionIndex].attemptCount === 1) {
+                // First attempt, show hint
+                attempts[currentQuestionIndex].hintShown = true;
+                showHint(quizData.Questions[currentQuestionIndex].Hint);
+            } else if (attempts[currentQuestionIndex].attemptCount === 2) {
+                // Second attempt, show correct answer
+                attempts[currentQuestionIndex].options.forEach(option => {
+                    if (option.isCorrect) {
+                        option.isHinted = true;
+                    } else {
+                        option.isDisabled = true;
+                    }
+                });
+                showCorrectAnswer(correctOptionLetter, correctOptionText, correctOptionDescription);
+            }
+            // // Prevent the user from moving to the next question until they select a radio button
+            // nextQuestionBtn.disabled = true;
+            // document.querySelectorAll('.option').forEach((option) => {
+            //     option.addEventListener('click', () => {
+            //         nextQuestionBtn.disabled = false;
+            //     });
+            // });
+        }
+
+        // Clear the hint and answer containers when navigating to a new question
+        if (currentQuestionIndex !== answeredQuestions - 1) {
+            const hintContainer = document.querySelector('.hint-container');
+            const correctAnswerContainer = document.querySelector('.correct-answer-container');
+            hintContainer.innerHTML = '';
+            correctAnswerContainer.innerHTML = '';
         }
     }
-    // Change the location of this to the answer window
-    alert(`${correctOptionLetter} - ${correctOptionText}\n${correctOptionDescription}`);
+
+    answeredQuestions++;
 }
+
+// // Calculate score and update the question window
+// function handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription) {
+//     if (currentQuestionIndex === 0) { // First question
+//         // If the selected option is correct and has not been previously selected
+//         if (selectedOption.id === correctOptionLetter && !firstAttempt[currentQuestionIndex]) {
+//             // Count score
+//             correctAttempts++;
+//             // Disable all options and mark correct answer green
+//             for (let option of document.getElementsByName('option')) {
+//                 option.disabled = true;
+//                 if (option.id === correctOptionLetter) {
+//                     option.parentElement.style.backgroundColor = 'green';
+//                     option.parentElement.style.borderColor = 'green';
+//                 } else {
+//                     option.parentElement.style.backgroundColor = 'red';
+//                     option.parentElement.style.borderColor = 'red';
+//                 }
+//             }
+//             // Show correct answer description and hint
+//             document.getElementById('correctOptionDescription').innerText = correctOptionDescription;
+//             document.getElementById('hint').innerText = quizData.Questions[currentQuestionIndex].Hint;
+//         } else { // If the answer is incorrect
+//             // If it is the first attempt, mark the incorrect answer grey and disable it
+//             if (!firstAttempt[currentQuestionIndex]) {
+//                 selectedOption.parentElement.style.backgroundColor = 'grey';
+//                 selectedOption.parentElement.style.borderColor = 'grey';
+//                 selectedOption.disabled = true;
+//             }
+//             // Show correct answer description and hint
+//             document.getElementById('correctOptionDescription').innerText = correctOptionDescription;
+//             document.getElementById('hint').innerText = quizData.Questions[currentQuestionIndex].Hint;
+//         }
+//     } else { // For subsequent questions
+//         // If the selected option is correct
+//         if (selectedOption.id === correctOptionLetter) {
+//             // Count score
+//             correctAttempts++;
+//             // Disable all options and mark correct answer green
+//             for (let option of document.getElementsByName('option')) {
+//                 option.disabled = true;
+//                 if (option.id === correctOptionLetter) {
+//                     option.parentElement.style.backgroundColor = 'green';
+//                     option.parentElement.style.borderColor = 'green';
+//                 } else {
+//                     option.parentElement.style.backgroundColor = 'red';
+//                     option.parentElement.style.borderColor = 'red';
+//                 }
+//             }
+//             // Show correct answer description and hint
+//             document.getElementById('correctOptionDescription').innerText = correctOptionDescription;
+//             document.getElementById('hint').innerText = quizData.Questions[currentQuestionIndex].Hint;
+//         } else { // If the answer is incorrect
+//             // If it is the first attempt, mark the incorrect answer grey and disable it
+//             if (!firstAttempt[currentQuestionIndex]) {
+//                 selectedOption.parentElement.style.backgroundColor = 'grey';
+//                 selectedOption.parentElement.style.borderColor = 'grey';
+//                 selectedOption.disabled = true;
+//             }
+//             // Show correct answer description and hint
+//             document.getElementById('correctOptionDescription').innerText = correctOptionDescription;
+//             document.getElementById('hint').innerText = quizData.Questions[currentQuestionIndex].Hint;
+//         }
+//     }
+// }
 
 // Function to show hint
 function showHint(hint) {
@@ -115,7 +249,25 @@ function showCorrectAnswer(correctOptionLetter, correctOptionText, correctOption
     answerContainer.style.display = 'block';
 }
 
-// Function to disable options
+// document.querySelectorAll('.option').forEach((option) => {
+//     option.addEventListener('click', () => {
+//         nextQuestionBtn.disabled = false;
+//         option.querySelector('input[type="radio"]').checked = true;
+//     });
+// });
+
+// // Add a function to check if any radio button is selected
+// function getSelectedRadioButton() {
+//     const radioButtons = document.querySelectorAll('input[type="radio"]');
+//     for (const radioButton of radioButtons) {
+//       if (radioButton.checked) {
+//         return radioButton;
+//       }
+//     }
+//     return null;
+//   }
+
+// // Function to disable options
 function disableOptions() {
     const options = document.querySelectorAll('.option');
     options.forEach((option) => {
@@ -123,10 +275,6 @@ function disableOptions() {
     });
 }
 
-let quizData
-let currentQuestionIndex = 0;
-let answeredQuestions = 0
-let result
 
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -163,8 +311,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     textSections.push(text);
                 } else if (element.tagName) {
                     const tagName = element.tagName.toLowerCase();
-                    const text = element.textContent;
-                    textSections.push(`<${tagName}>${text}</${tagName}>`);
+                    const html = element.outerHTML;
+                    textSections.push(html);
                 }
             });
 
@@ -174,13 +322,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Add suport for images! DO IT!
             const processedTextSections = textSections.map((text) => {
-                const textWithoutTags = text.replace(/<[^>]+>/g, '');
-                const cssClass = getCssClassForTag(text);
-                if (cssClass) {
-                    return `<div class="${cssClass}">${textWithoutTags}</div>`;
-                } else {
-                    return `<div>${textWithoutTags}</div>`;
+                const htmlElement = htmlDoc.createElement('div');
+                htmlElement.innerHTML = text;
+                const elements = htmlElement.childNodes;
+
+                function applyCssClasses(element) {
+                    if (element.nodeType === Node.TEXT_NODE) {
+                        // no change, just keep the text node
+                    } else if (element.tagName) {
+                        const tagName = element.tagName.toLowerCase();
+                        const cssClass = getCssClassForTag(tagName);
+                        if (cssClass) {
+                            element.className = cssClass;
+                        }
+                        // Recursively apply CSS classes to child nodes
+                        Array.prototype.forEach.call(element.childNodes, applyCssClasses);
+                    } else if (element.tagName === 'strong') {
+                        const cssClass = getCssClassForTag('strong');
+                        if (cssClass) {
+                            const span = document.createElement('span');
+                            span.className = cssClass;
+                            span.textContent = element.textContent;
+                            element.parentNode.replaceChild(span, element);
+                        }
+                    }
                 }
+
+                Array.prototype.forEach.call(elements, applyCssClasses);
+
+                return htmlElement.outerHTML;
             });
 
             console.log('Processed text sections:', processedTextSections);
@@ -276,14 +446,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const radioButton = document.createElement('input');
                 radioButton.type = 'radio';
-                radioButton.name = 'option';
+                radioButton.name = `option-${currentQuestionIndex}`;
                 radioButton.value = index.toString();
 
                 optionElement.appendChild(radioButton);
 
                 answerContainer.appendChild(optionElement); // Append options to answer container
             });
-
 
             // Add an event listener to the answer container to handle clicks on options
             answerContainer.addEventListener('click', (event) => {
@@ -305,24 +474,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
-            // Add an event listener to the answer container to handle clicks on options
-            answerContainer.addEventListener('click', (event) => {
-                if (event.target.tagName === 'INPUT' && event.target.type === 'radio') {
-                    event.target.checked = true;
-                    const radioButtons = answerContainer.querySelectorAll('input[type="radio"]');
-                    radioButtons.forEach((radioButton) => {
-                        if (radioButton !== event.target) {
-                            radioButton.checked = false;
-                        }
-                    });
-                    if (selectedOption) {
-                        selectedOption.classList.remove('selected');
-                    }
-                    selectedOption = event.target.parentElement;
-                    selectedOption.classList.add('selected');
-                }
-            });
-
             // Find the correct option description for the current question
             const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
 
@@ -331,81 +482,64 @@ document.addEventListener('DOMContentLoaded', async () => {
             correctOptionDescriptionElement.classList.add('correct-option-description');
             correctOptionDescriptionElement.innerText = correctOptionDescription;
 
-            // questionContainer.appendChild(correctOptionDescriptionElement);
             questionContainer.appendChild(questionText);
             questionContainer.appendChild(hintContainer); // Append hint container
             questionContainer.appendChild(answerContainer); // Append answer container
-
-            console.log('Question text:', quizWindowTitle.innerText);
-            console.log('Question options:', Array.from(answerContainer.children).map(child => child.innerText));
         };
 
 
-        const generateNavigationButtons = () => {
-            const prevQuestionBtn = document.querySelector('.prev-question-btn');
-            const nextQuestionBtn = document.querySelector('.next-question-btn');
-
-            if (!prevQuestionBtn || !nextQuestionBtn) {
-                console.log('prevQuestionBtn or nextQuestionBtn is null');
-                return;
-            }
-
-            function prevQuestion() {
-                currentQuestionIndex--;
-                updateQuestionWindow();
-            }
-
-            function nextQuestion() {
-                currentQuestionIndex++;
-                updateQuestionWindow();
-            }
-
-            prevQuestionBtn.addEventListener('click', () => {
-                prevQuestion();
-                updateQuestionWindow(); // Update the question window when navigating
-            });
-
-            nextQuestionBtn.addEventListener('click', () => {
-                const selectedOption = document.querySelector('input[name="option"]:checked');
-
-                if (!selectedOption) {
-                    alert('Selecteer 1 van de antwoord opties voor dat je de vraag checked');
-                    return; // Do not allow a user to proceed if no option is selected
-                }
-
-                // If an option is selected, proceed with checking the answer and navigating to the next question
-                const correctOptionIndex = quizData.Questions[currentQuestionIndex].CorrectOption;
-                const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex) + '.';
-                const correctOptionText = quizData.Questions[currentQuestionIndex].Options[correctOptionIndex];
-                const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
-
-                handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription);
-
-                nextQuestion();
-                updateQuestionWindow(); // Update the question window when navigating
-
-            });
-        };
         const generateTimer = () => {
-            const timer = document.createElement('div');
-            timer.classList.add('timer');
-            timer.innerText = '00:00';
+            const quizTimerContainer = document.createElement('div');
+            quizTimerContainer.classList.add('quiz-timer-container', 'hidden');
+            quizWindow.querySelector('.quiz-window-header').appendChild(quizTimerContainer);
 
-            quizWindow.querySelector('.quiz-window-controls').appendChild(timer);
+            const quizTimer = document.createElement('div');
+            quizTimer.classList.add('quiz-timer');
+            quizTimerContainer.appendChild(quizTimer);
 
-            let startTime = new Date();
-            let elapsedTime = 0;
+            const questionTimerContainer = document.createElement('div');
+            questionTimerContainer.classList.add('question-timer-container', 'hidden');
+            quizWindow.querySelector('.quiz-window-controls').appendChild(questionTimerContainer);
 
-            const updateTimer = () => {
+            const questionTimer = document.createElement('div');
+            questionTimer.classList.add('question-timer');
+            questionTimerContainer.appendChild(questionTimer);
+
+            let quizStartTime = null;
+            let questionStartTime = null;
+
+            const updateQuizTimer = () => {
+                if (!quizStartTime) {
+                    quizStartTime = new Date();
+                }
                 const now = new Date();
-                elapsedTime = (now - startTime) / 1000;
+                const elapsedTime = (now - quizStartTime) / 1000;
                 const minutes = Math.floor(elapsedTime / 60);
                 const seconds = Math.floor(elapsedTime % 60);
                 const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                timer.innerText = formattedTime;
+                quizTimer.innerText = formattedTime;
             };
 
-            setInterval(updateTimer, 1000);
+            const updateQuestionTimer = () => {
+                if (!questionStartTime) {
+                    questionStartTime = new Date();
+                }
+                const now = new Date();
+                const elapsedTime = (now - questionStartTime) / 1000;
+                const minutes = Math.floor(elapsedTime / 60);
+                const seconds = Math.floor(elapsedTime % 60);
+                const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                questionTimer.innerText = formattedTime;
+            };
+
+            setInterval(updateQuizTimer, 1000);
+
+            const updateQuestion = () => {
+                questionStartTime = new Date();
+                updateQuestionTimer();
+            };
+
+            updateQuestion();
         };
 
         const generateQuizWindow = () => {
@@ -418,7 +552,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             quizWindowContainer.style.display = 'block';
 
             // Initialize the question window, navigation buttons, and timer
-            generateNavigationButtons();
             generateTimer();
             generateQuestionWindow();
         };
@@ -439,14 +572,76 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     function prevQuestion() {
-        currentQuestionIndex--;
-        updateQuestionWindow();
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            updateQuestionWindow();
+            const correctAnswerContainer = document.querySelector('.correct-answer-container');
+            correctAnswerContainer.innerHTML = `<p>${question.CorrectOptionLetter} - ${question.CorrectOptionText}</p><p>${question.CorrectOptionDescription}</p>`;
+            correctAnswerContainer.style.display = 'block';
+        }
     }
 
     function nextQuestion() {
         currentQuestionIndex++;
         updateQuestionWindow();
+        const correctAnswerContainer = document.querySelector('.correct-answer-container');
+        correctAnswerContainer.innerHTML = '';
+        correctAnswerContainer.style.display = 'none';
     }
+
+
+    // function nextQuestion() {
+    //     if (currentQuestionIndex < quizData.Questions.length - 1) {
+    //         currentQuestionIndex++;
+    //     } else {
+    //         // Calculate score
+    //         const scoreWithoutHints = correctAttempts / quizData.Questions.length * 100;
+    //         const finalScore = scoreWithoutHints + hintAttempts * 5;
+    //         document.getElementById('finalScore').innerText = 'Your final score is: ' + finalScore + ' / 100';
+    //         // Show the score and reset the quiz
+    //         document.getElementById('quiz').style.display = 'none';
+    //         document.getElementById('score').style.display = 'block';
+    //         document.getElementById('resetQuizBtn').style.display = 'block';
+    //         document.getElementById('nextQuestionBtn').style.display = 'none';
+    //         return;
+    //     }
+    //     // Display the next question
+    //     document.getElementById('question').innerText = quizData.Questions[currentQuestionIndex].Question;
+    //     document.getElementById('optionA').innerText = quizData.Questions[currentQuestionIndex].OptionA;
+    //     document.getElementById('optionB').innerText = quizData.Questions[currentQuestionIndex].OptionB;
+    //     document.getElementById('optionC').innerText = quizData.Questions[currentQuestionIndex].OptionC;
+    //     document.getElementById('optionD').innerText = quizData.Questions[currentQuestionIndex].OptionD;
+    //     document.getElementById('correctOptionDescription').innerText = '';
+    //     document.getElementById('hint').innerText = '';
+    //     // Enable all options
+    //     for (let option of document.getElementsByName('option')) {
+    //         option.disabled = false;
+    //         option.parentElement.style.backgroundColor = 'white';
+    //         option.parentElement.style.borderColor = 'black';
+    //     }
+    // }
+
+
+    // nextQuestionBtn.addEventListener('click', () => {
+    //     const selectedOption = document.querySelector('input[name="option"]:checked');
+
+    //     if (!selectedOption) {
+    //         alert('Selecteer 1 van de antwoord opties voor dat je de vraag checked');
+    //         return; // Do not allow a user to proceed if no option is selected
+    //     }
+
+    //     // If an option is selected, proceed with checking the answer and navigating to the next question
+    //     const correctOptionIndex = quizData.Questions[currentQuestionIndex].CorrectOption;
+    //     const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex) + '.';
+    //     const correctOptionText = quizData.Questions[currentQuestionIndex].Options[correctOptionIndex];
+    //     const correctOptionDescription = quizData.Questions[currentQuestionIndex].CorrectOptionDescription;
+
+    //     handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription);
+
+    //     nextQuestion();
+    //     updateQuestionWindow(); // Update the question window when navigating
+
+    // });
 
     function checkSubmitButton() {
         const quizWindow = document.querySelector('.quiz-window');
@@ -476,20 +671,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const hintContainer = document.createElement('div');
         answerContainer.classList.add('hint-container');
 
-        quizWindow.querySelector('.quiz-window-header .question-number').innerText = `${currentQuestionIndex + 1} / ${quizData.Questions.length}`;
+        quizWindow.querySelector('.quiz-window-header .question-number').innerText = `Vraag ${currentQuestionIndex + 1} van de ${quizData.Questions.length}`;
+
 
         quizData.Questions[currentQuestionIndex].Options.forEach((option, index) => {
             const optionElement = document.createElement('div');
             optionElement.classList.add('option');
             optionElement.innerText = option;
-            optionElement.addEventListener('click', () => {
-                if (option === quizData.Questions[currentQuestionIndex].Correct) {
-                    alert('Correct answer!');
-                } else {
-                    alert('Incorrect answer.');
-                }
-                nextQuestion();
-            });
+            // optionElement.addEventListener('click', () => {
+            //     if (option === quizData.Questions[currentQuestionIndex].Correct) {
+            //         alert('Correct answer!');
+            //     } else {
+            //         alert('Incorrect answer.');
+            //     }
+            //     nextQuestion();
+            // });
             answerContainer.appendChild(optionElement);
         });
 
@@ -510,6 +706,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
         // Function to calculate scores and display results upon quiz submission
+        // Update the user's account info with the relevant data
+        // Update the status of the quiz to finished for the user's account specifically
         function submitQuiz() {
             const totalQuestions = quizData.Questions.length;
             const scoreWithoutHintsPercentage = (scoreWithoutHints / totalQuestions) * 100;
@@ -519,36 +717,52 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Score with hints:', scoreWithHints, '/', totalQuestions);
 
             // Display overlay with scores
+            // Display an overlay that appears on top of the quiz with a darkened but still opaque background covering the entire quiz page
+            // Display an overlay that appears on top of the quiz with a darkened but still opaque background covering the entire quiz page
             const overlay = document.createElement('div');
-            overlay.classList.add('overlay');
+            overlay.classList.add('overlay', 'quiz-submission-overlay');
             overlay.innerHTML = `
-                <div class="score-overlay">
-                    <h2>Quiz Results</h2>
-                    <p>Score without hints: ${scoreWithoutHintsPercentage}%</p>
-                    <p>Score with hints: ${scoreWithHintsPercentage}%</p>
-                    <button onclick="redirectToDashboard()">Go to Dashboard</button>
+                <div class="overlay-content">
+                <h2>Quiz Results</h2>
+                <p>Score without hints: ${scoreWithoutHints}%</p>
+                <p>Score with hints: ${scoreWithHints}%</p>
+                <p>Time spent: ${timeSpent} seconds</p>
+                <p>Quiz duration: ${quizDuration} seconds</p>
+                <p>Click anywhere to go to the dashboard</p>
                 </div>
             `;
             document.body.appendChild(overlay);
-        }
 
-        // Function to redirect user to dashboard
-        function redirectToDashboard() {
-            window.location.href = "dashboard.html";
+            // Remove the CSS class that hides the timers
+            const quizTimerContainer = document.querySelector('.quiz-timer-container');
+            const questionTimerContainer = document.querySelector('.question-timer-container');
+            quizTimerContainer.classList.remove('hidden');
+            questionTimerContainer.classList.remove('hidden');
+
+            // Redirect the user to the dashboard when they click anywhere on the screen
+            overlay.addEventListener('click', () => {
+                window.location.href = "dashboard.html";
+            });
         }
 
         // Function to show hint in the hint field
-        function showHint(hint) {
-            const hintField = document.getElementById('quiz-window-hint');
-            hintField.innerText = hint;
-            hintField.style.display = 'block';
+        const showHint = (hint) => {
+            const hintContainer = document.querySelector('.hint-container');
+            hintContainer.innerHTML = '';
+            const hintParagraph = document.createElement('p');
+            hintParagraph.innerText = hint;
+            hintContainer.appendChild(hintParagraph);
+            hintContainer.style.display = 'block';
         }
 
         // Function to display correct answer along with hint
-        function showCorrectAnswer(answer, hint) {
-            const answerField = document.getElementById('quiz-window-answer');
-            answerField.innerText = `Hint: ${hint}\nCorrect Answer: ${answer}`;
-            answerField.style.display = 'block';
+        const showCorrectAnswer = (correctOptionLetter, correctOptionText, correctOptionDescription) => {
+            const correctAnswerContainer = document.querySelector('.correct-answer-container');
+            const correctAnswerElement = document.createElement('div');
+            correctAnswerElement.classList.add('correct-answer');
+            correctAnswerElement.innerHTML = `<p>Correct answer: ${correctOptionLetter} - ${correctOptionText}</p><p>${correctOptionDescription}</p>`;
+            correctAnswerContainer.appendChild(correctAnswerElement);
+            correctAnswerContainer.style.display = 'block';
         }
 
         // Function to disable all options after showing correct answer
@@ -588,22 +802,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('submitQuizBtn not found');
         }
 
-        // updateQuestionWindow();
 
         // Update the prev/next buttons
         prevQuestionBtn.addEventListener('click', () => {
             if (currentQuestionIndex > 0) {
                 prevQuestion();
-                nextQuestionBtn.disabled = false;
                 updateQuestionWindow(); // Update the question window when navigating
+                if (currentQuestionIndex === 0) {
+                    prevQuestionBtn.disabled = true; // Disable the prev button when reaching the first question
+                }
+                handleUserAnswer();
             }
         });
 
         nextQuestionBtn.addEventListener('click', () => {
             if (currentQuestionIndex < quizData.Questions.length - 1) {
+                // const selectedRadioButton = getSelectedRadioButton();
+                // if (!selectedRadioButton) {
+                //     nextQuestionBtn.disabled = true;
+                //     return;
+                // }
                 nextQuestion();
-                prevQuestionBtn.disabled = false;
                 updateQuestionWindow(); // Update the question window when navigating
+                prevQuestionBtn.disabled = false; // Enable the prev button when navigating to a later question
+                handleUserAnswer();
             }
         });
     }
@@ -616,6 +838,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const hintContainer = quizWindow.querySelector('.hint-container');
         const correctAnswerContainer = quizWindow.querySelector('.correct-answer-container');
         const questionNumber = quizWindow.querySelector('.question-number');
+        // const prevQuestionBtn = quizWindow.querySelector('.prev-question-button');
+        // prevQuestionBtn.disabled = currentQuestionIndex === 0;
 
         if (!quizWindow || !questionText || !answerContainer || !hintContainer || !correctAnswerContainer || !questionNumber) {
             console.log('quizWindow, questionText, answerContainer, hintContainer, or correctAnswerContainer is null');
@@ -640,7 +864,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         questionData.Options.forEach((option, index) => {
             const optionElement = document.createElement('div');
             optionElement.classList.add('option');
-            optionElement.innerText = option;
+            optionElement.innerText = `${String.fromCharCode(65 + index) + '. '} ${option}`;
+            optionElement.dataset.index = index;
 
             // Add event listener to each option
             optionElement.addEventListener('click', async () => {
@@ -686,12 +911,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         closeQuizWindow();
     });
 
-    // Generate the quiz window when the page loads
-    showQuizWindow();
-
-    // Update the question window when the quiz window is opened
-    updateQuestionWindow();
-
     $(document).ready(function () {
         const quizWindowContainer = $(".quiz-window-container");
         const quizWindow = $(".quiz-window");
@@ -716,16 +935,135 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // // Add a CSS class to the container when the quiz window is generated
-    // function showQuizWindow() {
-    //     // ...
-    //     document.getElementById('quiz-window-container').classList.add('open');
+    // Add event listener to close the quiz window
+    $(".close-quiz-window-button").on("click", function () {
+        closeQuizWindow();
+    });
+
+    // Generate the quiz window when the page loads
+    showQuizWindow();
+
+    // Update the question window when the quiz window is opened
+    updateQuestionWindow();
+
+
+
+    // code related to the future implementation of the pause quiz feature
+
+    // Global variables
+    // let quizProgress;
+    // let quizTimerInterval;
+    // let questionTimerInterval;
+    // let isPaused = false;
+
+    // // Function to update quiz timer
+    // function updateQuizTimer() {
+    //     quizProgress.timeSpent++;
+    //     updateTimer();
     // }
 
-    // // Remove the CSS class from the container when the quiz window is closed
-    // function closeQuizWindow() {
-    //     // ...
-    //     document.getElementById('quiz-window-container').classList.remove('open');
+    // // Function to update question timer
+    // function updateQuestionTimer() {
+    //     quizProgress.questionStartTime++;
+    //     updateTimer();
     // }
+
+    // // Function to update the timer display
+    // function updateTimer() {
+    //     // Calculate time spent on quiz and question
+    //     const quizTimeSpent = Math.floor((Date.now() - quizProgress.quizStartTime) / 1000);
+    //     const questionTimeSpent = Math.floor((Date.now() - quizProgress.questionStartTime) / 1000);
+
+    //     // Update timer display
+    //     // Replace with actual timer elements
+    //     const quizTimerDisplay = document.querySelector('.quiz-timer');
+    //     quizTimerDisplay.innerText = `Quiz time: ${quizTimeSpent} seconds`;
+
+    //     const questionTimerDisplay = document.querySelector('.question-timer');
+    //     questionTimerDisplay.innerText = `Question time: ${questionTimeSpent} seconds`;
+    // }
+
+    // // Function to initialize the pause and resume functionality
+    // function initializePauseResume() {
+    //     const pauseResumeContainer = document.createElement('div');
+    //     pauseResumeContainer.classList.add('pause-resume-container');
+
+    //     const pauseButton = document.createElement('button');
+    //     pauseButton.classList.add('pause-button');
+    //     pauseButton.innerText = 'Pause';
+    //     pauseResumeContainer.appendChild(pauseButton);
+
+    //     const resumeButton = document.createElement('button');
+    //     resumeButton.classList.add('resume-button');
+    //     resumeButton.innerText = 'Resume';
+    //     resumeButton.disabled = true;
+    //     pauseResumeContainer.appendChild(resumeButton);
+
+    //     const pauseTimer = () => {
+    //         isPaused = true;
+    //         pauseButton.innerText = 'Resume';
+    //         resumeButton.disabled = false;
+    //         clearInterval(quizTimerInterval);
+    //         clearInterval(questionTimerInterval);
+    //     };
+
+    //     const resumeTimer = () => {
+    //         isPaused = false;
+    //         pauseButton.innerText = 'Pause';
+    //         resumeButton.disabled = true;
+    //         quizTimerInterval = setInterval(updateQuizTimer, 1000);
+    //         questionTimerInterval = setInterval(updateQuestionTimer, 1000);
+    //     };
+
+    //     pauseButton.addEventListener('click', () => {
+    //         if (!isPaused) {
+    //             pauseTimer();
+    //         } else {
+    //             resumeTimer();
+    //         }
+    //     });
+
+    //     resumeButton.addEventListener('click', () => {
+    //         resumeTimer();
+    //     });
+
+    //     // Initialize the quiz and question timers
+    //     quizTimerInterval = setInterval(updateQuizTimer, 1000);
+    //     questionTimerInterval = setInterval(updateQuestionTimer, 1000);
+    // }
+
+    // // Load quiz progress and initialize pause and resume functionality
+    // (async () => {
+    //     // Replace with actual quiz progress retrieval
+    //     quizProgress = await loadQuizProgress();
+    //     initializePauseResume();
+    // })();
+
+    // // Function to save quiz progress
+    // async function saveQuizProgress() {
+    //     // Save the quiz progress in the user's account
+    //     // You can use Firebase or another database to store the quiz progress
+    //     // For example:
+    //     const userId = 'user123';
+    //     const quizId = 'quiz456';
+    //     const progressRef = firebase.database().ref(`users/${userId}/quizzes/${quizId}/progress`);
+    //     await progressRef.set(quizProgress);
+    // }
+
+    // // Function to load quiz progress
+    // async function loadQuizProgress() {
+    //     // Load the quiz progress from the user's account
+    //     // You can use Firebase or another database to retrieve the quiz progress
+    //     // For example:
+    //     const userId = 'user123';
+    //     const quizId = 'quiz456';
+    //     const progressRef = firebase.database().ref(`users/${userId}/quizzes/${quizId}/progress`);
+    //     const snapshot = await progressRef.once('value');
+    //     return snapshot.val();
+    // }
+
+    // // Save quiz progress on completion or any other events as needed
+    // // saveQuizProgress();
+
 
 });
