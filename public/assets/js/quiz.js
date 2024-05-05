@@ -143,13 +143,13 @@ function handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText
                 });
                 showCorrectAnswer(correctOptionLetter, correctOptionText, correctOptionDescription);
             }
-            // // Prevent the user from moving to the next question until they select a radio button
-            // nextQuestionBtn.disabled = true;
-            // document.querySelectorAll('.option').forEach((option) => {
-            //     option.addEventListener('click', () => {
-            //         nextQuestionBtn.disabled = false;
-            //     });
-            // });
+            // Prevent the user from moving to the next question until they select a radio button
+            nextQuestionBtn.disabled = true;
+            document.querySelectorAll('.option').forEach((option) => {
+                option.addEventListener('click', () => {
+                    nextQuestionBtn.disabled = false;
+                });
+            });
         }
 
         // Clear the hint and answer containers when navigating to a new question
@@ -275,8 +275,29 @@ function disableOptions() {
     });
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    var contentWrapper = document.getElementById('content-wrapper');
+
+    setTimeout(function () {
+        var loader = document.querySelector('.loading-indicator');
+        if (loader) {
+            loader.style.display = 'none';
+        }
+        contentWrapper.style.opacity = '10';
+    }, 500); // Adjust this value to control the delay before the loader disappears and the content is displayed
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // var contentWrapper = document.getElementById('content-wrapper');
+
+    // setTimeout(function () {
+    //     var loader = document.querySelector('.loading-indicator');
+    //     if (loader) {
+    //         loader.style.display = 'none';
+    //     }
+    //     contentWrapper.style.opacity = '1';
+    // }, 1000); // Adjust this value to control the delay before the loader disappears and the content is displayed
+
     const urlParams = new URLSearchParams(window.location.search);
     const quizId = urlParams.get('id');
 
@@ -337,14 +358,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                         // Recursively apply CSS classes to child nodes
                         Array.prototype.forEach.call(element.childNodes, applyCssClasses);
-                    } else if (element.tagName === 'strong') {
-                        const cssClass = getCssClassForTag('strong');
-                        if (cssClass) {
-                            const span = document.createElement('span');
-                            span.className = cssClass;
-                            span.textContent = element.textContent;
-                            element.parentNode.replaceChild(span, element);
-                        }
                     }
                 }
 
@@ -353,21 +366,37 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return htmlElement.outerHTML;
             });
 
-            console.log('Processed text sections:', processedTextSections);
-
             // Create containers for each text section and add the special white space class
             const container = document.createElement('div');
             container.className = 'text-section-container';
 
-            processedTextSections.forEach((textSection) => {
+            let previousHeight = 0;
+            processedTextSections.forEach((textSection, index) => {
                 const sectionContainer = document.createElement('div');
                 sectionContainer.className = 'text-section';
                 sectionContainer.innerHTML = textSection;
-                container.appendChild(sectionContainer);
-                container.appendChild(document.createElement('div')); // add a special white space class here
-            });
 
-            console.log('Container:', container);
+                // Adjust the maximum width of the text sections
+                sectionContainer.style.maxWidth = '100%';
+
+                // Add a special white space class to the container of each text section
+                const whiteSpaceContainer = document.createElement('div');
+                whiteSpaceContainer.className = 'text-section-white-space';
+                whiteSpaceContainer.style.height = index === 0 ? '1rem' : (processedTextSections[index - 1].height + previousHeight + 2) + 'rem';
+                previousHeight = whiteSpaceContainer.offsetHeight;
+                container.appendChild(whiteSpaceContainer);
+
+                // Add alignment classes to each paragraph within the text section
+                const paragraphs = sectionContainer.querySelectorAll('p');
+                paragraphs.forEach((paragraph) => {
+                    const alignmentClasses = ['embedded-text-left', 'embedded-text-right', 'embedded-text-middle'];
+                    const randomIndex = Math.floor(Math.random() * alignmentClasses.length);
+                    const alignmentClass = alignmentClasses[randomIndex];
+                    paragraph.classList.add(alignmentClass);
+                });
+
+                container.appendChild(sectionContainer);
+            });
 
             document.querySelector('.embedded-text').innerHTML = '';
             document.querySelector('.embedded-text').appendChild(container);
@@ -745,34 +774,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Function to show hint in the hint field
-        const showHint = (hint) => {
-            const hintContainer = document.querySelector('.hint-container');
-            hintContainer.innerHTML = '';
-            const hintParagraph = document.createElement('p');
-            hintParagraph.innerText = hint;
-            hintContainer.appendChild(hintParagraph);
-            hintContainer.style.display = 'block';
-        }
+        // // Function to show hint in the hint field
+        // const showHint = (hint) => {
+        //     const hintContainer = document.querySelector('.hint-container');
+        //     hintContainer.innerHTML = '';
+        //     const hintParagraph = document.createElement('p');
+        //     hintParagraph.innerText = hint;
+        //     hintContainer.appendChild(hintParagraph);
+        //     hintContainer.style.display = 'block';
+        // }
 
-        // Function to display correct answer along with hint
-        const showCorrectAnswer = (correctOptionLetter, correctOptionText, correctOptionDescription) => {
-            const correctAnswerContainer = document.querySelector('.correct-answer-container');
-            const correctAnswerElement = document.createElement('div');
-            correctAnswerElement.classList.add('correct-answer');
-            correctAnswerElement.innerHTML = `<p>Correct answer: ${correctOptionLetter} - ${correctOptionText}</p><p>${correctOptionDescription}</p>`;
-            correctAnswerContainer.appendChild(correctAnswerElement);
-            correctAnswerContainer.style.display = 'block';
-        }
+        // // Function to display correct answer along with hint
+        // const showCorrectAnswer = (correctOptionLetter, correctOptionText, correctOptionDescription) => {
+        //     const correctAnswerContainer = document.querySelector('.correct-answer-container');
+        //     const correctAnswerElement = document.createElement('div');
+        //     correctAnswerElement.classList.add('correct-answer');
+        //     correctAnswerElement.innerHTML = `<p>Correct answer: ${correctOptionLetter} - ${correctOptionText}</p><p>${correctOptionDescription}</p>`;
+        //     correctAnswerContainer.appendChild(correctAnswerElement);
+        //     correctAnswerContainer.style.display = 'block';
+        // }
 
-        // Function to disable all options after showing correct answer
-        function disableOptions() {
-            const options = document.querySelectorAll('.option');
-            options.forEach(option => {
-                option.style.pointerEvents = 'none'; // Disable clicking on options
-                option.style.opacity = '0.5'; // Reduce opacity to visually indicate disabled state
-            });
-        }
+        // // Function to disable all options after showing correct answer
+        // function disableOptions() {
+        //     const options = document.querySelectorAll('.option');
+        //     options.forEach(option => {
+        //         option.style.pointerEvents = 'none'; // Disable clicking on options
+        //         option.style.opacity = '0.5'; // Reduce opacity to visually indicate disabled state
+        //     });
+        // }
 
         checkSubmitButton();
 

@@ -682,6 +682,101 @@ ul {
   color: #fff;
 }
 
+
+/* Embedded Text border classes */
+.text-section-container, .text-section, .text-section-white-space {
+  box-sizing: border-box;
+}
+
+.embedded-text-left {
+  position: relative;
+  border: 2px solid #007bff; /* Change the color to your preference */
+  border-radius: 10px; /* Change the border radius to your preference */
+  padding: 10px; /* Add some padding to the text section */
+  width: 80%; /* Take up 80% of the width */
+  float: left; /* Float the text section to the left */
+  overflow: hidden;
+}
+
+.embedded-text-left:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: 20%;
+  border-left: 2px solid #007bff; /* Match the border color of the text section */
+  overflow: hidden;
+}
+
+.embedded-text-right {
+  position: relative;
+  border: 2px solid #007bff; /* Change the color to your preference */
+  border-radius: 10px; /* Change the border radius to your preference */
+  padding: 10px; /* Add some padding to the text section */
+  width: 80%; /* Take up 80% of the width */
+  float: right; /* Float the text section to the right */
+  overflow: hidden;
+}
+
+.embedded-text-right:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: 20%;
+  border-right: 2px solid #007bff; /* Match the border color of the text section */
+  overflow: hidden;
+}
+
+.embedded-text-middle {
+  position: relative;
+  border: 2px solid #007bff; /* Change the color to your preference */
+  border-radius: 10px; /* Change the border radius to your preference */
+  padding: 10px; /* Add some padding to the text section */
+  width: 80%; /* Take up 80% of the width */
+  margin: 0 auto; /* Center the text section */
+  overflow: hidden;
+}
+
+.embedded-text-middle:before,
+.embedded-text-middle:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10%;
+  border-right: 2px solid #007bff; /* Match the border color of the text section */
+  overflow: hidden;
+}
+
+.embedded-text-middle:before {
+  left: -10%;
+  overflow: hidden;
+}
+
+.embedded-text-middle:after {
+  right: -10%;
+  overflow: hidden;
+}
+
+.text-section-container {
+  overflow: hidden;
+}
+
+.text-section {
+  overflow: hidden;
+}
+
+.text-section-white-space {
+  height: 1rem;
+  /* border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd; */
+  /* margin: 0.5em 0; */
+  overflow: hidden;
+}
+
 /* Embedded Text html element classes */
 .embedded-text-h1,
 .embedded-text-h2,
@@ -747,3 +842,50 @@ ul {
   line-height: 1.5;
 }
 
+/* Throbber/Loading animation */
+.loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.si-icon-hourglass {
+  animation: spin 1s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(-360deg);
+  }
+}
+
+.si-icon-hourglass .si-icon {
+  position: relative;
+  display: inline-block;
+  animation: fall 1s linear infinite;
+}
+
+@keyframes fall {
+  0% {
+      transform: translateY(0%);
+  }
+  100% {
+      transform: translateY(100%);
+  }
+}
+
+#content-wrapper {
+  opacity: 0;
+  transition: opacity 0.5s;
+}

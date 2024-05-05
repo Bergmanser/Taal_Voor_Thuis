@@ -27,52 +27,66 @@
             </ul>
         </nav>
     </header>
-    <main id="quiz-main">
-        <div class="quiz-container"> 
-            <div id="slider-container">
-                <div id="range-slider" class="custom-range-slider"></div>
-            </div>
-            <div class="container-embedded-text-hero">
-                <div class="hero" style="background-image: url(banner-image-url);">
-                    <div class="title" id="quiz-title"></div>
-                </div>
-                <div class="embedded-text-section">
-                    <div class="embedded-text"></div>
-                </div>
-                <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
-            </div>
-        
-            <div class="quiz-window-container hidden">
-                <div class="quiz-window" id="quiz-window">
-                    <!-- <div id="slider-container">
-                        <div id="range-slider"></div>
-                    </div> -->
-                    <div class="quiz-window-header" id="quiz-window-header">
-                        <div class="question-number" id="question-number"></div>
-                        <button class="quiz-window-close btn btn-primary" id="quiz-window-close">X</button>
-                    </div>
-                    <div class="quiz-window-content">
-                        <div class="question-window-title" id="question-window-title"></div>
-                        
-                        <div class="question-container" id="question-container">
-                            
-                        </div>
-                        <!-- <div class="quiz-window-hint" id="quiz-window-hint"></div> -->
-                        <div class="question-text"></div>
-                        <div class="answer-container"></div>
-                        <div class="hint-container"></div>
-                        <div class="correct-answer-container"></div>
-                        <!-- <div class="quiz-window-answer" id="quiz-window-answer"></div> -->
-                        <div class="quiz-window-controls">
-                            <button class="prev-question-btn" disabled="">Previous</button>
-                            <button class="next-question-btn">Next</button>
-                        </div>
-                        <button class="submit-quiz-btn hidden" disabled>Submit Quiz</button>
-                    </div>
-                </div>
-            </div> 
+    <div class="content-wrapper">
+        <div class="loading-indicator">
+            <span class="si-icon si-icon-hourglass" data-icon-name="hourglass">
+                <svg height="64" version="1.1" width="64" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                    <desc>Created with Snap</desc>
+                    <defs></defs>
+                    <g>
+                        <path fill="none" stroke="#fff" stroke-width="5" d="m 15.177521,13.308356 33.644958,0 -11.214986,18.691643 11.214986,18.691645 -33.644958,0 11.214986,-18.691645 z" transform="matrix(-1,0,0,-1,64,64)"></path>
+                        <path fill="#fff" stroke="none" d="M22,17C22,17,42,17,42,17C42,17,33,32,33,32C33,32,31,32,31,32C31,32,31,32,31,32C31,32,22,17,22,17" transform="matrix(-1,0,0,-1,64,64)"></path>
+                    </g>
+                </svg>
+            </span>
         </div>
-    </main>
+        <main id="quiz-main">
+            <div class="quiz-container"> 
+                <div id="slider-container">
+                    <div id="range-slider" class="custom-range-slider"></div>
+                </div>
+                <div class="container-embedded-text-hero">
+                    <div class="hero" style="background-image: url(banner-image-url);">
+                        <div class="title" id="quiz-title"></div>
+                    </div>
+                    <div class="embedded-text-section">
+                        <div class="embedded-text"></div>
+                    </div>
+                    <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
+                </div>
+            
+                <div class="quiz-window-container hidden">
+                    <div class="quiz-window" id="quiz-window">
+                        <!-- <div id="slider-container">
+                            <div id="range-slider"></div>
+                        </div> -->
+                        <div class="quiz-window-header" id="quiz-window-header">
+                            <div class="question-number" id="question-number"></div>
+                            <button class="quiz-window-close btn btn-primary" id="quiz-window-close">X</button>
+                        </div>
+                        <div class="quiz-window-content">
+                            <div class="question-window-title" id="question-window-title"></div>
+                            
+                            <div class="question-container" id="question-container">
+                                
+                            </div>
+                            <!-- <div class="quiz-window-hint" id="quiz-window-hint"></div> -->
+                            <div class="question-text"></div>
+                            <div class="answer-container"></div>
+                            <div class="hint-container"></div>
+                            <div class="correct-answer-container"></div>
+                            <!-- <div class="quiz-window-answer" id="quiz-window-answer"></div> -->
+                            <div class="quiz-window-controls">
+                                <button class="prev-question-btn" disabled="">Previous</button>
+                                <button class="next-question-btn">Next</button>
+                            </div>
+                            <button class="submit-quiz-btn hidden" disabled>Submit Quiz</button>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </main>
+    </div>
     <script type="module" src="../public/assets/js/quiz.js"></script>
 </body>
 </html>
