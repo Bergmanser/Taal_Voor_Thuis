@@ -19,7 +19,6 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth();
 const db = getFirestore(app);
-const quizzesCollection = collection(db, "quizzes");
 
 // An image class still needs to be added 
 const getCssClassForTag = (tag) => {
@@ -55,24 +54,6 @@ for (let i = 0; i < bElements.length; i++) {
     bElements[i].parentNode.replaceChild(strongElement, bElements[i]);
 }
 
-// function applyCssClasses(element) {
-//     if (element.nodeType === Node.TEXT_NODE) {
-//       const cssClass = getCssClassForTag(element.parentElement.tagName.toLowerCase());
-//       if (cssClass) {
-//         const span = document.createElement('span');
-//         span.className = cssClass;
-//         span.textContent = element.textContent;
-//         element.parentElement.replaceChild(span, element);
-//       }
-//     } else {
-//       const cssClass = getCssClassForTag(element.tagName.toLowerCase());
-//       if (cssClass) {
-//         element.classList.add(cssClass);
-//       }
-//       Array.prototype.forEach.call(element.childNodes, applyCssClasses);
-//     }
-//   }
-
 // Check if the user is logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -94,13 +75,28 @@ let scoreWithHints = 0;
 let attempts = [];
 const nextQuestionBtn = document.getElementById('.next-question-btn');
 
+
 function handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription) {
     if (currentQuestionIndex === 0) { // First question
         //...
     } else { // For subsequent questions
-        //...
+        if (!selectedOption) {
+            console.error("selectedOption is undefined");
+            return;
+        }
+
+        const correctOptionLetter = quizData.Questions[currentQuestionIndex].CorrectOptionLetter;
+
         if (selectedOption.id === correctOptionLetter) {
-            //...
+            // Check if all questions have been answered
+            if (currentQuestionIndex === quizData.Questions.length - 1) {
+                // Display the quiz submission overlay
+                displayQuizSubmissionOverlay();
+            } else {
+                // Move to the next question
+                nextQuestion();
+            }
+
         } else { // If the answer is incorrect
             if (!attempts[currentQuestionIndex]) {
                 attempts[currentQuestionIndex] = {
@@ -229,43 +225,48 @@ function handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText
 //     }
 // }
 
-// Function to show hint
 function showHint(hint) {
     const hintContainer = document.querySelector('.hint-container');
     hintContainer.innerHTML = '';
+    const hintTitle = document.createElement('h4');
+    hintTitle.innerText = 'Hint:';
+    hintContainer.appendChild(hintTitle);
     const hintParagraph = document.createElement('p');
     hintParagraph.innerText = hint;
     hintContainer.appendChild(hintParagraph);
     hintContainer.style.display = 'block';
 }
 
-// Function to show correct answer
 function showCorrectAnswer(correctOptionLetter, correctOptionText, correctOptionDescription) {
-    const answerContainer = document.querySelector('.answer-container');
+    const correctAnswerContainer = document.querySelector('.correct-answer-container');
+    correctAnswerContainer.innerHTML = '';
     const correctAnswerElement = document.createElement('div');
     correctAnswerElement.classList.add('correct-answer');
-    correctAnswerElement.innerHTML = `<p>Correct answer: ${correctOptionLetter} - ${correctOptionText}</p><p>${correctOptionDescription}</p>`;
-    answerContainer.appendChild(correctAnswerElement);
-    answerContainer.style.display = 'block';
+    const answerTitle = document.createElement('h4');
+    answerTitle.innerText = 'Answer:';
+    correctAnswerElement.appendChild(answerTitle);
+    correctAnswerElement.innerHTML += `<p>Correct answer: ${correctOptionLetter} - ${correctOptionText}</p><p>${correctOptionDescription}</p>`;
+    correctAnswerContainer.appendChild(correctAnswerElement);
+    correctAnswerContainer.style.display = 'block';
 }
 
-// document.querySelectorAll('.option').forEach((option) => {
-//     option.addEventListener('click', () => {
-//         nextQuestionBtn.disabled = false;
-//         option.querySelector('input[type="radio"]').checked = true;
-//     });
-// });
+document.querySelectorAll('.option').forEach((option) => {
+    option.addEventListener('click', () => {
+        nextQuestionBtn.disabled = false;
+        option.querySelector('input[type="radio"]').checked = true;
+    });
+});
 
-// // Add a function to check if any radio button is selected
-// function getSelectedRadioButton() {
-//     const radioButtons = document.querySelectorAll('input[type="radio"]');
-//     for (const radioButton of radioButtons) {
-//       if (radioButton.checked) {
-//         return radioButton;
-//       }
-//     }
-//     return null;
-//   }
+// Add a function to check if any radio button is selected
+function getSelectedRadioButton() {
+    const radioButtons = document.querySelectorAll('input[type="radio"]');
+    for (const radioButton of radioButtons) {
+        if (radioButton.checked) {
+            return radioButton;
+        }
+    }
+    return null;
+}
 
 // // Function to disable options
 function disableOptions() {
@@ -283,21 +284,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (loader) {
             loader.style.display = 'none';
         }
-        contentWrapper.style.opacity = '10';
+        // contentWrapper.style.opacity = '10';
     }, 500); // Adjust this value to control the delay before the loader disappears and the content is displayed
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // var contentWrapper = document.getElementById('content-wrapper');
-
-    // setTimeout(function () {
-    //     var loader = document.querySelector('.loading-indicator');
-    //     if (loader) {
-    //         loader.style.display = 'none';
-    //     }
-    //     contentWrapper.style.opacity = '1';
-    // }, 1000); // Adjust this value to control the delay before the loader disappears and the content is displayed
-
     const urlParams = new URLSearchParams(window.location.search);
     const quizId = urlParams.get('id');
 
@@ -320,7 +311,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Parse the HTML content
             const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(quizData.Embedded_text, 'text/html');
+            const htmlDoc = parser.parseFromString(quizData.EmbeddedText, 'text/html');
 
             // Extract the text and HTML elements
             const textElements = htmlDoc.body.childNodes;
@@ -408,15 +399,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Declare the quizWindow variable outside of the event listener
         const quizWindow = document.querySelector('.quiz-window');
-        const quizWindowTitle = document.getElementById('question-window-title');
+        // const quizWindowTitle = document.getElementById('question-window-title');
         const questionContainer = quizWindow.querySelector('.question-container');
         const answerDescriptionContainer = quizWindow.querySelector('.quiz-window-answer');
         const hintContainer = quizWindow.querySelector(".quiz-window-hint")
         const questionNumber = quizWindow.querySelector('.question-number');
         const quizWindowContainer = document.querySelector('.quiz-window-container');
         const startQuizButton = document.getElementById("start-quiz-button");
-        const prevQuestionBtn = document.createElement('button');
-        const nextQuestionBtn = document.createElement('button');
+        const prevQuestionBtn = document.createElement('prev-question-btn');
+        const nextQuestionBtn = document.createElement('next-question-btn');
 
         startQuizButton.addEventListener('click', () => {
             quizWindow.style.display = 'block';
@@ -458,7 +449,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             hint.innerText = question.Hint;
             hint.style.display = 'none';
 
-            quizWindowTitle.innerText = question.Text;
+            questionText.innerText = question.Text
 
             questionContainer.innerHTML = '';
             hintContainer.innerHTML = '';
@@ -774,36 +765,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // // Function to show hint in the hint field
-        // const showHint = (hint) => {
-        //     const hintContainer = document.querySelector('.hint-container');
-        //     hintContainer.innerHTML = '';
-        //     const hintParagraph = document.createElement('p');
-        //     hintParagraph.innerText = hint;
-        //     hintContainer.appendChild(hintParagraph);
-        //     hintContainer.style.display = 'block';
-        // }
-
-        // // Function to display correct answer along with hint
-        // const showCorrectAnswer = (correctOptionLetter, correctOptionText, correctOptionDescription) => {
-        //     const correctAnswerContainer = document.querySelector('.correct-answer-container');
-        //     const correctAnswerElement = document.createElement('div');
-        //     correctAnswerElement.classList.add('correct-answer');
-        //     correctAnswerElement.innerHTML = `<p>Correct answer: ${correctOptionLetter} - ${correctOptionText}</p><p>${correctOptionDescription}</p>`;
-        //     correctAnswerContainer.appendChild(correctAnswerElement);
-        //     correctAnswerContainer.style.display = 'block';
-        // }
-
-        // // Function to disable all options after showing correct answer
-        // function disableOptions() {
-        //     const options = document.querySelectorAll('.option');
-        //     options.forEach(option => {
-        //         option.style.pointerEvents = 'none'; // Disable clicking on options
-        //         option.style.opacity = '0.5'; // Reduce opacity to visually indicate disabled state
-        //     });
-        // }
-
-        checkSubmitButton();
+        // checkSubmitButton();
 
         if (submitQuizBtn) {
             console.error('submitQuizBtn not found');
@@ -879,6 +841,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         answerContainer.innerHTML = '';
         hintContainer.innerHTML = '';
         correctAnswerContainer.innerHTML = '';
+
+        // Hide the hint and answer containers
+        hintContainer.style.display = 'none';
+        correctAnswerContainer.style.display = 'none';
 
         // Update the question number
         questionNumber.innerText = `Vraag ${currentQuestionIndex + 1} van de ${quizData.Questions.length}`;
@@ -979,7 +945,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // code related to the future implementation of the pause quiz feature
 
-    // Global variables
+    //     // Global variables
     // let quizProgress;
     // let quizTimerInterval;
     // let questionTimerInterval;
@@ -987,112 +953,132 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // // Function to update quiz timer
     // function updateQuizTimer() {
-    //     quizProgress.timeSpent++;
-    //     updateTimer();
+    //   quizProgress.timeSpent++;
+    //   updateTimer();
     // }
 
     // // Function to update question timer
     // function updateQuestionTimer() {
-    //     quizProgress.questionStartTime++;
-    //     updateTimer();
+    //   quizProgress.questionStartTime++;
+    //   updateTimer();
     // }
 
     // // Function to update the timer display
     // function updateTimer() {
-    //     // Calculate time spent on quiz and question
-    //     const quizTimeSpent = Math.floor((Date.now() - quizProgress.quizStartTime) / 1000);
-    //     const questionTimeSpent = Math.floor((Date.now() - quizProgress.questionStartTime) / 1000);
+    //   // Calculate time spent on quiz and question
+    //   const quizTimeSpent = Math.floor((Date.now() - quizProgress.quizStartTime) / 1000);
+    //   const questionTimeSpent = Math.floor((Date.now() - quizProgress.questionStartTime) / 1000);
 
-    //     // Update timer display
-    //     // Replace with actual timer elements
-    //     const quizTimerDisplay = document.querySelector('.quiz-timer');
-    //     quizTimerDisplay.innerText = `Quiz time: ${quizTimeSpent} seconds`;
+    //   // Update timer display
+    //   // Replace with actual timer elements
+    //   const quizTimerDisplay = document.querySelector('.quiz-timer');
+    //   quizTimerDisplay.innerText = `Quiz time: ${quizTimeSpent} seconds`;
 
-    //     const questionTimerDisplay = document.querySelector('.question-timer');
-    //     questionTimerDisplay.innerText = `Question time: ${questionTimeSpent} seconds`;
+    //   const questionTimerDisplay = document.querySelector('.question-timer');
+    //   questionTimerDisplay.innerText = `Question time: ${questionTimeSpent} seconds`;
     // }
 
     // // Function to initialize the pause and resume functionality
     // function initializePauseResume() {
-    //     const pauseResumeContainer = document.createElement('div');
-    //     pauseResumeContainer.classList.add('pause-resume-container');
+    //   const pauseResumeContainer = document.createElement('div');
+    //   pauseResumeContainer.classList.add('pause-resume-container');
 
-    //     const pauseButton = document.createElement('button');
-    //     pauseButton.classList.add('pause-button');
+    //   const pauseButton = document.createElement('button');
+    //   pauseButton.classList.add('pause-button');
+    //   pauseButton.innerText = 'Pause';
+    //   pauseResumeContainer.appendChild(pauseButton);
+
+    //   const resumeButton = document.createElement('button');
+    //   resumeButton.classList.add('resume-button');
+    //   resumeButton.innerText = 'Resume';
+    //   resumeButton.disabled = true;
+    //   pauseResumeContainer.appendChild(resumeButton);
+
+    //   const pauseTimer = () => {
+    //     isPaused = true;
+    //     pauseButton.innerText = 'Resume';
+    //     resumeButton.disabled = false;
+    //     clearInterval(quizTimerInterval);
+    //     clearInterval(questionTimerInterval);
+    //     saveQuizProgressLocally();
+    //     saveQuizProgressTemporarilyInDatabase();
+    //   };
+
+    //   const resumeTimer = () => {
+    //     isPaused = false;
     //     pauseButton.innerText = 'Pause';
-    //     pauseResumeContainer.appendChild(pauseButton);
-
-    //     const resumeButton = document.createElement('button');
-    //     resumeButton.classList.add('resume-button');
-    //     resumeButton.innerText = 'Resume';
     //     resumeButton.disabled = true;
-    //     pauseResumeContainer.appendChild(resumeButton);
-
-    //     const pauseTimer = () => {
-    //         isPaused = true;
-    //         pauseButton.innerText = 'Resume';
-    //         resumeButton.disabled = false;
-    //         clearInterval(quizTimerInterval);
-    //         clearInterval(questionTimerInterval);
-    //     };
-
-    //     const resumeTimer = () => {
-    //         isPaused = false;
-    //         pauseButton.innerText = 'Pause';
-    //         resumeButton.disabled = true;
-    //         quizTimerInterval = setInterval(updateQuizTimer, 1000);
-    //         questionTimerInterval = setInterval(updateQuestionTimer, 1000);
-    //     };
-
-    //     pauseButton.addEventListener('click', () => {
-    //         if (!isPaused) {
-    //             pauseTimer();
-    //         } else {
-    //             resumeTimer();
-    //         }
-    //     });
-
-    //     resumeButton.addEventListener('click', () => {
-    //         resumeTimer();
-    //     });
-
-    //     // Initialize the quiz and question timers
     //     quizTimerInterval = setInterval(updateQuizTimer, 1000);
     //     questionTimerInterval = setInterval(updateQuestionTimer, 1000);
+    //   };
+
+    //   pauseButton.addEventListener('click', () => {
+    //     if (!isPaused) {
+    //       pauseTimer();
+    //     } else {
+    //       resumeTimer();
+    //     }
+    //   });
+
+    //   resumeButton.addEventListener('click', () => {
+    //     resumeTimer();
+    //   });
+
+    //   // Initialize the quiz and question timers
+    //   quizTimerInterval = setInterval(updateQuizTimer, 1000);
+    //   questionTimerInterval = setInterval(updateQuestionTimer, 1000);
     // }
 
-    // // Load quiz progress and initialize pause and resume functionality
-    // (async () => {
-    //     // Replace with actual quiz progress retrieval
-    //     quizProgress = await loadQuizProgress();
-    //     initializePauseResume();
-    // })();
+    // // Function to save quiz progress locally
+    // function saveQuizProgressLocally() {
+    //   localStorage.setItem('quizProgress', JSON.stringify(quizProgress));
+    // }
 
-    // // Function to save quiz progress
-    // async function saveQuizProgress() {
-    //     // Save the quiz progress in the user's account
-    //     // You can use Firebase or another database to store the quiz progress
-    //     // For example:
-    //     const userId = 'user123';
-    //     const quizId = 'quiz456';
-    //     const progressRef = firebase.database().ref(`users/${userId}/quizzes/${quizId}/progress`);
-    //     await progressRef.set(quizProgress);
+    // // Function to save quiz progress temporarily in the database
+    // async function saveQuizProgressTemporarilyInDatabase() {
+    //   const userId = 'user123';
+    //   const quizId = 'quiz456';
+    //   const pausedQuizzesRef = db.collection('pausedQuizzes').doc(userId);
+    //   const pausedQuizzesData = pausedQuizzesRef.get().then((doc) => {
+    //     if (!doc.exists) {
+    //       pausedQuizzesRef.set({
+    //         quizzes: [quizProgress],
+    //         timestamp: new Date(),
+    //       });
+    //     } else {
+    //       const quizzes = doc.data().quizzes;
+    //       if (quizzes.length < 6) {
+    //         quizzes.push(quizProgress);
+    //         pausedQuizzesRef.set({
+    //           quizzes: quizzes,
+    //           timestamp: new Date(),
+    //         });
+    //       } else {
+    //         // Show warning message to user
+    //         alert('You have already paused 6 quizzes. Your progress on the previous quiz will be deleted if you pause another one.');
+    //       }
+    //     }
+    //   });
     // }
 
     // // Function to load quiz progress
     // async function loadQuizProgress() {
-    //     // Load the quiz progress from the user's account
-    //     // You can use Firebase or another database to retrieve the quiz progress
-    //     // For example:
-    //     const userId = 'user123';
-    //     const quizId = 'quiz456';
-    //     const progressRef = firebase.database().ref(`users/${userId}/quizzes/${quizId}/progress`);
-    //     const snapshot = await progressRef.once('value');
-    //     return snapshot.val();
+    //   // Load the quiz progress from the user's account
+    //   // You can use Firebase or another database to retrieve the quiz progress
+    //   // For example:
+    //   const userId = 'user123';
+    //   const quizId = 'quiz456';
+    //   const progressRef = firebase.database().ref(`users/${userId}/quizzes/${quizId}/progress`);
+    //   const snapshot = await progressRef.once('value');
+    //   return snapshot.val();
     // }
 
+    // // Load quiz progress and initialize pause and resume functionality
+    // (async () => {
+    //   quizProgress = await loadQuizProgress();
+    //   initializePauseResume();
+    // })();
+
     // // Save quiz progress on completion or any other events as needed
-    // // saveQuizProgress();
-
-
+    // saveQuizProgress();
 });

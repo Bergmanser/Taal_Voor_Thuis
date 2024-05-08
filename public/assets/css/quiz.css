@@ -315,7 +315,7 @@ ul {
 }
 
 
-/* Hint*/
+/* Hint and Answer fields*/
 /* .hint {
   color: #6c757d;
   padding: 0.5rem 1rem;
@@ -326,11 +326,30 @@ ul {
 } */
 
 .hint-container {
+  padding: auto;
   display: none;
+  border: 1px solid #6b4c83;
+  background-color: #f5f5dc;
+  border-top: none;
 }
 
 .correct-option-description-container {
   display: none;
+}
+
+.correct-answer {
+  /* display: none; */
+  /* padding: auto;
+  margin: 1rem; */
+  border-bottom: none;
+  border: 1px solid #6b4c83;
+  background-color: #f5f5dc;
+}
+
+.hint-container h4, .correct-answer-container h4 {
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
 }
 
 /* Next button main page */
@@ -690,7 +709,7 @@ ul {
 
 .embedded-text-left {
   position: relative;
-  border: 2px solid #007bff; /* Change the color to your preference */
+  border: 2px solid #6b4c83; /* Change the color to your preference */
   border-radius: 10px; /* Change the border radius to your preference */
   padding: 10px; /* Add some padding to the text section */
   width: 80%; /* Take up 80% of the width */
@@ -705,13 +724,13 @@ ul {
   bottom: 0;
   right: 100%;
   width: 20%;
-  border-left: 2px solid #007bff; /* Match the border color of the text section */
+  border-left: 2px solid #6b4c83; /* Match the border color of the text section */
   overflow: hidden;
 }
 
 .embedded-text-right {
   position: relative;
-  border: 2px solid #007bff; /* Change the color to your preference */
+  border: 2px solid #6b4c83; /* Change the color to your preference */
   border-radius: 10px; /* Change the border radius to your preference */
   padding: 10px; /* Add some padding to the text section */
   width: 80%; /* Take up 80% of the width */
@@ -726,13 +745,13 @@ ul {
   bottom: 0;
   left: 100%;
   width: 20%;
-  border-right: 2px solid #007bff; /* Match the border color of the text section */
+  border-right: 2px solid #6b4c83; /* Match the border color of the text section */
   overflow: hidden;
 }
 
 .embedded-text-middle {
   position: relative;
-  border: 2px solid #007bff; /* Change the color to your preference */
+  border: 2px solid #6b4c83; /* Change the color to your preference */
   border-radius: 10px; /* Change the border radius to your preference */
   padding: 10px; /* Add some padding to the text section */
   width: 80%; /* Take up 80% of the width */
@@ -747,7 +766,7 @@ ul {
   top: 0;
   bottom: 0;
   width: 10%;
-  border-right: 2px solid #007bff; /* Match the border color of the text section */
+  border-right: 2px solid #6b4c83; /* Match the border color of the text section */
   overflow: hidden;
 }
 
