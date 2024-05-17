@@ -2,6 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+// import { renderTextSections, initScreenReader, highlightCurrentWord, currentTextSectionIndex, currentWordIndex, readNextWord } from '../js/screenreader_quiztext.js'
+export { textContainer, quizData }
 
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
@@ -54,6 +56,8 @@ for (let i = 0; i < bElements.length; i++) {
     bElements[i].parentNode.replaceChild(strongElement, bElements[i]);
 }
 
+const textContainer = document.querySelector('.text-section-container');
+
 // Check if the user is logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -73,7 +77,9 @@ let result
 let scoreWithoutHints = 0;
 let scoreWithHints = 0;
 let attempts = [];
+const prevQuestionBtn = document.getElementById('.prev-question-btn');
 const nextQuestionBtn = document.getElementById('.next-question-btn');
+const selectedOption = document.querySelector('input[name="option"]:checked');
 
 
 function handleUserAnswer(selectedOption, correctOptionLetter, correctOptionText, correctOptionDescription) {
@@ -250,31 +256,31 @@ function showCorrectAnswer(correctOptionLetter, correctOptionText, correctOption
     correctAnswerContainer.style.display = 'block';
 }
 
-document.querySelectorAll('.option').forEach((option) => {
-    option.addEventListener('click', () => {
-        nextQuestionBtn.disabled = false;
-        option.querySelector('input[type="radio"]').checked = true;
-    });
-});
+// document.querySelectorAll('.option').forEach((option) => {
+//     option.addEventListener('click', () => {
+//         nextQuestionBtn.disabled = false;
+//         option.querySelector('input[type="radio"]').checked = true;
+//     });
+// });
 
-// Add a function to check if any radio button is selected
-function getSelectedRadioButton() {
-    const radioButtons = document.querySelectorAll('input[type="radio"]');
-    for (const radioButton of radioButtons) {
-        if (radioButton.checked) {
-            return radioButton;
-        }
-    }
-    return null;
-}
+// // Add a function to check if any radio button is selected
+// function getSelectedRadioButton() {
+//     const radioButtons = document.querySelectorAll('input[type="radio"]');
+//     for (const radioButton of radioButtons) {
+//         if (radioButton.checked) {
+//             return radioButton;
+//         }
+//     }
+//     return null;
+// }
 
-// // Function to disable options
-function disableOptions() {
-    const options = document.querySelectorAll('.option');
-    options.forEach((option) => {
-        option.disabled = true;
-    });
-}
+// // // Function to disable options
+// function disableOptions() {
+//     const options = document.querySelectorAll('.option');
+//     options.forEach((option) => {
+//         option.disabled = true;
+//     });
+// }
 
 document.addEventListener('DOMContentLoaded', function () {
     var contentWrapper = document.getElementById('content-wrapper');
@@ -356,10 +362,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 return htmlElement.outerHTML;
             });
+            console.log("Text Section After Processing:", processedTextSections)
 
             // Create containers for each text section and add the special white space class
             const container = document.createElement('div');
             container.className = 'text-section-container';
+
 
             let previousHeight = 0;
             processedTextSections.forEach((textSection, index) => {
@@ -391,6 +399,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             document.querySelector('.embedded-text').innerHTML = '';
             document.querySelector('.embedded-text').appendChild(container);
+            console.log(container)
+
+            // Start reading the text
+            // initScreenReader();
+            // renderTextSections(quizData);
+            // readNextWord();
         } else {
             console.log('quizData is null or undefined');
         }
@@ -736,8 +750,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Score without hints:', scoreWithoutHints, '/', totalQuestions);
             console.log('Score with hints:', scoreWithHints, '/', totalQuestions);
 
-            // Display overlay with scores
-            // Display an overlay that appears on top of the quiz with a darkened but still opaque background covering the entire quiz page
             // Display an overlay that appears on top of the quiz with a darkened but still opaque background covering the entire quiz page
             const overlay = document.createElement('div');
             overlay.classList.add('overlay', 'quiz-submission-overlay');
@@ -941,7 +953,69 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Update the question window when the quiz window is opened
     updateQuestionWindow();
 
+    // Add a CSS class to the toolbar when the screenreader button is clicked
+    function showToolbar() {
+        $('#toolbar').addClass('open');
+        $('#screenreader-button').addClass('hidden');
+    }
 
+    // Remove the CSS class from the toolbar when the close button is clicked
+    function closeToolbar() {
+        $('#toolbar').removeClass('open');
+        $('#screenreader-button').removeClass('hidden');
+    }
+
+    // Add event listener to open the toolbar
+    $('#screenreader-button').on('click', function () {
+        showToolbar();
+    });
+
+    // Add event listener to close the toolbar
+    $('#close-toolbar-button').on('click', function () {
+        closeToolbar();
+    });
+
+    // Add event listener to open the auto-scroll dropdown
+    $('#auto-scroll-dropdown-button').on('click', function () {
+        $(this).attr('aria-expanded', $(this).attr('aria-expanded') === 'true' ? 'false' : 'true');
+        $('#auto-scroll-dropdown').toggleClass('hidden');
+    });
+
+    // Add event listener to close the auto-scroll dropdown
+    $('#auto-scroll-dropdown').on('click', function (event) {
+        if (event.target.id === 'auto-scroll-dropdown') {
+            $('#auto-scroll-dropdown-button').attr('aria-expanded', 'false');
+            $(this).addClass('hidden');
+        }
+    });
+
+    // Add event listener to handle the auto-scroll options
+    $('.auto-scroll-option').on('click', function () {
+        const value = $(this).data('value');
+        if (value === 'on') {
+            // Enable auto-scroll
+            console.log('Screenreader auto scroll: Enabled');
+            $('#auto-scroll-dropdown-button').text('Screenreader auto scroll: On');
+            $('#auto-scroll-button-text').removeClass('red').addClass('green');
+        } else {
+            // Disable auto-scroll
+            console.log('Screenreader auto scroll: Disabled');
+            $('#auto-scroll-dropdown-button').text('Screenreader auto scroll: Off');
+            $('#auto-scroll-button-text').removeClass('green').addClass('red');
+        }
+        $('#auto-scroll-dropdown').addClass('hidden');
+    });
+
+    // Set the initial state of the auto-scroll dropdown
+    const initialValue = 'on'; // Set the initial value to 'on' or 'off'
+    let autoScrollButtonText = $('#auto-scroll-button-text');
+    if (initialValue === 'on') {
+        autoScrollButtonText.text('On');
+        autoScrollButtonText.removeClass('red').addClass('green');
+    } else {
+        autoScrollButtonText.text('Off');
+        autoScrollButtonText.removeClass('green').addClass('red');
+    }
 
     // code related to the future implementation of the pause quiz feature
 

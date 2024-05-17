@@ -354,6 +354,7 @@ ul {
 
 /* Next button main page */
 .start-quiz-button {
+  /* text-align: center; */
   display: inline-block;
   padding: 10px 20px;
   margin: 20px;
@@ -907,4 +908,106 @@ ul {
 #content-wrapper {
   opacity: 0;
   transition: opacity 0.5s;
+}
+
+/* Screen Reader */
+.current-word {
+  background-color: yellow;
+}
+
+.screenreader-toolbar-container {
+  text-align: center;
+  margin: 20px auto;
+}
+
+#toolbar {
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.toolbar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#toolbar button, #toolbar input[type="number"] {
+  margin: 10px;
+}
+
+.auto-scroll-options {
+  margin-top: 20px;
+}
+
+.auto-scroll-options label {
+  margin-right: 20px;
+}
+
+.green {
+  color: #2ecc71;
+}
+
+.red {
+  color: #e74c3c;
+}
+
+.open {
+  display: block;
+}
+
+#screenreader-button {
+  margin-bottom: 20px;
+}
+
+#close-toolbar-button {
+  margin-top: 20px;
+}
+
+.auto-scroll-options {
+  position: relative;
+  display: inline-block; /* Add this to make the dropdown inline */
+}
+
+#auto-scroll-dropdown {
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: none;
+}
+
+#auto-scroll-dropdown li {
+  padding: 10px;
+}
+
+#auto-scroll-dropdown li:hover {
+  background-color: #ddd;
+}
+
+.auto-scroll-option {
+  background-color: transparent;
+  border: none;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.auto-scroll-option:focus {
+  outline: none;
 }
