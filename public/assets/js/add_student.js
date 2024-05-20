@@ -3,7 +3,6 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
     authDomain: "project-plato-eb365.firebaseapp.com",
@@ -108,12 +107,16 @@ async function getStudent(email) {
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
+        console.log("Currently logged in user: " + user.email)
         const uid = user.uid;
         const parentEmail = user.email;
 
         const counter = getStudentCounter();
 
-        addEventListener("change", async (e) => {
+        const form = document.querySelector('.form-content');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
             var uniqueEmail = await generateUniqueEmail(parentEmail, counter);
             var username = document.getElementById("username-student-signup").value;
             var password = document.getElementById("password-student-signup").value;
@@ -125,24 +128,26 @@ onAuthStateChanged(auth, async (user) => {
                 const user = userCredential.user;
 
                 // Send users info to Firestore
-                // const userRef = doc(database, "users/", user.uid);
                 const userRef = doc(database, `users/${user.uid}`);
                 await setDoc(userRef, {
                     email: uniqueEmail,
                     username: username,
-                    counter: counter,
+                    parentEmail: parentEmail, // Adds the parents email to user document
+                    username: username,
+                    userRoleId: 0 // Set userRoleId to 0 for students
                 }, { merge: true });
 
                 const studentRef = doc(database, `studentdb/${user.uid}`);
                 await setDoc(studentRef, {
                     email: uniqueEmail,
                     username: username,
-                    counter: counter,
+                    parentEmail: parentEmail, // Adds the parents email to user document
+                    userRoleId: 0 // Set userRoleId to 0 for students
                 }, { merge: true });
 
                 // Insert redirect after sign-up here!
                 alert("Student Added!");
-                window.location.href = "student_overview_parent_tvt.html";
+                // window.location.href = "student_overview_parent_tvt.html";
             } catch (error) {
                 const errorCode = error.code;
                 const errorMessage = error.message;

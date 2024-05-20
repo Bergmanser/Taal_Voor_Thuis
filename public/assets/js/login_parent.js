@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
@@ -18,7 +18,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth();
-const database = getDatabase(app);
+const database = getFirestore(app);
 
 //Login logic
 addEventListener("change", (e) => {
@@ -30,22 +30,42 @@ addEventListener("change", (e) => {
     var email = emailInput.value;
     var password = passwordInput.value;
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        const date = new Date();
+    // Get the user document from Firestore using the email address
+    getUserByEmail(email)
+      .then((userDoc) => {
+        const userRoleId = userDoc.data().userRoleId;
 
-        update(ref(database, "users/" + user.uid), {
-          last_login: date,
-        })
+        // Check if the user exists and has a valid user role (i.e. userRoleId === 1 or userRoleId === 2)
+        if (userDoc.exists() && (userRoleId === 1 || userRoleId === 2)) {
+          signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              // Signed in
+              const user = userCredential.user;
+              const date = new Date();
 
-        // Insert redirect after sign-up here!
-        alert("User logged in!");
+              // Update the user document in Firestore
+              const userRef = doc(database, "users", user.uid);
+              updateDoc(userRef, {
+                last_login: date,
+              })
+                .then(() => {
+                  // Redirect to main menu
+                  alert("User logged in!");
+                  window.location.href = "parent_overview.html";
+                })
+                .catch((error) => {
+                  console.error("Error updating user document:", error);
+                });
+            })
+            .catch((error) => {
+              const errorCode = error.code;
+              const errorMessage = error.message;
 
-        // (temporarily) Redirects parent account to main_menu after log in
-        window.location.href = "main_menu.html";
-        // ...
+              alert(errorMessage);
+            });
+        } else {
+          alert("Invalid user or user role.");
+        }
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -55,3 +75,17 @@ addEventListener("change", (e) => {
       });
   }
 });
+
+// Get the user document from Firestore using the email address
+async function getUserByEmail(email) {
+  const usersRef = collection(database, "users");
+  const userQuery = query(usersRef, where("email", "==", email));
+  const userSnapshot = await getDocs(userQuery);
+
+  if (userSnapshot.size === 1) {
+    console.log("Found user:", userSnapshot.docs[0].data());
+    return userSnapshot.docs[0];
+  } else {
+    throw new Error("User not found.");
+  }
+}

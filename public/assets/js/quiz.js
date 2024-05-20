@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-// import { renderTextSections, initScreenReader, highlightCurrentWord, currentTextSectionIndex, currentWordIndex, readNextWord } from '../js/screenreader_quiztext.js'
+import { initScreenReader } from '../js/screenreader_quiztext.js'
 export { textContainer, quizData }
 
 const firebaseConfig = {
@@ -22,7 +22,7 @@ const analytics = getAnalytics(app);
 const auth = getAuth();
 const db = getFirestore(app);
 
-// An image class still needs to be added 
+// Applies predetermined css classes to the elements of the EmbeddedText
 const getCssClassForTag = (tag) => {
     const tagName = tag.toLowerCase();
     switch (tagName) {
@@ -336,9 +336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             console.log('Text sections before processing:', textSections);
 
-            // Process the text sections and add CSS classes 
-
-            // Add suport for images! DO IT!
+            // Process the text sections and add CSS classes
             const processedTextSections = textSections.map((text) => {
                 const htmlElement = htmlDoc.createElement('div');
                 htmlElement.innerHTML = text;
@@ -368,7 +366,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const container = document.createElement('div');
             container.className = 'text-section-container';
 
-
             let previousHeight = 0;
             processedTextSections.forEach((textSection, index) => {
                 const sectionContainer = document.createElement('div');
@@ -397,17 +394,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 container.appendChild(sectionContainer);
             });
 
+            // Create the hidden text for the screen reader
+            const hiddenTextContainer = document.createElement('div');
+            hiddenTextContainer.className = 'screenreader-text';
+            hiddenTextContainer.style.display = 'none';
+
+            const plainText = textSections.join(' ');  // Combine all text sections into a single plain text string
+            hiddenTextContainer.textContent = plainText;
+
             document.querySelector('.embedded-text').innerHTML = '';
             document.querySelector('.embedded-text').appendChild(container);
-            console.log(container)
+            document.querySelector('.embedded-text').appendChild(hiddenTextContainer);
+            console.log(container);
+            console.log(hiddenTextContainer)
 
             // Start reading the text
-            // initScreenReader();
-            // renderTextSections(quizData);
-            // readNextWord();
+            initScreenReader();
         } else {
             console.log('quizData is null or undefined');
         }
+
 
         // Generate the quiz question and answers by clicking on the startQuizButton
 
@@ -975,50 +981,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         closeToolbar();
     });
 
-    // Add event listener to open the auto-scroll dropdown
-    $('#auto-scroll-dropdown-button').on('click', function () {
-        $(this).attr('aria-expanded', $(this).attr('aria-expanded') === 'true' ? 'false' : 'true');
-        $('#auto-scroll-dropdown').toggleClass('hidden');
-    });
+    // // Add event listener to open the auto-scroll dropdown
+    // $('#auto-scroll-dropdown-button').on('click', function () {
+    //     $(this).attr('aria-expanded', $(this).attr('aria-expanded') === 'true' ? 'false' : 'true');
+    //     $('#auto-scroll-dropdown').toggleClass('hidden');
+    // });
 
-    // Add event listener to close the auto-scroll dropdown
-    $('#auto-scroll-dropdown').on('click', function (event) {
-        if (event.target.id === 'auto-scroll-dropdown') {
-            $('#auto-scroll-dropdown-button').attr('aria-expanded', 'false');
-            $(this).addClass('hidden');
-        }
-    });
+    // // Add event listener to close the auto-scroll dropdown
+    // $('#auto-scroll-dropdown').on('click', function (event) {
+    //     if (event.target.id === 'auto-scroll-dropdown') {
+    //         $('#auto-scroll-dropdown-button').attr('aria-expanded', 'false');
+    //         $(this).addClass('hidden');
+    //     }
+    // });
 
-    // Add event listener to handle the auto-scroll options
-    $('.auto-scroll-option').on('click', function () {
-        const value = $(this).data('value');
-        if (value === 'on') {
-            // Enable auto-scroll
-            console.log('Screenreader auto scroll: Enabled');
-            $('#auto-scroll-dropdown-button').text('Screenreader auto scroll: On');
-            $('#auto-scroll-button-text').removeClass('red').addClass('green');
-        } else {
-            // Disable auto-scroll
-            console.log('Screenreader auto scroll: Disabled');
-            $('#auto-scroll-dropdown-button').text('Screenreader auto scroll: Off');
-            $('#auto-scroll-button-text').removeClass('green').addClass('red');
-        }
-        $('#auto-scroll-dropdown').addClass('hidden');
-    });
+    // // Add event listener to handle the auto-scroll options
+    // $('.auto-scroll-option').on('click', function () {
+    //     const value = $(this).data('value');
+    //     if (value === 'on') {
+    //         // Enable auto-scroll
+    //         console.log('Screenreader auto scroll: Enabled');
+    //         $('#auto-scroll-dropdown-button').text('Screenreader auto scroll: On');
+    //         $('#auto-scroll-button-text').removeClass('red').addClass('green');
+    //     } else {
+    //         // Disable auto-scroll
+    //         console.log('Screenreader auto scroll: Disabled');
+    //         $('#auto-scroll-dropdown-button').text('Screenreader auto scroll: Off');
+    //         $('#auto-scroll-button-text').removeClass('green').addClass('red');
+    //     }
+    //     $('#auto-scroll-dropdown').addClass('hidden');
+    // });
 
-    // Set the initial state of the auto-scroll dropdown
-    const initialValue = 'on'; // Set the initial value to 'on' or 'off'
-    let autoScrollButtonText = $('#auto-scroll-button-text');
-    if (initialValue === 'on') {
-        autoScrollButtonText.text('On');
-        autoScrollButtonText.removeClass('red').addClass('green');
-    } else {
-        autoScrollButtonText.text('Off');
-        autoScrollButtonText.removeClass('green').addClass('red');
-    }
+    // // Set the initial state of the auto-scroll dropdown
+    // const initialValue = 'on'; // Set the initial value to 'on' or 'off'
+    // let autoScrollButtonText = $('#auto-scroll-button-text');
+    // if (initialValue === 'on') {
+    //     autoScrollButtonText.text('On');
+    //     autoScrollButtonText.removeClass('red').addClass('green');
+    // } else {
+    //     autoScrollButtonText.text('Off');
+    //     autoScrollButtonText.removeClass('green').addClass('red');
+    // }
+
 
     // code related to the future implementation of the pause quiz feature
-
     //     // Global variables
     // let quizProgress;
     // let quizTimerInterval;

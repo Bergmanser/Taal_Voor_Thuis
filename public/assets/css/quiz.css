@@ -1011,3 +1011,76 @@ ul {
 .auto-scroll-option:focus {
   outline: none;
 }
+
+/* The css for the dictionary searchbar and overlay on the quiz page */
+      /* Make the search bar take up about 10% of the screen width */
+      .gsc-control-cs {
+        /* position: sticky !important; */
+        /* top: 10%;
+        left: 10px; */
+        /* z-index: 1000; */
+        /* border: 2px solid #007bff; */
+        /* border-radius: 5px;
+        padding: 5px; */
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+      }
+
+      .gsc-control-cse {
+      background-color: #ffffff !important;
+      border: 1px solid #6b4c83 !important;
+      padding: 10px 1px 8px 10px !important;
+      border-radius: 5px !important;
+      }
+
+      /* Autocomplete results */
+      .gsc-input-box ul.gsc-results {
+          position: fixed !important;
+      }
+
+      .google-search-box {
+          /* position: sticky !important; */
+          top: 10%;
+          z-index: 1000;
+          /* border-color: 1px solid red; */
+          width: 30%;
+          position: fixed;
+          padding: 5.5px;
+          border-radius: 20px;
+          /* background-color: blue; */
+      }
+
+     #cse .gsc-control-cse {
+  background-color: red;
+  border: 1px solid #fff;
+}
+      
+      #cse .gsc-search-box {
+      width: 100%;  
+      }​
+      
+      /* Style the input element */
+      .gsc-search-box .gsc-input-box {
+        width: 20%;
+        border: none;
+        padding: 5px;
+        box-sizing: border-box;
+      }
+      
+      /* Hide the submit button */
+      .gsc-search-box input[type="submit"] {
+        display: none;
+      }
+    
+      /* Hide the blue glass effect */
+      .gsc-input-box-hover,
+      .gsc-input-box-focus {
+        background-color: transparent;
+      }
+
+      .gsc-search-button {
+          display: none;
+      }
+      
+      .gsc-search-button-v2{
+
+      }

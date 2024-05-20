@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taal voor Thuis</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* General styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #2b2b2b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background-color: #191919;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    position: relative;
+}
+
+.login-container h1 {
+    font-size: 24px;
+    color: #a2d63c;
+    margin-bottom: 10px;
+}
+
+.login-container p {
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.login-container a {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.login-container a:hover {
+    text-decoration: none;
+}
+
+.input-field {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #333333;
+    border-radius: 5px;
+    background-color: #2b2b2b;
+    color: #ffffff;
+}
+
+.input-field::placeholder {
+    color: #888888;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    color: #ffcc33;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #ffffff;
+}
+
+.puzzle-icon {
+    width: 40px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <button class="close-button">&times;</button>
+        <img src="../public/assets/images/MeerDanBijles-Logo.png" alt="Puzzle Icon" class="puzzle-icon">
+        <h1>Taal voor Thuis</h1>
+        <p>Log hier in als je een <a href="#">leerling</a> bent!</p>
+        <input type="text" class="input-field" placeholder="Gebruikersnaam">
+        <input type="password" class="input-field" placeholder="Wachtwoord">
+    </div>
+</body>
+</html>

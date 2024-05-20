@@ -49,7 +49,20 @@
                     <div class="hero" style="background-image: url(banner-image-url);">
                         <div class="title" id="quiz-title"></div>
                     </div>
-                    <div class="text-section-container"></div>
+                    <div class="text-section-container" id="text-section-container"></div>
+                    <div class="screenreader-text" style="display:none;">
+                        <p>In de zomer is zonnebrandcrème <b>onmisbaar</b>, je ziet veel mensen om je heen het gebruiken. Dat is ook logisch, want in de zomer schijnt de zon vaak en wil iedereen tijd buiten doorbrengen. We weten ook dat je van te lang in de zon spelen, kunt verbranden. Om <b>dat</b> te voorkomen gebruiken we zonnebrandcrème. Alleen hoe zit het dan met de dagen waarop de zon niet schijnt? Dan is zonnebrandcrème toch helemaal niet nodig, zou je denken...</p>   <p>De zon is eigenlijk een soort ster, maar in plaats van 's nachts te twinkelen zoals de sterren die we aan de hemel zien, straalt de zon altijd fel licht en warmte uit. Naast licht en warmte zendt de zon <b>straling</b> uit. Deze bestaat eigenlijk uit kleine, onzichtbare deeltjes die van de zon afkomen en door de ruimte reizen, helemaal tot aan onze aarde! De zon zendt verschillende soorten stralen uit, waaronder UV-stralen. Deze stralen kunnen goed zijn voor ons omdat ze ons lichaam helpen vitamine D te maken, die belangrijk is voor onze botten en ons immuunsysteem. Maar te veel blootstelling aan UV-stralen kan schadelijk zijn voor onze huid en tot verbranding leiden.</p>   <p>Om toch van de zon te genieten zonder te verbranden, kunnen we onszelf beschermen met zonnebrandcrème. Deze crème bevat speciale ingrediënten die een onzichtbare laag op je huid vormen en schadelijke UV-stralen van de zon tegenhouden. Het is hierbij wel belangrijk dat je minstens 30 minuten voordat je naar buiten gaat de zonnebrandcrème aanbrengt, zodat het goed kan intrekken. <b>Ook</b> zal je rekening moeten houden met het kiezen van de juiste zonnebrandcrème. Op elke zonnebrandcrème staat een <b>factor</b> vermeld. Dit is eigenlijk de sterkte waarmee de zonnebrandcrème je huid beschermt. Vaak wordt dit aangegeven in ‘SPF’, die staat voor ‘Sun Protection Factor’. De SPF is een getal dat aangeeft hoeveel langer je in de zon kunt blijven zonder te verbranden in vergelijking met wanneer je geen zonnebrandcrème gebruikt. Tot slot moet je niet vergeten om zonnebrandcrème om het paar uur opnieuw in te smeren!</p>   <p>De zon zendt dus constant straling uit. Dat betekent dat je lichaam elke dag wordt blootgesteld aan UV-stralen, zelfs wanneer je de zon niet ziet schijnen of als het niet warm is. UV-stralen kunnen namelijk door bewolking en glas heen dringen. Het is dus belangrijk om dagelijks zonnebrandcrème te smeren om een gezonde huid te behouden. Dan is zonnebrandcrème in de winter toch niet zo gek als het klinkt!</p>
+                    </div>
+
+                    <!-- Adds a searchbar for the dictionay and browser search function -->
+                    <!-- <input type="text" id="search-box">
+                    <div id="overlay" style="display:none;">
+                    <div id="google-search-results"></div>
+                    </div> -->
+                    <div class="google-search-box">
+                        <div class="gcse-search"></div>
+                    </div>
+                    
 
                     <!-- Add a toolbar for controlling the screen reader -->
                     <div class="screenreader-toolbar-container">
@@ -61,16 +74,6 @@
                             <button id="reset-button">Reset</button>
                             <input id="start-from-input" type="number" value="1" />
                             <button id="start-from-button">Start from</button>
-                            <div class="auto-scroll-options">
-                            <!-- <label>
-                                <input type="radio" name="auto-scroll" value="on" />
-                                <span>Screenreader auto scroll: <span class="green">On</span></span>
-                            </label>
-                            <label>
-                                <input type="radio" name="auto-scroll" value="off" />
-                                <span>Screenreader auto scroll: <span class="red">Off</span></span>
-                            </label>
-                            </div> -->
                             <div class="auto-scroll-options">
                                 <button id="auto-scroll-dropdown-button" aria-haspopup="true" aria-expanded="false">
                                     Screenreader auto scroll: <span id="auto-scroll-button-text"></span>
@@ -86,7 +89,7 @@
                     </div>
                                         
                     <div class="embedded-text-section">
-                        <div class="embedded-text"></div>
+                        <div class="embedded-text" id="embedded-text"></div>
                     </div>
                     <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
                 </div>
@@ -123,6 +126,8 @@
             </div>
         </main>
     </div>
+    <script src="https://cse.google.com/cse.js?cx=111c176d9efa64756"></script>
+    <!-- <script type="module" src="../public/assets/js/dictionary_search.js"></script> -->
     <script type="module" src="../public/assets/js/quiz.js"></script>
     <script type="module" src="../public/assets/js/screenreader_quiztext.js"></script>
 </body>

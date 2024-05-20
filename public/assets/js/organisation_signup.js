@@ -21,7 +21,7 @@ const auth = getAuth();
 const database = getFirestore(app);
 
 //Sign-up logic
-const form = document.querySelector('.sign-up-form form');
+const form = document.querySelector('.form-content');
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     var emailInput = document.getElementById("email-user-signup");
@@ -45,7 +45,7 @@ form.addEventListener('submit', async (e) => {
                     uid: user.uid,
                     email: email,
                     username: username,
-                    userRoleId: 1 // Set userRoleId to 1 for private individuals (parent user)
+                    userRoleId: 2 // Set userRoleId to 2 for organisations (parent user)
                 });
 
                 // Insert redirect after sign-up here!
