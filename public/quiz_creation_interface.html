@@ -3,6 +3,7 @@
   <head>
     <title>Upload een Quiz</title>
     <link rel="stylesheet" href="./assets/css/quiz_creation_interface.css"/>
+    <link rel="stylesheet" href="../public/assets/css/embedded_text_creation.css">
     <!-- Theme included stylesheets -->
     <link
       href="https://cdn.quilljs.com/1.3.6/quill.snow.css"
@@ -53,17 +54,34 @@
       <div></div>
       <label>Voeg hier de bijhorende toets tekst toe</label>
 
-      <div id="embedded-text">
-        <button type="button" id="add-embedded-text-button">Add Embedded Text</button>
-        <div id="embedded-text-toolbar">
-          <div id="embedded-text-toolbar-content" style="display: none;">
-            <div id="quill-container"></div>
-            <div id="quill-error"></div>
-            <!-- The buttons will be added here -->
+      <div class="embedded-text-container">
+        <div class="embedded-text-main-toolbar">
+          <button class="embedded-text-color-btn">Color</button>
+          <button class="embedded-text-bg-btn">Background</button>
+          <button class="embedded-text-left-btn">Left</button>
+          <button class="embedded-text-right-btn">Right</button>
+          <button class="embedded-text-middle-btn">Middle</button>
+          <button class="embedded-text-full-btn">Full</button>
+        </div>
+        <div class="container">
+          <div class="toolbar">
+            <!-- Toolbar content goes here -->
+          </div>
+          <div class="content">
+            <div class="text-area"></div>
           </div>
         </div>
+        <div class="embedded-text-editor">
+          <div class="quill-container"></div>
+        </div>
+        <div class="embedded-text-preview"></div>
+        <button class="embedded-text-save">Save</button>
+        <button class="embedded-text-delete">Delete</button>
+        <div class="embedded-text-bg-container">
+          <input type="file" class="embedded-text-bg-input" accept="image/*">
+          <div class="embedded-text-bg-preview"></div>
+        </div>
       </div>
-
 
       <label for="quiz-type">Selecteer de type van de toets</label>
       <div>

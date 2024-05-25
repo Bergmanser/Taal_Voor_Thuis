@@ -1,31 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../public/assets/css/parent_overview.css">
-    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
-    <title>Student Overview Page Parent Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../public/assets/css/parent_overview.css">
+  <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+  <title>Student Overview Page Parent Dashboard</title>
+  <style>
+    #childUserList {
+      display: block;
+      max-height: 400px; /* Adjust height as needed */
+      overflow-y: scroll;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background-color: white;
+    }
+  </style>
 </head>
-  <body>
-    <button id="run-btn">Add new student accounts</button>
-    <table id="child-users-table">
-      <thead>
-          <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Customizable</th>
-          </tr>
-      </thead>
-      <tbody></tbody>
-  </table>
+<body>
+  <div class="container">
+      <div id="header" class="sticky-top">
+          <h1 id="welcomeHeader">Welcome</h1> <!-- Dynamic Header -->
+      </div>
+
+      <!-- Child Users Table -->
+      <table class="table">
+          <thead>
+              <tr>
+                  <th colspan="2">
+                      <input type="text" id="searchBar" class="form-control" placeholder="Search by child name">
+                  </th>
+              </tr>
+              <tr>
+                  <th>Child Name</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody id="childUserList">
+              <!-- Child users will be populated here -->
+          </tbody>
+      </table>
+
+      <!-- Add Child Button -->
+     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addStudentModal">
+          Add Child
+      </button>
+  </div>
+  
+  <!-- Add Student Button which triggers the modal -->
+<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addStudentModal">
+  Add Student
+</button> -->
+
+<!-- Modal -->
+<div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addStudentModalLabel">Add Student</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <!-- Form Content -->
+              <form id="addStudentForm" class="form-content">
+                  <div class="form-group">
+                      <input type="text" class="form-control" id="username-student-signup" placeholder="Username" required>
+                  </div>
+                  <div class="form-group">
+                      <input type="password" class="form-control" id="password-student-signup" placeholder="Password" required>
+                  </div>
+                  <input type="submit" class="btn btn-success" value="Add User">
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              Are you sure you want to delete <span id="deleteStudentName"></span>?
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Go Back</button>
+              <button type="button" class="btn btn-danger" id="confirmDeleteButton">Confirm</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script type="module" src="../public/assets/js/parent_overview.js"></script>
-  </body>
+  <script type="module" src="../public/assets/js/add_student.js"></script>
+<!-- 
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <!-- <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+    <script src="../public/assets/js/firebase_config.js"></script>
+    <script src="app.js"></script> -->
+</body>
 </html>
-
-
 

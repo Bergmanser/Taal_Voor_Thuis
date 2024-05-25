@@ -1,8 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { retrieveStudentsWithSameParentEmail } from "../js/parent_overview.js";
 
+// Main Config for Project Plato
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
     authDomain: "project-plato-eb365.firebaseapp.com",
@@ -14,11 +16,28 @@ const firebaseConfig = {
     measurementId: "G-KHJXGLJM4Y"
 };
 
+// Secondary Config for Project Plato
+const secondaryFirebaseConfig = {
+    apiKey: "AIzaSyAb6cOf4ZXjI1t6s-Ks0DnKUA08FFu7Oow",
+    authDomain: "project-plato-eb365.firebaseapp.com",
+    databaseURL: "https://project-plato-eb365-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "project-plato-eb365",
+    storageBucket: "project-plato-eb365.appspot.com",
+    messagingSenderId: "753582080609",
+    appId: "1:753582080609:web:72f850e85a54a0c156e020",
+    measurementId: "G-8S3CL4DGY9"
+};
+
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth();
 const database = getFirestore(app);
+
+// Secondary Firebase app initialization
+const secondaryApp = initializeApp(secondaryFirebaseConfig, "secondary");
+const secondaryAuth = getAuth(secondaryApp);
 
 function getStudentCounter() {
     const parentUid = auth.currentUser.uid;
@@ -107,7 +126,6 @@ async function getStudent(email) {
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        console.log("Currently logged in user: " + user.email)
         const uid = user.uid;
         const parentEmail = user.email;
 
@@ -124,7 +142,7 @@ onAuthStateChanged(auth, async (user) => {
             console.log(uniqueEmail);
 
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, uniqueEmail, password);
+                const userCredential = await createUserWithEmailAndPassword(secondaryAuth, uniqueEmail, password);
                 const user = userCredential.user;
 
                 // Send users info to Firestore
@@ -147,7 +165,11 @@ onAuthStateChanged(auth, async (user) => {
 
                 // Insert redirect after sign-up here!
                 alert("Student Added!");
-                // window.location.href = "student_overview_parent_tvt.html";
+                // Close the modal
+                $('#addStudentModal').modal('hide');
+
+                // Refresh the student list
+                retrieveStudentsWithSameParentEmail(auth.currentUser.email);
             } catch (error) {
                 const errorCode = error.code;
                 const errorMessage = error.message;

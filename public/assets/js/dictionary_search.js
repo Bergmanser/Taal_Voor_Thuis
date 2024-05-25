@@ -1,6 +1,6 @@
 // const axios = require('axios');
 
-// const apiKey = 'AIzaSyAb6cOf4ZXjI1t6s-Ks0DnKUA08FFu7Oow';
+// const apiKey = '';
 // const cx = '111c176d9efa64756';
 // const query = 'example query';
 

@@ -3,6 +3,7 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+// Main Config for Project Plato
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
     authDomain: "project-plato-eb365.firebaseapp.com",

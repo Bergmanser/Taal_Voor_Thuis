@@ -5,6 +5,7 @@ import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstat
 import { initScreenReader } from '../js/screenreader_quiztext.js'
 export { textContainer, quizData }
 
+// Main Config for Project Plato
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
     authDomain: "project-plato-eb365.firebaseapp.com",

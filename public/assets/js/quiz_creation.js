@@ -4,6 +4,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 // import { embeddedTextCreation } from '../js/embedded_text_creation.js';
 
+// Main Config for Project Plato
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
     authDomain: "project-plato-eb365.firebaseapp.com",

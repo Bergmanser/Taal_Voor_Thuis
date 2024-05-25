@@ -1,56 +1,94 @@
-// // Import the functions you need from the SDKs you need
-// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-// import { getAnalytics } from "firebase/analytics";
-// import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
-// // import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-// // TODO: Add SDKs for Firebase products that you want to use
-// // https://firebase.google.com/docs/web/setup#available-libraries
+// import { auth, secondaryAuth, secondaryDatabase } from './firebase.js';
+// import { createUserWithEmailAndPassword, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+// import { doc, setDoc, getDocs, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// // Your web app's Firebase configuration
-// // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// const firebaseConfig = {
-//     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
-//     authDomain: "project-plato-eb365.firebaseapp.com",
-//     projectId: "project-plato-eb365",
-//     storageBucket: "project-plato-eb365.appspot.com",
-//     messagingSenderId: "753582080609",
-//     appId: "1:753582080609:web:98b2db93e63a500a56e020",
-//     measurementId: "G-KHJXGLJM4Y"
-// };
+// $(document).ready(function () {
+//     const modal = $('#signupModal');
+//     const deleteModal = $('#deleteModal');
+//     const openSignupBtn = $('#openSignupBtn');
+//     const closeBtns = $('.close');
+//     const confirmDeleteBtn = $('#confirmDeleteBtn');
+//     const cancelDeleteBtn = $('#cancelDeleteBtn');
+//     let childToDelete = null;
 
-// // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
-// const auth = getAuth(app);
-// const database = getDatabase(app);
+//     openSignupBtn.on('click', function () {
+//         modal.show();
+//     });
+
+//     closeBtns.on('click', function () {
+//         modal.hide();
+//         deleteModal.hide();
+//     });
+
+//     $(window).on('click', function (event) {
+//         if (event.target == modal[0]) {
+//             modal.hide();
+//         }
+//         if (event.target == deleteModal[0]) {
+//             deleteModal.hide();
+//         }
+//     });
+
+//     async function createChildUser(username, age, gender, password, parentInfo) {
+//         const uniqueEmail = `${username}+${parentInfo.email}`;
+
+//         try {
+//             const userCredential = await createUserWithEmailAndPassword(secondaryAuth, uniqueEmail, password);
+//             const user = userCredential.user;
+
+//             await setDoc(doc(secondaryDatabase, `users/${user.uid}`), {
+//                 email: uniqueEmail,
+//                 username: username,
+//                 age: age,
+//                 gender: gender,
+//                 parentEmail: parentInfo.email,
+//                 userRoleId: 0
+//             });
+
+//             await setDoc(doc(secondaryDatabase, `studentdb/${user.uid}`), {
+//                 email: uniqueEmail,
+//                 username: username,
+//                 age: age,
+//                 gender: gender,
+//                 parentEmail: parentInfo.email,
+//                 userRoleId: 0
+//             });
+
+//             secondaryAuth.signOut();
+
+//             modal.hide();
+//             alert("Student Added!");
+//             displayChildren();
+//         } catch (error) {
+//             alert(error.message);
+//         }
+//     }
+
+//     function getParentInfo() {
+//         const parentUser = auth.currentUser;
+//         if (parentUser) {
+//             return {
+//                 uid: parentUser.uid,
+//                 email: parentUser.email
+//             };
+//         } else {
+//             throw new Error('No parent user is currently logged in');
+//         }
+//     }
+
+//     $('#signupForm').on('submit', async function (event) {
+//         event.preventDefault();
+//         try {
+//             const parentInfo = getParentInfo();
+//             const username = $('#username-student-signup').val();
+//             const age = $('#age-student-signup').val();
+//             const gender = $('#gender-student-signup').val();
+//             const password = $('#password-student-signup').val();
+//             await createChildUser(username, age, gender, password, parentInfo);
+//         } catch (error) {
+//             alert(error.message);
 
 
-// // function validate_password() {
-
-// //     let password = document.getElementById('password').value;
-// //     let confirm_password = document.getElementById('confirm_password').value;
-// //     if (password != confirm_password) {
-// //         document.getElementById('wrong_password_alert').style.color = 'red';
-// //         document.getElementById('wrong_password_alert').innerHTML
-// //             = '☒ Use same password';
-// //         document.getElementById('create').disabled = true;
-// //         document.getElementById('create').style.opacity = (0.4);
-// //     } else {
-// //         document.getElementById('wrong_pass_alert').style.color = 'green';
-// //         document.getElementById('wrong_pass_alert').innerHTML =
-// //             '🗹 Password Matched';
-// //         document.getElementById('create').disabled = false;
-// //         document.getElementById('create').style.opacity = (1);
-// //     }
-// // }
-
-// // function wrong_password_alert() {
-// //     if (document.getElementById('password').value != "" &&
-// //         document.getElementById('confirm_password').value != "") {
-// //         alert("Your response is submitted");
-// //     } else {
-// //         alert("Please fill all the fields");
-// //     }
-// // }
-
-// // console.log("hello world")
+//         }
+//     })
+// });
