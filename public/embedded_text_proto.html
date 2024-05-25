@@ -144,7 +144,6 @@
                 let toolbar = $('<div class="background-toolbar"></div>');
                 let removeButton = $('<button class="btn btn-sm btn-danger remove-background">Remove</button>');
                 let zIndexDropdown = $('<select class="btn btn-sm btn-secondary"><option value="background">Background</option><option value="foreground">Foreground</option></select>');
-
                 toolbar.append(removeButton);
                 toolbar.append(zIndexDropdown);
 
@@ -234,6 +233,7 @@
                         }
                     } else if (type === 'middle') {
                         section.addClass('middle-section');
+                        toolbar.append('<button class="btn btn-sm btn-primary swap-button">Swap</button>'); // Add Swap button to main toolbar
                         backgroundDiv1 = $('<div class="background-middle-1 background-section"><div class="background-inner">Click to add an image...</div></div>');
                         backgroundDiv2 = $('<div class="background-middle-2 background-section"><div class="background-inner">Click to add an image...</div></div>');
                         backgroundDiv1.prepend(createBackgroundToolbar());
@@ -248,6 +248,38 @@
                         container.append(section);
                         container.append(backgroundDiv2);
                         console.log('Middle section added');
+
+                        backgroundDiv1.find('.background-inner').click(function() {
+                        let input = $('<input type="file" accept="image/*">');
+                        input.click();
+                        input.change(function(e) {
+                            let file = e.target.files[0];
+                            if (file) {
+                                let reader = new FileReader();
+                                reader.onload = function(event) {
+                                    backgroundDiv1.find('.background-inner').html('<img src="'+event.target.result+'" alt="Image" style="width: 100%;">');
+                                    backgroundDiv1.find('.background-toolbar').show();
+                                }
+                                reader.readAsDataURL(file);
+                            }
+                         });
+                        });
+
+                    backgroundDiv2.find('.background-inner').click(function() {
+                        let input = $('<input type="file" accept="image/*">');
+                        input.click();
+                        input.change(function(e) {
+                            let file = e.target.files[0];
+                            if (file) {
+                                let reader = new FileReader();
+                                reader.onload = function(event) {
+                                    backgroundDiv2.find('.background-inner').html('<img src="'+event.target.result+'" alt="Image" style="width: 100%;">');
+                                    backgroundDiv2.find('.background-toolbar').show();
+                                }
+                                reader.readAsDataURL(file);
+                            }
+                        });
+                    });
                     }
 
                     backgroundDiv && backgroundDiv.find('.background-inner').click(function() {
@@ -395,19 +427,19 @@
 
                     // Ensure background section height matches main section height
                     function adjustBackgroundHeight() {
-                        if (backgroundDiv) {
-                            backgroundDiv.css('min-height', sectionContent.outerHeight() + toolbar.outerHeight());
-                        }
-                        if (backgroundDiv1) {
-                            backgroundDiv1.css('min-height', sectionContent.outerHeight() + toolbar.outerHeight());
-                        }
-                        if (backgroundDiv2) {
-                            backgroundDiv2.css('min-height', sectionContent.outerHeight() + toolbar.outerHeight());
-                        }
+                    if (backgroundDiv) {
+                        backgroundDiv.css('min-height', sectionContent.outerHeight() + toolbar.outerHeight());
+                    }
+                    if (backgroundDiv1) {
+                        backgroundDiv1.css('min-height', sectionContent.outerHeight() + toolbar.outerHeight());
+                    }
+                    if (backgroundDiv2) {
+                        backgroundDiv2.css('min-height', sectionContent.outerHeight() + toolbar.outerHeight());
+                    }
                     }
                     sectionContent.on('input', adjustBackgroundHeight);
                     adjustBackgroundHeight();
-                }
+                    }
 
                 $('#preview').append(container);
                 console.log('Section added:', section);
@@ -433,6 +465,19 @@
                     backgroundDiv2.remove();
                 }
 
+                if (newType === 'left' || newType === 'right') {
+                if (section.hasClass('middle-section')) {
+                    if (backgroundDiv1.find('img').length > 0 && backgroundDiv2.find('img').length > 0) {
+                    if (confirm("Are you sure you want to remove both images?")) {
+                            backgroundDiv1.remove();
+                            backgroundDiv2.remove();
+                        } else {
+                            return;
+                        }
+                    }
+                }
+                }
+
                 container.empty();
 
                 if (newType === 'left') {
@@ -443,22 +488,12 @@
                         backgroundDiv.find('.background-inner').html('<img src="'+backgroundImage1+'" alt="Image" style="width: 100%;">');
                         backgroundDiv.find('.background-toolbar').show();
                     }
-                    container.append(section);
                     container.append(backgroundDiv);
-                } else if (newType === 'right') {
-                    section.addClass('right-section');
-                    backgroundDiv = $('<div class="background-right background-section"><div class="background-inner">Click to add an image...</div></div>');
-                    backgroundDiv.prepend(createBackgroundToolbar());
-                    if (backgroundImage1) {
-                        backgroundDiv.find('.background-inner').html('<img src="'+backgroundImage1+'" alt="Image" style="width: 100%;">');
-                        backgroundDiv.find('.background-toolbar').show();
-                    }
-                    container.append(backgroundDiv);
-                    container.append(section);
                 } else if (newType === 'middle') {
                     section.addClass('middle-section');
-                    backgroundDiv1 = $('<div class="background-middle-1 background-section"><div class="background-inner">Click to add an image...</div></div>');
-                    backgroundDiv2 = $('<div class="background-middle-2 background-section"><div class="background-inner">Click to add an image...</div></div>');
+                    toolbar.append('<button class="btn btn-sm btn-primary swap-button">Swap</button>'); // Add Swap button to main toolbar
+                    backgroundDiv1 = $('<div class="background-left background-section"><div class="background-inner">Click to add an image...</div></div>');
+                    backgroundDiv2 = $('<div class="background-right background-section"><div class="background-inner">Click to add an image...</div></div>');
                     backgroundDiv1.prepend(createBackgroundToolbar());
                     backgroundDiv2.prepend(createBackgroundToolbar());
                     if (backgroundImage1) {
@@ -469,11 +504,42 @@
                         backgroundDiv2.find('.background-inner').html('<img src="'+backgroundImage2+'" alt="Image" style="width: 100%;">');
                         backgroundDiv2.find('.background-toolbar').show();
                     }
-                    container.append(backgroundDiv1);
-                    container.append(section);
-                    container.append(backgroundDiv2);
+                    container.append(backgroundDiv1, backgroundDiv2);
+                } else if (newType === 'right') {
+                    section.addClass('right-section');
+                    backgroundDiv = $('<div class="background-right background-section"><div class="background-inner">Click to add an image...</div></div>');
+                    backgroundDiv.prepend(createBackgroundToolbar());
+                    if (backgroundImage1) {
+                        backgroundDiv.find('.background-inner').html('<img src="'+backgroundImage1+'" alt="Image" style="width: 100%;">');
+                        backgroundDiv.find('.background-toolbar').show();
+                    }
+                    container.append(backgroundDiv);
                 }
 
+                container.append(section);
+
+                if (newType === 'left' || newType === 'right') {
+                    section.find('.content-inner').html(section.find('.content-inner').html());
+                } else if (newType === 'middle') {
+                    if (backgroundImage1) {
+                        backgroundDiv1.find('.background-inner').html('<img src="'+backgroundImage1+'" alt="Image" style="width: 100%;">');
+                        backgroundDiv1.find('.background-toolbar').show();
+                    }
+                    if (backgroundImage2) {
+                        backgroundDiv2.find('.background-inner').html('<img src="'+backgroundImage2+'" alt="Image" style="width: 100%;">');
+                        backgroundDiv2.find('.background-toolbar').show();
+                    }
+                }
+
+                section.find('.content-inner').on('input', function() {
+                    if (newType === 'left' || newType === 'right') {
+                        section.find('.content-inner').html(section.find('.content-inner').html());
+                    } else if (newType === 'middle') {
+                        backgroundDiv1.find('.background-inner').html(backgroundDiv1.find('.background-inner').html());
+                        backgroundDiv2.find('.background-inner').html(backgroundDiv2.find('.background-inner').html());
+                    }
+                });
+            
                 // Reattach file input click handlers for new background sections
                 if (backgroundDiv) {
                     backgroundDiv.find('.background-inner').click(function() {
@@ -541,6 +607,16 @@
             });
             $('#addFull').click(function() {
                 addSection('full');
+            });
+
+            // Attach click event handler for swap buttons
+            $(document).on('click', '.swap-button', function() {
+                let container = $(this).closest('.section-container');
+                let backgroundDiv1Inner = container.find('.background-middle-1 .background-inner');
+                let backgroundDiv2Inner = container.find('.background-middle-2 .background-inner');
+                let temp = backgroundDiv1Inner.html();
+                backgroundDiv1Inner.html(backgroundDiv2Inner.html());
+                backgroundDiv2Inner.html(temp);
             });
 
         });
