@@ -3,22 +3,19 @@
   <head>
     <title>Upload een Quiz</title>
     <link rel="stylesheet" href="./assets/css/quiz_creation_interface.css"/>
-    <link rel="stylesheet" href="../public/assets/css/embedded_text_creation.css">
-    <!-- Theme included stylesheets -->
-    <link
-      href="https://cdn.quilljs.com/1.3.6/quill.snow.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://unpkg.com/quill-image-uploader@1.2.4/dist/quill.imageUploader.min.css"
-      rel="stylesheet"
-    />
+    <!-- <link rel="stylesheet" href="../public/assets/css/embedded_text_creation.css"> -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://unpkg.com/@cloak/quill-toolbar@1.0.0/dist/quill-toolbar.min.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <script src="https://unpkg.com/quill-image-uploader@1.2.4/dist/quill.imageUploader.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.1/dist/pickr.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.1/dist/themes/nano.min.css"/> -->
   </head>
   <body>
     <h1>Maak een op deze pagina een nieuwe toets aan</h1>
@@ -52,37 +49,9 @@
       <input type="file" id="banner" accept="image/jpeg,image/png,image/jpg" />
       <div id="banner-error"></div>
       <div></div>
-      <label>Voeg hier de bijhorende toets tekst toe</label>
-
-      <div class="embedded-text-container">
-        <div class="embedded-text-main-toolbar">
-          <button class="embedded-text-color-btn">Color</button>
-          <button class="embedded-text-bg-btn">Background</button>
-          <button class="embedded-text-left-btn">Left</button>
-          <button class="embedded-text-right-btn">Right</button>
-          <button class="embedded-text-middle-btn">Middle</button>
-          <button class="embedded-text-full-btn">Full</button>
-        </div>
-        <div class="container">
-          <div class="toolbar">
-            <!-- Toolbar content goes here -->
-          </div>
-          <div class="content">
-            <div class="text-area"></div>
-          </div>
-        </div>
-        <div class="embedded-text-editor">
-          <div class="quill-container"></div>
-        </div>
-        <div class="embedded-text-preview"></div>
-        <button class="embedded-text-save">Save</button>
-        <button class="embedded-text-delete">Delete</button>
-        <div class="embedded-text-bg-container">
-          <input type="file" class="embedded-text-bg-input" accept="image/*">
-          <div class="embedded-text-bg-preview"></div>
-        </div>
+      <div>
+        <div id="embedded-text-creation"></div>
       </div>
-
       <label for="quiz-type">Selecteer de type van de toets</label>
       <div>
         <select id="quiz-type" name="quiz-type" required>
@@ -95,7 +64,7 @@
       </select>
       <div id="quiz-type-error"></div>
       </div>
-      <label for="difficulty">Selecteer een moeilijkheidsgraad bij deze toets:</label>
+      <!-- <label for="difficulty">Selecteer een moeilijkheidsgraad bij deze toets:</label>
       <div>
         <select id="difficulty" name="difficulty" required>
           <option value="">Selecteer een moeilijkheidsgraad</option>
@@ -104,7 +73,7 @@
           <option value="hard">Hard</option>
         </select>
         <div id="difficulty-error"></div>
-      </div>
+      </div> -->
         <div id="questions">
             <!-- <div id="question-0" class="question">
               <h2>Question 1</h2>
@@ -163,7 +132,16 @@
         </script> -->
         <!-- <script type="module" src="../public/assets/js/quill_container.js"></script>    -->
         <script type="module" src="../public/assets/js/quiz_creation.js"></script>
-        <script type="module" src="../public/assets/js/embedded_text_creation.js"></script>
+        <!-- <script type="module" src="../public/assets/js/embedded_text_creation.js"></script> -->
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            fetch('embedded_text_proto.html')
+              .then(response => response.text())
+              .then(data => {
+                document.getElementById('embedded-text-creation').innerHTML = data;
+              });
+          });
+        </script>
 
   </body>
 </html>
