@@ -291,6 +291,8 @@
             }
         }
 
+        let storedRange = null;
+
         function addSection(type, content = 'Edit this text...', background = null, borderColor = '#ddd', textColor = '#000', isBold = false) {
             console.log(`Adding section: ${type}`);
             if (!type) {
@@ -479,30 +481,141 @@
                     }
                 });
 
-                section.find('.bold-btn').click(function() {
-                    let selection = window.getSelection();
-                    if (selection.rangeCount > 0) {
-                        let range = selection.getRangeAt(0);
-                        if (sectionContent[0].contains(range.commonAncestorContainer)) {
-                            let span = document.createElement('span');
-                            let isBold = window.getComputedStyle(range.startContainer.parentNode).fontWeight === 'bold' || range.startContainer.parentNode.nodeName === 'B';
+                
+                // Handle focus event on section content
+                section.find('.section-content').on('focus', function() {
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0) {
+                    storedRange = selection.getRangeAt(0);
+                }
+                });
 
-                            if (isBold) {
-                                // Remove bold formatting
-                                document.execCommand('removeFormat', false, null);
-                                console.log('Bold removed from selected text:', selection.toString());
-                            } else {
-                                // Apply bold formatting
-                                document.execCommand('bold', false, null);
-                                console.log('Bold applied to selected text:', selection.toString());
-                            }
+                // Handle mouseup event on section content
+                section.find('.section-content').on('mouseup', function() {
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0) {
+                    storedRange = selection.getRangeAt(0);
+                    console.log('Selection stored:', storedRange);
+                }
+                });
+
+                // Handle click event on bold button
+                section.find('.bold-btn').click(function() {
+                console.log('Bold button clicked.');
+
+                setTimeout(function() {
+                    if (storedRange !== null) {
+                    let selectedText = storedRange.toString();
+
+                    if (selectedText !== '') {
+                        if (sectionContent[0].contains(storedRange.commonAncestorContainer)) {
+                        let isBold = false;
+
+                        // Check if any part of the range is bold
+                        const rangeClone = storedRange.cloneRange();
+                        const startContainer = rangeClone.startContainer;
+                        const endContainer = rangeClone.endContainer;
+
+                        if (startContainer.nodeType === Node.TEXT_NODE) {
+                            isBold = checkIfBold(startContainer);
+                        }
+                        if (endContainer.nodeType === Node.TEXT_NODE) {
+                            isBold = isBold || checkIfBold(endContainer);
+                        }
+
+                        console.log('Is text bold?', isBold);
+
+                        if (isBold) {
+                            // Remove bold formatting by replacing <b> elements with their child nodes
+                            removeBoldFormatting(storedRange);
+                            console.log('Removing bold formatting.');
                         } else {
-                            console.log('Selection is outside the contenteditable area.');
+                            // Apply bold formatting
+                            let wrapBold = document.createElement('b');
+                            storedRange.surroundContents(wrapBold);
+                            console.log('Applying bold formatting.');
+                        }
+                        } else {
+                        console.log('Selection is outside the contenteditable area.');
                         }
                     } else {
                         console.log('No text selected.');
                     }
+                    } else {
+                    console.log('No range stored.');
+                    }
+                }, 0);
                 });
+
+                // Function to check if a text node is within a bold element
+                function checkIfBold(node) {
+                let parentNode = node.parentNode;
+                while (parentNode && parentNode !== sectionContent[0]) {
+                    const fontWeight = window.getComputedStyle(parentNode).fontWeight;
+                    const nodeName = parentNode.nodeName;
+                    if (fontWeight === 'bold' || nodeName === 'B') {
+                    return true;
+                    }
+                    parentNode = parentNode.parentNode;
+                }
+                return false;
+                }
+
+                // Function to remove bold formatting from the selected range
+                function removeBoldFormatting(range) {
+                const startContainer = range.startContainer;
+                const endContainer = range.endContainer;
+
+                // Split the start and end containers to ensure we only affect the selection
+                range.splitBoundaries();
+
+                // Get all <b> elements within the range
+                const boldElements = Array.from(document.querySelectorAll('b'));
+                boldElements.forEach(b => {
+                    // Check if the <b> element is within the range
+                    if (range.intersectsNode(b)) {
+                    // Replace <b> with its child nodes
+                    const parent = b.parentNode;
+                    while (b.firstChild) {
+                        parent.insertBefore(b.firstChild, b);
+                    }
+                    parent.removeChild(b);
+                    }
+                });
+                }
+
+                // Utility function to split range boundaries to ensure accurate formatting changes
+                Range.prototype.splitBoundaries = function() {
+                const startContainer = this.startContainer;
+                const startOffset = this.startOffset;
+                const endContainer = this.endContainer;
+                const endOffset = this.endOffset;
+
+                if (startContainer.nodeType === Node.TEXT_NODE) {
+                    const startNode = startContainer;
+                    const endNode = endContainer;
+                    if (startNode === endNode) {
+                    const text = startNode.textContent;
+                    const beforeText = text.substring(0, startOffset);
+                    const afterText = text.substring(endOffset);
+
+                    const middleText = text.substring(startOffset, endOffset);
+                    const middleNode = document.createTextNode(middleText);
+
+                    if (beforeText.length > 0) {
+                        const beforeNode = document.createTextNode(beforeText);
+                        startNode.parentNode.insertBefore(beforeNode, startNode);
+                    }
+                    startNode.parentNode.insertBefore(middleNode, startNode);
+
+                    if (afterText.length > 0) {
+                        const afterNode = document.createTextNode(afterText);
+                        startNode.parentNode.insertBefore(afterNode, startNode.nextSibling);
+                    }
+                    startNode.parentNode.removeChild(startNode);
+                    }
+                }
+                };
 
                 section.find('.color-picker').click(function() {
                     const pickr = Pickr.create({
