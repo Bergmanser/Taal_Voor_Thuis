@@ -10,9 +10,37 @@
     .toolbar {
       margin-bottom: 20px;
     }
+
+    .toolbar .btn {
+    margin-right: 2px; /* Reduce space between buttons */
+    padding: 5px 10px;
+    }
+
+    .color-picker, .text-color-picker {
+        background-color: #f8f9fa;  /* Default background color */
+        color: #212529;  /* Default text color */
+        border: 1px solid #ced4da;  /* Default border */
+        padding: 5px 10px;
+        display: inline-block;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .section-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;  /* Align items to the start */
+        align-items: center;
+    }
+
+    .section-toolbar .btn {
+        margin-right: 2px; /* Reduce space between buttons */
+    }
+    
     .container-preview {
       border: 1px solid #ddd;
       padding: 20px;
+      width: auto;
       min-height: 200px;
       background-color: #ffffff;
     }
@@ -618,67 +646,70 @@
                 };
 
                 section.find('.color-picker').click(function() {
-                    const pickr = Pickr.create({
-                        el: this,
-                        theme: 'nano',
-                        default: borderColor,
-                        components: {
-                            preview: false,
-                            opacity: true,
-                            hue: true,
-                            interaction: {
-                                hex: true,
-                                rgba: true,
-                                hsla: true,
-                                hsva: true,
-                                cmyk: true,
-                                input: true,
-                                clear: true,
-                                save: true
-                            }
-                        }
-                    });
+            const pickr = Pickr.create({
+                el: this,
+                theme: 'nano',
+                default: borderColor,
+                components: {
+                    preview: false,
+                    opacity: true,
+                    hue: true,
+                    interaction: {
+                        hex: true,
+                        rgba: true,
+                        hsla: true,
+                        hsva: true,
+                        cmyk: true,
+                        input: true,
+                        clear: true,
+                        save: true
+                    }
+                }
+            });
 
-                    pickr.on('save', (color) => {
-                        const colorStr = color.toHEXA().toString();
-                        sectionContent.css('border-color', colorStr);
-                        pickr.hide();
-                    });
+            pickr.on('save', (color) => {
+                const colorStr = color.toHEXA().toString();
+                sectionContent.css('border-color', colorStr);
+                pickr.hide();
+                // Update the button's background color
+                $(this).css('background-color', colorStr);
+            });
 
-                    pickr.show();
-                });
+            pickr.show();
+        });
 
-                section.find('.text-color-picker').click(function() {
-                    const pickr = Pickr.create({
-                        el: this,
-                        theme: 'nano',
-                        default: textColor,
-                        components: {
-                            preview: false,
-                            opacity: true,
-                            hue: true,
-                            interaction: {
-                                hex: true,
-                                rgba: true,
-                                hsla: true,
-                                hsva: true,
-                                cmyk: true,
-                                input: true,
-                                clear: true,
-                                save: true
-                            }
-                        }
-                    });
+        section.find('.text-color-picker').click(function() {
+            const pickr = Pickr.create({
+                el: this,
+                theme: 'nano',
+                default: textColor,
+                components: {
+                    preview: false,
+                    opacity: true,
+                    hue: true,
+                    interaction: {
+                        hex: true,
+                        rgba: true,
+                        hsla: true,
+                        hsva: true,
+                        cmyk: true,
+                        input: true,
+                        clear: true,
+                        save: true
+                    }
+                }
+            });
 
-                    pickr.on('save', (color) => {
-                        const colorStr = color.toHEXA().toString();
-                        sectionContent.css('color', colorStr);
-                        pickr.hide();
-                    });
+            pickr.on('save', (color) => {
+                const colorStr = color.toHEXA().toString();
+                sectionContent.css('color', colorStr);
+                pickr.hide();
+                // Update the button's background color
+                $(this).css('background-color', colorStr);
+            });
 
-                    pickr.show();
-                });
-
+            pickr.show();
+        });
                 section.find('.remove-section').click(function() {
                     container.remove();
                 });
