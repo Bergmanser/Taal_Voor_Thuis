@@ -1,4 +1,5 @@
-$(document).ready(function () {
+// embedded_text_creation.js
+export function initializeEmbeddedTextCreation() {
     var sortable = Sortable.create(document.getElementById('preview'), {
         delay: 1500,
         delayOnTouchOnly: true,
@@ -10,11 +11,9 @@ $(document).ready(function () {
     });
 
     function saveOrder() {
-        console.log('Saving order');
         let order = $("#preview .section-container").map(function () {
             return $(this).data('index');
         }).get();
-        console.log('Order:', order);
 
         let content = $("#preview .section-container").map(function () {
             let section = $(this).find('.section');
@@ -36,23 +35,18 @@ $(document).ready(function () {
                 backgroundImages: backgroundImages
             };
         }).get();
-        console.log('Content:', content);
 
         localStorage.setItem('sectionOrder', JSON.stringify(order));
         localStorage.setItem('sectionContent', JSON.stringify(content));
     }
 
     function loadOrder() {
-        console.log('Loading order');
         let order = JSON.parse(localStorage.getItem('sectionOrder'));
         let content = JSON.parse(localStorage.getItem('sectionContent'));
         if (order && content) {
-            console.log('Loaded order:', order);
-            console.log('Loaded content:', content);
             $('#preview').empty();  // Clear existing content
             order.forEach(function (index, i) {
                 let sectionData = content[i];
-                console.log('Section Data:', sectionData);
                 if (sectionData && typeof sectionData === 'object') {
                     let sectionType = sectionData.type;
                     let sectionContent = sectionData.content;
@@ -63,8 +57,6 @@ $(document).ready(function () {
                     let container = addSection(sectionType, sectionContent, backgroundImages, borderColor, textColor, isBold);
                     container.data('index', index);
                     $('#preview').append(container);
-                } else {
-                    console.error('Invalid section data:', sectionData);
                 }
             });
         }
@@ -120,7 +112,6 @@ $(document).ready(function () {
     }
 
     function adjustBackgroundHeight(sectionContent, toolbar, backgroundDiv, backgroundDiv1, backgroundDiv2) {
-        console.log('Adjusting background height');
         if (toolbar && toolbar.length) {
             const toolbarHeight = toolbar.outerHeight();
             if (backgroundDiv) {
@@ -132,19 +123,12 @@ $(document).ready(function () {
             if (backgroundDiv2) {
                 backgroundDiv2.css('min-height', sectionContent.outerHeight() + toolbarHeight);
             }
-        } else {
-            console.error('toolbar is not properly defined or selected');
         }
     }
 
     let storedRange = null;
 
     function addSection(type, content = 'Edit this text...', background = null, borderColor = '#ddd', textColor = '#000', isBold = false) {
-        console.log(`Adding section: ${type}`);
-        if (!type) {
-            console.error('Section type is undefined');
-            return;
-        }
         let container = $('<div class="section-container"></div>');
         let section = $('<div class="section"></div>');
         let toolbar = $('<div class="section-toolbar"></div>');
@@ -194,6 +178,7 @@ $(document).ready(function () {
             $('#preview').append(container);
             section.find('.remove-section').click(function () {
                 container.remove();
+                saveOrder();
             });
         } else {
             if (type === 'left') {
@@ -327,7 +312,6 @@ $(document).ready(function () {
                 }
             });
 
-
             // Handle focus event on section content
             section.find('.section-content').on('focus', function () {
                 const selection = window.getSelection();
@@ -347,8 +331,6 @@ $(document).ready(function () {
 
             // Handle click event on bold button
             section.find('.bold-btn').click(function () {
-                console.log('Bold button clicked.');
-
                 setTimeout(function () {
                     if (storedRange !== null) {
                         let selectedText = storedRange.toString();
@@ -357,7 +339,6 @@ $(document).ready(function () {
                             if (sectionContent[0].contains(storedRange.commonAncestorContainer)) {
                                 let isBold = false;
 
-                                // Check if any part of the range is bold
                                 const rangeClone = storedRange.cloneRange();
                                 const startContainer = rangeClone.startContainer;
                                 const endContainer = rangeClone.endContainer;
@@ -369,31 +350,18 @@ $(document).ready(function () {
                                     isBold = isBold || checkIfBold(endContainer);
                                 }
 
-                                console.log('Is text bold?', isBold);
-
                                 if (isBold) {
-                                    // Remove bold formatting by replacing <b> elements with their child nodes
                                     removeBoldFormatting(storedRange);
-                                    console.log('Removing bold formatting.');
                                 } else {
-                                    // Apply bold formatting
                                     let wrapBold = document.createElement('b');
                                     storedRange.surroundContents(wrapBold);
-                                    console.log('Applying bold formatting.');
                                 }
-                            } else {
-                                console.log('Selection is outside the contenteditable area.');
                             }
-                        } else {
-                            console.log('No text selected.');
                         }
-                    } else {
-                        console.log('No range stored.');
                     }
                 }, 0);
             });
 
-            // Function to check if a text node is within a bold element
             function checkIfBold(node) {
                 let parentNode = node.parentNode;
                 while (parentNode && parentNode !== sectionContent[0]) {
@@ -407,20 +375,15 @@ $(document).ready(function () {
                 return false;
             }
 
-            // Function to remove bold formatting from the selected range
             function removeBoldFormatting(range) {
                 const startContainer = range.startContainer;
                 const endContainer = range.endContainer;
 
-                // Split the start and end containers to ensure we only affect the selection
                 range.splitBoundaries();
 
-                // Get all <b> elements within the range
                 const boldElements = Array.from(document.querySelectorAll('b'));
                 boldElements.forEach(b => {
-                    // Check if the <b> element is within the range
                     if (range.intersectsNode(b)) {
-                        // Replace <b> with its child nodes
                         const parent = b.parentNode;
                         while (b.firstChild) {
                             parent.insertBefore(b.firstChild, b);
@@ -430,7 +393,6 @@ $(document).ready(function () {
                 });
             }
 
-            // Utility function to split range boundaries to ensure accurate formatting changes
             Range.prototype.splitBoundaries = function () {
                 const startContainer = this.startContainer;
                 const startOffset = this.startOffset;
@@ -489,7 +451,6 @@ $(document).ready(function () {
                     const colorStr = color.toHEXA().toString();
                     sectionContent.css('border-color', colorStr);
                     pickr.hide();
-                    // Update the button's background color
                     $(this).css('background-color', colorStr);
                 });
 
@@ -522,7 +483,6 @@ $(document).ready(function () {
                     const colorStr = color.toHEXA().toString();
                     sectionContent.css('color', colorStr);
                     pickr.hide();
-                    // Update the button's background color
                     $(this).css('background-color', colorStr);
                 });
 
@@ -530,15 +490,14 @@ $(document).ready(function () {
             });
             section.find('.remove-section').click(function () {
                 container.remove();
+                saveOrder();
             });
 
             if (type !== 'full') {
                 toolbar.find('.position-dropdown').change(function () {
-                    console.log('Position dropdown changed');
                     let newType = $(this).val();
-                    console.log('New type:', newType);
                     changePosition(container, section, sectionContent, newType, backgroundDiv, backgroundDiv1, backgroundDiv2);
-                    toolbar.find('.position-dropdown').val(newType); // Update dropdown to reflect new position
+                    toolbar.find('.position-dropdown').val(newType);
                 });
             }
 
@@ -553,7 +512,6 @@ $(document).ready(function () {
     }
 
     function changePosition(container, section, sectionContent, newType, backgroundDiv, backgroundDiv1, backgroundDiv2) {
-        console.log('Changing position');
         section.removeClass('left-section right-section middle-section');
         let backgroundImage1 = null;
         let backgroundImage2 = null;
@@ -690,7 +648,6 @@ $(document).ready(function () {
     }
 
     function reattachEventHandlers(section, sectionContent, toolbar) {
-        console.log('Reattaching event handlers');
         sectionContent.off('focus blur input');
         sectionContent.on('focus', function () {
             if ($(this).text() === sectionContent.attr('data-placeholder')) {
@@ -718,19 +675,11 @@ $(document).ready(function () {
                     let isBold = window.getComputedStyle(range.startContainer.parentNode).fontWeight === 'bold' || range.startContainer.parentNode.nodeName === 'B';
 
                     if (isBold) {
-                        // Remove bold formatting
                         document.execCommand('removeFormat', false, null);
-                        console.log('Bold removed from selected text:', selection.toString());
                     } else {
-                        // Apply bold formatting
                         document.execCommand('bold', false, null);
-                        console.log('Bold applied to selected text:', selection.toString());
                     }
-                } else {
-                    console.log('Selection is outside the contenteditable area.');
                 }
-            } else {
-                console.log('No text selected.');
             }
         });
 
@@ -798,6 +747,7 @@ $(document).ready(function () {
 
         toolbar.find('.remove-section').off('click').click(function () {
             section.closest('.section-container').remove();
+            saveOrder();
         });
 
         toolbar.find('.swap-button').off('click').click(function () {
@@ -810,9 +760,7 @@ $(document).ready(function () {
         });
 
         toolbar.find('.position-dropdown').off('change').change(function () {
-            console.log('Position dropdown changed');
             let newType = $(this).val();
-            console.log('New type:', newType);
             changePosition(section.closest('.section-container'), section, sectionContent, newType, section.closest('.background-left'), section.closest('.background-middle-1'), section.closest('.background-middle-2'));
         });
     }
@@ -827,25 +775,25 @@ $(document).ready(function () {
         let index = $('#preview .section-container').length;
         let container = addSection('left');
         container.data('index', index);
-        saveOrder();  // Save order and content when a new section is added
+        saveOrder();
     });
     $('#addRight').click(function () {
         let index = $('#preview .section-container').length;
         let container = addSection('right');
         container.data('index', index);
-        saveOrder();  // Save order and content when a new section is added
+        saveOrder();
     });
     $('#addMiddle').click(function () {
         let index = $('#preview .section-container').length;
         let container = addSection('middle');
         container.data('index', index);
-        saveOrder();  // Save order and content when a new section is added
+        saveOrder();
     });
     $('#addFull').click(function () {
         let index = $('#preview .section-container').length;
         let container = addSection('full');
         container.data('index', index);
-        saveOrder();  // Save order and content when a new section is added
+        saveOrder();
     });
 
     $('#logContent').click(function () {
@@ -859,4 +807,8 @@ $(document).ready(function () {
             delay: 1300
         }
     });
-});
+}
+
+export function getEmbeddedText() {
+    return document.getElementById('preview').innerHTML;
+}

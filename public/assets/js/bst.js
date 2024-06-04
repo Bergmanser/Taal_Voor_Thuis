@@ -83,7 +83,7 @@ const quizzes = [
             {
                 QuestionId: '5',
                 Text: 'Welke uitspraken over UV-stralingen zijn juist?',
-                Options: ['UV-straling komt van de zon.', 'Te veel UV-straling isgoed voor je lichaam.', 'De zon zendt alleen UV-straling uit.', 'UV-straling helpt je met een vitamine aanmaken en je weerstand.'],
+                Options: ['UV-straling komt van de zon.', 'Te veel UV-straling is goed voor je lichaam.', 'De zon zendt alleen UV-straling uit.', 'UV-straling helpt je met een vitamine aanmaken en je weerstand.'],
                 CorrectOption: 0,
                 Hint: 'Denk aan wat er in de alinea 2 wordt besproken. In die alinea wordt vooral gesproken over de zon en wat de zon is.',
                 CorrectOptionDescription: `Uit de tekst blijkt dat UV-straling van de zon komt, maar dit is niet de enige straling die de zon uitzendt. UV-straling helpt je lichaam met de aanmaak van vitamine D en is goed voor je immuunsysteem. Alhoewel, te veel UV-straling leidt tot beschadiging van je huid.`,

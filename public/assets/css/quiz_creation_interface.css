@@ -1,5 +1,6 @@
 body {
   font-family: Arial, sans-serif;
+  background-color: rgb(246, 238, 227);
 }
 
 h1 {
@@ -12,6 +13,10 @@ form {
   padding: 20px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
+}
+
+.text-center {
+  
 }
 
 .card {
@@ -221,3 +226,44 @@ form {
   opacity: 0.8;
 }
 
+/* Adjusted layout for title color picker and font search bar */
+#title-style-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#title-style-options input[list="fonts"] {
+  flex: 0 0 30%;
+}
+
+#title-color-picker-container {
+  flex: 0 0 auto;
+}
+
+/* Adjusted layout for question type dropdown and add question button */
+#question-type {
+  /* display: inline-block; */
+  width: 30%;
+}
+
+#questions {
+  margin-top: 20px;
+}
+
+/* Centered submit button */
+button[type="submit"] {
+  display: block;
+  margin: 20px auto;
+}
+
+.form-group.d-flex .flex-grow-1,
+.form-group.d-flex .mr-2 {
+    /* margin-right: 0 !important; */
+    padding-right: 0 !important;
+}
+
+#add-question-button {
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+}

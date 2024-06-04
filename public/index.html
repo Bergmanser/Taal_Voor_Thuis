@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="styles.css"/>
-        <script type="text/javascript" src="app.js"></script>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Taal Voor Thuis Home</title>
-        <script type="module" src="../assets/js/app.js"></script>
+        <title>Taal Voor Thuis Header</title>
+        <script type="module" src="../public/assets/js/app.js"></script>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <link
           rel="stylesheet"
@@ -15,25 +13,45 @@
           crossorigin="anonymous"
           referrerpolicy="no-referrer"
         />
-        <link rel="stylesheet" href="../assets/css/styles.css"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="../public/assets/css/styles.css"/>
+        <script type="module" src="../public/assets/js/app.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.1/dist/pickr.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     </head>
     <body>
-        <nav id="navbar" class="nav">
-            <ul class="nav-list">
-              <li>
-                <a href="#welcome-section">About</a>
-              </li>
-              <li>
-                <a href="#projects">Work</a>
-              </li>
-              <li>
-                <a href="#contact">Contact</a>
-              </li>
-            </ul>
-          </nav>
-          
-        <h1>MDB: Hello World!</h1>
-
-    </body>
-
-</html>
+      <header class="header">
+          <button id="menuButton" class="menu-btn btn btn-primary">
+              <i class="fa fa-bars"></i>
+          </button>
+          <img src="../public/assets/images/tempLogo.png" alt="Logo" class="logo" id="homeLogo">
+          <button class="logout-btn btn btn-secondary" id="logoutButton">
+              <i class="fa fa-sign-out-alt"></i> Logout
+          </button>
+      </header>
+      <div class="overlay" id="overlay"></div>
+      <nav id="menu" class="menu">
+          <ul>
+              <!-- Links will be inserted here based on the user type -->
+          </ul>
+      </nav>
+  
+      <!-- Custom Modal for Logout Confirmation -->
+      <div id="logoutModal" class="modal">
+          <div class="modal-content">
+              <span class="close" id="closeModal">&times;</span>
+              <h5>Confirm Logout</h5>
+              <p>Are you sure you want to logout?</p>
+              <div class="modal-footer">
+                  <button class="btn btn-secondary" id="cancelLogout">Cancel</button>
+                  <button class="btn btn-primary" id="confirmLogout">Logout</button>
+              </div>
+          </div>
+      </div>
+  </body>
+  </html>

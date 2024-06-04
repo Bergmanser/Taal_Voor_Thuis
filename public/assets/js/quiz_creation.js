@@ -3,6 +3,7 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+import { initializeEmbeddedTextCreation, getEmbeddedText } from './embedded_text_creation.js';
 
 // Main Config for Project Plato
 const firebaseConfig = {
@@ -27,45 +28,69 @@ const quizForm = document.getElementById('quiz-form');
 const questionsContainer = document.getElementById('questions');
 let questionId = 1;
 
+function compressData(data) {
+    return LZString.compress(JSON.stringify(data));
+}
+
+function decompressData(compressedData) {
+    try {
+        let data = LZString.decompress(compressedData);
+        return JSON.parse(data);
+    } catch (error) {
+        console.error("Error decompressing data:", error);
+        return null; // Return null or some default value if decompression fails
+    }
+}
+
 function saveFormData() {
     const formData = {
         title: document.getElementById('title').value,
+        titleColor: document.getElementById('title').style.color,
+        titleFont: document.getElementById('title').style.fontFamily,
         description: document.getElementById('description').value,
         groupId: document.getElementById('group-id-subject').value,
-        banner: document.getElementById('banner').value,
+        banner: document.getElementById('banner').src || '',
         quizType: document.getElementById('quiz-type').value,
         questions: Array.from(document.querySelectorAll('.question')).map((question) => {
             const questionId = question.id.split('-')[1];
-            const typeElement = document.getElementById(`question-type-${questionId}`);
             return {
                 id: questionId,
                 title: document.getElementById(`question-title-${questionId}`).value,
                 options: Array.from(document.querySelectorAll(`#question-options-${questionId} input[type="text"]`)).map(input => input.value),
                 hint: document.getElementById(`question-hint-${questionId}`).value,
-                type: typeElement ? typeElement.value : 'multiple-choice'
+                correctOptionDescription: document.getElementById(`correct-option-description-${questionId}`).value,
+                type: 'multiple-choice'
             };
         }),
         embeddedText: document.getElementById('preview').innerHTML || '' // Save the embedded text HTML or an empty string
     };
-    localStorage.setItem('quizFormData', JSON.stringify(formData));
+    localStorage.setItem('quizFormData', compressData(formData));
 }
 
 function loadFormData() {
-    const formData = JSON.parse(localStorage.getItem('quizFormData'));
+    const formData = decompressData(localStorage.getItem('quizFormData'));
     if (formData) {
         document.getElementById('title').value = formData.title;
+        document.getElementById('title').style.color = formData.titleColor;
+        document.getElementById('title').style.fontFamily = formData.titleFont;
         document.getElementById('description').value = formData.description;
         document.getElementById('group-id-subject').value = formData.groupId;
-        document.getElementById('banner').value = formData.banner;
+        if (formData.banner) {
+            const bannerPreview = document.createElement('img');
+            bannerPreview.src = formData.banner;
+            bannerPreview.alt = "Banner Image";
+            document.getElementById('quiz-card-preview').appendChild(bannerPreview);
+        }
         document.getElementById('quiz-type').value = formData.quizType;
         formData.questions.forEach((question, index) => {
-            addQuestion(question.type);
+            addQuestion(question.type, true); // Pass true to indicate reloading
             document.getElementById(`question-title-${index + 1}`).value = question.title;
             question.options.forEach(option => addOption(index + 1, option));
             document.getElementById(`question-hint-${index + 1}`).value = question.hint;
+            document.getElementById(`correct-option-description-${index + 1}`).value = question.correctOptionDescription;
         });
         if (document.getElementById('preview')) {
-            document.getElementById('preview').innerHTML = formData.embeddedText || ''; // Load the embedded text HTML or an empty string
+            document.getElementById('preview').innerHTML = formData.embeddedText || '';
         }
     }
 }
@@ -80,18 +105,123 @@ onAuthStateChanged(auth, (user) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFormData();
+    initializeEmbeddedTextCreation(); // Initialize embedded text creation
+
     document.getElementById('add-question-button').addEventListener('click', () => {
         const questionType = document.getElementById('question-type').value;
-        addQuestion(questionType);
+        addQuestion(questionType, false); // pass false for isReload
         saveFormData();
+        console.log('Add question button clicked'); // Debugging log
     });
 
-    document.querySelectorAll('#embedded-text-creation button').forEach(button => {
-        button.addEventListener('click', (event) => {
-            event.preventDefault();
-            console.log(`Button ${button.textContent} clicked`);
-        });
+    quizForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log('Submit button clicked'); // Debugging log
+        const formValid = validateForm();
+        if (formValid) {
+            console.log('Form is valid'); // Debugging log
+            const confirmUpload = confirm('Are you sure you want to upload this quiz? You can edit this quiz later through a different interface.');
+            if (confirmUpload) {
+                try {
+                    const newQuiz = await createQuizFromForm();
+                    const quizId = await saveQuizToFirestore(newQuiz);
+                    resetForm();
+                    localStorage.removeItem('quizFormData'); // Clear local storage after successful upload
+                    localStorage.removeItem('sectionOrder'); // Clear embedded text section order
+                    localStorage.removeItem('sectionContent'); // Clear embedded text section content
+                    alert(`Quiz uploaded successfully! Quiz ID: ${quizId}`);
+                    window.location.href = ''; // Add the redirect link here
+                    console.log('Form submitted successfully'); // Debugging log
+                } catch (error) {
+                    console.error('Upload failed:', error); // Debugging log
+                    alert('Upload failed. Please contact the ICT department if the issue persists.');
+                }
+            }
+        } else {
+            console.log('Form is not valid'); // Debugging log
+        }
     });
+
+    // Ensure the title color picker element exists
+    const titleColorPickerElement = document.getElementById('title-color-picker-container');
+    if (titleColorPickerElement) {
+        const titleColorPicker = Pickr.create({
+            el: '#title-color-picker-container',
+            theme: 'nano',
+            default: '#000000',
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                    cmyk: true,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
+
+        titleColorPicker.on('save', (color) => {
+            const colorStr = color.toHEXA().toString();
+            document.getElementById('title').style.color = colorStr;
+            titleColorPicker.hide();
+            saveFormData();
+        });
+    }
+
+    // Create a datalist and input for font selection
+    const titleStyleOptionsElement = document.getElementById('title-style-options');
+    if (titleStyleOptionsElement) {
+        const fontSearchBar = document.createElement('input');
+        fontSearchBar.setAttribute('list', 'fonts');
+        fontSearchBar.setAttribute('placeholder', 'Search for fonts...');
+        fontSearchBar.className = 'form-control mb-2';
+
+        const fontDataList = document.createElement('datalist');
+        fontDataList.id = 'fonts';
+
+        titleStyleOptionsElement.appendChild(fontSearchBar);
+        titleStyleOptionsElement.appendChild(fontDataList);
+
+        // Add available fonts to the datalist
+        const availableFonts = [
+            'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Oswald', 'Source Sans Pro',
+            'Slabo 27px', 'Slabo 13px', 'Raleway', 'PT Sans', 'Merriweather', 'Noto Sans',
+            'Nunito', 'Ubuntu', 'Playfair Display', 'Rubik', 'Poppins', 'Inconsolata',
+            'Cabin', 'Karla', 'Libre Baskerville', 'Anton', 'Abril Fatface', 'Lobster',
+            'Arimo', 'Varela Round', 'Dancing Script', 'Fira Sans', 'Josefin Sans',
+            'Quicksand', 'Barlow', 'Exo 2', 'Righteous', 'Pacifico', 'Muli', 'Work Sans',
+            'Titillium Web', 'Asap', 'Catamaran', 'Crete Round', 'Alegreya', 'Cinzel',
+            'Baloo', 'Bungee', 'Cairo', 'IBM Plex Sans', 'Heebo', 'Red Hat Display',
+            'Manrope', 'Saira', 'Space Mono', 'OpenDyslexic', 'Lexend Deca', 'Lexend Tera',
+            'Lexend Giga', 'Lexend Mega', 'Lexend Peta', 'Lexend Zetta', 'Lexend Exa',
+            'Comic Sans MS', 'Arial', 'Verdana'
+        ];
+
+        availableFonts.forEach(font => {
+            const option = document.createElement('option');
+            option.value = font;
+            fontDataList.appendChild(option);
+        });
+
+        // Load the selected font
+        fontSearchBar.addEventListener('input', (event) => {
+            const selectedFont = event.target.value;
+            if (availableFonts.includes(selectedFont)) {
+                document.getElementById('title').style.fontFamily = selectedFont;
+                const link = document.createElement('link');
+                link.href = `https://fonts.googleapis.com/css?family=${selectedFont}&display=swap`;
+                link.rel = 'stylesheet';
+                document.head.appendChild(link);
+                saveFormData();
+            }
+        });
+    }
 });
 
 const banner = document.getElementById('banner');
@@ -109,6 +239,7 @@ banner.addEventListener('change', (event) => {
         reader.onload = (e) => {
             const img = document.createElement('img');
             img.src = e.target.result;
+            img.alt = "Banner Image";
             const quizCard = createQuizCard(e.target.result);
             quizCardPreview.innerHTML = '';
             quizCardPreview.appendChild(quizCard);
@@ -121,46 +252,48 @@ banner.addEventListener('change', (event) => {
     }
 });
 
-function addQuestion(type) {
+function addQuestion(type, isReload) {
+    console.log(`Adding question of type: ${type}, isReload: ${isReload}`); // Debugging log
     const question = document.createElement('div');
     question.className = 'question';
     question.id = `question-${questionId}`;
     question.innerHTML = `
-        <h2>Question ${questionId}</h2>
-        <label for="question-title-${questionId}">Question title</label>
-        <input type="text" id="question-title-${questionId}" placeholder="Question ${questionId} text" required />
-        <div class="question-options-container">
-            <select id="question-type-${questionId}" class="form-control">
-                <option value="multiple-choice" ${type === 'multiple-choice' ? 'selected' : ''}>Multiple Choice</option>
-                <option value="true-false" ${type === 'true-false' ? 'selected' : ''}>True/False</option>
-                <option value="short-answer" ${type === 'short-answer' ? 'selected' : ''}>Short Answer</option>
-            </select>
-            <div id="question-options-${questionId}"></div>
-            ${type === 'multiple-choice' ? '<button type="button" id="add-option-button-${questionId}">Add Option</button>' : ''}
-            <select id="correct-option-dropdown-${questionId}">
-                <option value="" disabled selected>Select correct option</option>
-            </select>
-        </div>
-        <input type="text" id="question-hint-${questionId}" placeholder="The hint for ${questionId}" required />
-        <button type="button" id="remove-question-button-${questionId}">Remove Question</button>
-    `;
+    <h2>Question ${questionId}</h2>
+    <label for="question-title-${questionId}">Question title</label>
+    <input type="text" id="question-title-${questionId}" class="form-control mb-2" placeholder="Question ${questionId} text" required />
+    <label for="question-options-container">Question options:</label>
+    <div class="question-options-container">
+        <div id="question-options-${questionId}"></div>
+        ${type === 'multiple-choice' ? `<button type="button" id="add-option-button-${questionId}" class="btn btn-secondary">Add Option</button>` : ''}
+        <select id="correct-option-dropdown-${questionId}" class="form-control mt-2">
+            <option value="" disabled selected>Select correct option</option>
+        </select>
+    </div>
+    <label for="question-hint-${questionId}">Question hint:</label>
+    <input type="text" id="question-hint-${questionId}" class="form-control mb-2" placeholder="This will be the hint for question ${questionId}" required />
+    <label for="correct-option-description-${questionId}">Explain the answer:</label>
+    <input type="text" id="correct-option-description-${questionId}" class="form-control mb-2" placeholder="Add the explanation for this questions answer here" required />
+    <button type="button" id="remove-question-button-${questionId}" class="btn btn-danger">Remove Question</button>
+`;
     questionsContainer.appendChild(question);
-    initializeQuestion(questionId, type);
+    initializeQuestion(questionId, type, isReload);
     questionId++;
     question.scrollIntoView({ behavior: 'smooth' });
 }
 
-function initializeQuestion(questionId, type) {
-    if (type === 'multiple-choice') {
+function initializeQuestion(questionId, type, isReload) {
+    console.log(`Initializing question ${questionId}, type: ${type}, isReload: ${isReload}`); // Debugging log
+    if (type === 'multiple-choice' && !isReload) {
         addOption(questionId); // Automatically add the first option
-        const addOptionButton = document.getElementById(`add-option-button-${questionId}`);
-        if (addOptionButton) {
-            addOptionButton.addEventListener('click', () => {
-                addOption(questionId);
-                saveFormData();
-            });
-        }
     }
+    document.querySelectorAll(`.add-option-button[data-question-id="${questionId}"]`).forEach(button => {
+        button.addEventListener('click', () => {
+            addOption(questionId);
+            saveFormData();
+            console.log(`Option added to Question ${questionId}`); // Debugging log
+        });
+    });
+
     const removeQuestionButton = document.getElementById(`remove-question-button-${questionId}`);
     removeQuestionButton.addEventListener('click', () => {
         removeQuestion(questionId);
@@ -170,7 +303,7 @@ function initializeQuestion(questionId, type) {
 }
 
 function updateQuestionIds() {
-    questionId = 1; // Reset questionId to 1
+    questionId = 1;
     Array.from(questionsContainer.children).forEach((question) => {
         question.id = `question-${questionId}`;
         question.querySelector('h2').innerText = `Question ${questionId}`;
@@ -190,7 +323,13 @@ function updateQuestionIds() {
         const hintInput = question.querySelector(`input[id^="question-hint-"]`);
         if (hintInput) {
             hintInput.id = `question-hint-${questionId}`;
-            hintInput.placeholder = `The hint for ${questionId}`;
+            hintInput.placeholder = `This will be the hint for question ${questionId}`;
+        }
+
+        const correctOptionDescriptionInput = question.querySelector(`input[id^="correct-option-description-"]`);
+        if (correctOptionDescriptionInput) {
+            correctOptionDescriptionInput.id = `correct-option-description-${questionId}`;
+            correctOptionDescriptionInput.placeholder = `Add the explanation for this questions answer here`;
         }
 
         const removeButton = question.querySelector(`button[id^="remove-question-button-"]`);
@@ -213,6 +352,7 @@ function updateQuestionIds() {
 }
 
 function removeQuestion(questionId) {
+    console.log(`Removing question ${questionId}`); // Debugging log
     const question = document.getElementById(`question-${questionId}`);
     if (question) {
         questionsContainer.removeChild(question);
@@ -221,11 +361,13 @@ function removeQuestion(questionId) {
 }
 
 function addOption(questionId, optionText = '') {
+    console.log(`Adding option to question ${questionId}, optionText: ${optionText}`); // Debugging log
     const optionsContainer = document.getElementById(`question-options-${questionId}`);
     const optionSection = document.createElement('div');
-    optionSection.classList.add('option-section');
+    optionSection.classList.add('option-section', 'mb-2');
     const optionInput = document.createElement('input');
     optionInput.type = 'text';
+    optionInput.classList.add('form-control', 'mb-2');
     optionInput.placeholder = 'Option text';
     optionInput.value = optionText;
     optionInput.required = true;
@@ -235,6 +377,7 @@ function addOption(questionId, optionText = '') {
     });
     const removeOptionButton = document.createElement('button');
     removeOptionButton.textContent = 'Remove Option';
+    removeOptionButton.classList.add('btn', 'btn-danger');
     removeOptionButton.addEventListener('click', (event) => {
         removeOption(event, questionId);
         saveFormData();
@@ -246,6 +389,7 @@ function addOption(questionId, optionText = '') {
 }
 
 function removeOption(event, questionId) {
+    console.log(`Removing option from question ${questionId}`); // Debugging log
     const optionSection = event.target.parentNode;
     const optionsContainer = optionSection.parentNode;
     optionsContainer.removeChild(optionSection);
@@ -254,6 +398,7 @@ function removeOption(event, questionId) {
 }
 
 function populateCorrectOptionDropdown(questionId) {
+    console.log(`Populating correct option dropdown for question ${questionId}`); // Debugging log
     const correctOptionDropdown = document.getElementById(`correct-option-dropdown-${questionId}`);
     if (correctOptionDropdown) {
         const optionsContainer = document.getElementById(`question-options-${questionId}`);
@@ -273,6 +418,7 @@ function populateCorrectOptionDropdown(questionId) {
 }
 
 function initializeCorrectOptionDropdown(questionId) {
+    console.log(`Initializing correct option dropdown for question ${questionId}`); // Debugging log
     const optionsContainer = document.getElementById(`question-options-${questionId}`);
     if (optionsContainer) {
         optionsContainer.addEventListener('input', (event) => {
@@ -302,28 +448,6 @@ const bannerError = document.getElementById('banner-error');
 const quizType = document.getElementById('quiz-type');
 const quizTypeError = document.getElementById('quiz-type-error');
 
-quizForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formValid = validateForm();
-    if (formValid) {
-        const confirmUpload = confirm('Are you sure you want to upload this quiz? You can edit this quiz later through a different interface.');
-        if (confirmUpload) {
-            try {
-                const newQuiz = await createQuizFromForm();
-                const quizId = await saveQuizToFirestore(newQuiz);
-                resetForm();
-                localStorage.removeItem('quizFormData'); // Clear local storage after successful upload
-                localStorage.removeItem('sectionOrder'); // Clear embedded text section order
-                localStorage.removeItem('sectionContent'); // Clear embedded text section content
-                alert(`Quiz uploaded successfully! Quiz ID: ${quizId}`);
-                window.location.href = ''; // Add the redirect link here
-            } catch (error) {
-                alert('Upload failed. Please contact the ICT department if the issue persists.');
-            }
-        }
-    }
-});
-
 function validateForm() {
     resetErrorMessages();
     const titleValid = validateTitle();
@@ -331,7 +455,17 @@ function validateForm() {
     const groupIdValid = validateGroupId();
     const bannerValid = validateBanner();
     const quizTypeValid = validateQuizType();
-    return titleValid && descriptionValid && groupIdValid && bannerValid && quizTypeValid;
+    const formValid = titleValid && descriptionValid && groupIdValid && bannerValid && quizTypeValid;
+
+    if (!formValid) {
+        if (!titleValid) document.getElementById('title').scrollIntoView();
+        else if (!descriptionValid) document.getElementById('description').scrollIntoView();
+        else if (!groupIdValid) document.getElementById('group-id-subject').scrollIntoView();
+        else if (!bannerValid) document.getElementById('banner').scrollIntoView();
+        else if (!quizTypeValid) document.getElementById('quiz-type').scrollIntoView();
+    }
+
+    return formValid;
 }
 
 function resetErrorMessages() {
@@ -404,7 +538,8 @@ async function createQuizFromForm() {
             Options: options,
             CorrectOption: correctOptionIndex,
             Hint: document.getElementById(`question-hint-${questionId}`).value.trim(),
-            QuestionType: document.getElementById(`question-type-${questionId}`).value || 'multiple-choice'
+            CorrectOptionDescription: document.getElementById(`correct-option-description-${questionId}`).value.trim(),
+            QuestionType: 'multiple-choice'
         };
     });
 
@@ -414,7 +549,7 @@ async function createQuizFromForm() {
         Description: description,
         QuizGroupId: groupId,
         Banner: banner ? await uploadImage(banner, banner.name) : 'default-banner.png',
-        EmbeddedText: document.getElementById('preview').innerHTML || '', // Include the embedded text or an empty string
+        EmbeddedText: getEmbeddedText(), // Use the function to get embedded text
         Difficulty: 'easy',
         QuizType: quizType,
         Questions: questions,
@@ -454,8 +589,8 @@ function createQuizCard(imageSrc) {
         <div class="card-body">
             <h5 class="card-title">${title.value || 'Quiz Title'}</h5>
             <p class="card-text">${description.value || 'Quiz Description'}</p>
-            <button class="remove-banner-btn">&times;</button>
-            <button class="hide-banner-btn">Hide</button>
+            <button class="remove-banner-btn btn btn-danger">&times;</button>
+            <button class="hide-banner-btn btn btn-secondary">Hide</button>
         </div>
     `;
     quizCard.querySelector('.remove-banner-btn').addEventListener('click', () => {
@@ -468,12 +603,27 @@ function createQuizCard(imageSrc) {
     return quizCard;
 }
 
+document.addEventListener('embeddedTextChange', () => {
+    saveFormData();
+});
 
-// CLear out local storage for the embedded text aswell as the quiz form when uploading the quiz so that they don't imidiatly appear if the user where to immediatly make another quiz.
-// There seems to be a bit of a confliciting liver reload cycle with the embeeded text creation being dominant.
-// Both sections javascript logics are currently reponsible for live reloading and storing the nescecary object locallu, but since this happens in both instance it seems that the embedded text section might be dominant and changes to the question fiels are not saved when reloading returning them to their previous state before even adding or removing anything.
-// the add option button seems to currently be broken because of this asswell since its not really doing what it supossed t anymore, but there is no error happening for this at the moment.
 
-// Add bootstrap to the form elements consistently and to the question fields, addquestion buttton, and submit buttons
-// add auto scroll when a new quesrtion is added
-// add auto scroll whenever a new text section is added
+
+// `
+//     <h2>Question ${questionId}</h2>
+//     <label for="question-title-${questionId}">Question title</label>
+//     <input type="text" id="question-title-${questionId}" class="form-control mb-2" placeholder="Question ${questionId} text" required />
+//     <label for="question-options-container">Question options:</label>
+//     <div class="question-options-container">
+//         <div id="question-options-${questionId}"></div>
+//         ${type === 'multiple-choice' ? `<button type="button" id="add-option-button-${questionId}" class="btn btn-secondary">Add Option</button>` : ''}
+//         <select id="correct-option-dropdown-${questionId}" class="form-control mt-2">
+//             <option value="" disabled selected>Select correct option</option>
+//         </select>
+//     </div>
+//     <label for="question-hint-${questionId}">Question hint:</label>
+//     <input type="text" id="question-hint-${questionId}" class="form-control mb-2" placeholder="This will be the hint for question ${questionId}" required />
+//     <label for="correct-option-description-${questionId}">Explain the answer:</label>
+//     <input type="text" id="correct-option-description-${questionId}" class="form-control mb-2" placeholder="Add the explanation for this questions answer here" required />
+//     <button type="button" id="remove-question-button-${questionId}" class="btn btn-danger">Remove Question</button>
+// `
