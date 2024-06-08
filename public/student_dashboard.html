@@ -1,47 +1,35 @@
 <!DOCTYPE html>
-<htmllang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="./assets/css/student_dashboard.css">
-        <title>Quiz Student Dashboard</title>
-      </head>
-  <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./assets/css/student_dashboard.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Quiz Student Dashboard</title>
+</head>
+<body>
     <header>
-      <nav id="navbar" class="nav">
-        <ul class="nav-list">
-          <li>
-            <a href="#welcome-section">About</a>
-          </li>
-          <li>
-            <a href="#projects">Work</a>
-          </li>
-          <li>
-            <a href="#contact">Contact</a>
-          </li>
-        </ul>
-      </nav>
-
-        <h1>Quiz Site</h1>
-      </header>
-      <main>
+        <div id="header-container"></div>
+    </header>
+    <main>
         <section class="hero">
-          <h2>Welcome to the Quiz Site!</h2>
-          <p>Select a quiz to start:</p>
+            <h2>Welcome to the Quiz Site!</h2>
+            <p>Select a quiz to start:</p>
         </section>
-        <section id="quizzes">
-            <div class="card">
-                <img class="card-img-top" src="banner-image-url" alt="Quiz Banner">
-                <div class="card-body">
-                  <h5 class="card-title">Quiz Title</h5>
-                  <p class="card-text">Score: <span class="quiz-score">Hidden</span></p>
-                  <button id="card-btn" class="btn btn-primary" data-quiz-id="${doc.id}">Start Quiz</button>
-                </div>
-              </div>
-        </section>
-      </main>
-       <script type="module" src="../public/assets/js/student_dashboard.js"></script>
-  </body>
+        <section id="quizzes" class="quiz-container"></section>
+        <div class="pagination">
+            <button id="prev-page" class="page-btn">Vorige</button>
+            <span id="page-numbers"></span>
+            <button id="next-page" class="page-btn">Volgende</button>
+        </div>
+    </main>
+    <script type="module" src="../public/assets/js/student_dashboard.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#header-container').load('index.html', function() {
+                $.getScript('app.js');
+            });
+        });
+    </script>
+</body>
 </html>
-
-

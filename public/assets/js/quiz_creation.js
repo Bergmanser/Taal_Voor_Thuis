@@ -23,6 +23,8 @@ const analytics = getAnalytics(app);
 const auth = getAuth();
 const db = getFirestore(app);
 const storage = getStorage(app);
+const googleFontsApiUrl = 'https://www.googleapis.com/webfonts/v1/webfonts?key=YOUR_API_KEY';
+
 
 const quizForm = document.getElementById('quiz-form');
 const questionsContainer = document.getElementById('questions');
@@ -105,7 +107,7 @@ onAuthStateChanged(auth, (user) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFormData();
-    initializeEmbeddedTextCreation(); // Initialize embedded text creation
+    initializeEmbeddedTextCreation(uploadImage); // Initialize embedded text creation with the uploadImage function
 
     document.getElementById('add-question-button').addEventListener('click', () => {
         const questionType = document.getElementById('question-type').value;
@@ -200,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Baloo', 'Bungee', 'Cairo', 'IBM Plex Sans', 'Heebo', 'Red Hat Display',
             'Manrope', 'Saira', 'Space Mono', 'OpenDyslexic', 'Lexend Deca', 'Lexend Tera',
             'Lexend Giga', 'Lexend Mega', 'Lexend Peta', 'Lexend Zetta', 'Lexend Exa',
-            'Comic Sans MS', 'Arial', 'Verdana'
+            'Comic Sans MS', 'Arial', 'Verdana', 'overlock'
         ];
 
         availableFonts.forEach(font => {
@@ -286,13 +288,17 @@ function initializeQuestion(questionId, type, isReload) {
     if (type === 'multiple-choice' && !isReload) {
         addOption(questionId); // Automatically add the first option
     }
-    document.querySelectorAll(`.add-option-button[data-question-id="${questionId}"]`).forEach(button => {
-        button.addEventListener('click', () => {
+    const addOptionButton = document.getElementById(`add-option-button-${questionId}`);
+    if (addOptionButton) {
+        addOptionButton.addEventListener('click', () => {
             addOption(questionId);
             saveFormData();
             console.log(`Option added to Question ${questionId}`); // Debugging log
         });
-    });
+    } else {
+        console.error(`Add option button not found for question ${questionId}`);
+    }
+
 
     const removeQuestionButton = document.getElementById(`remove-question-button-${questionId}`);
     removeQuestionButton.addEventListener('click', () => {
@@ -362,9 +368,17 @@ function removeQuestion(questionId) {
 
 function addOption(questionId, optionText = '') {
     console.log(`Adding option to question ${questionId}, optionText: ${optionText}`); // Debugging log
+
+    // Check if the question container exists
     const optionsContainer = document.getElementById(`question-options-${questionId}`);
+    if (!optionsContainer) {
+        console.error(`Options container not found for question ${questionId}`);
+        return;
+    }
+
     const optionSection = document.createElement('div');
     optionSection.classList.add('option-section', 'mb-2');
+
     const optionInput = document.createElement('input');
     optionInput.type = 'text';
     optionInput.classList.add('form-control', 'mb-2');
@@ -375,6 +389,7 @@ function addOption(questionId, optionText = '') {
         event.stopPropagation();
         saveFormData();
     });
+
     const removeOptionButton = document.createElement('button');
     removeOptionButton.textContent = 'Remove Option';
     removeOptionButton.classList.add('btn', 'btn-danger');
@@ -382,10 +397,13 @@ function addOption(questionId, optionText = '') {
         removeOption(event, questionId);
         saveFormData();
     });
+
     optionSection.appendChild(optionInput);
     optionSection.appendChild(removeOptionButton);
     optionsContainer.appendChild(optionSection);
+
     populateCorrectOptionDropdown(questionId);
+    console.log(`Option added to question ${questionId}`);
 }
 
 function removeOption(event, questionId) {
@@ -396,6 +414,7 @@ function removeOption(event, questionId) {
     populateCorrectOptionDropdown(questionId);
     saveFormData();
 }
+
 
 function populateCorrectOptionDropdown(questionId) {
     console.log(`Populating correct option dropdown for question ${questionId}`); // Debugging log
@@ -606,24 +625,3 @@ function createQuizCard(imageSrc) {
 document.addEventListener('embeddedTextChange', () => {
     saveFormData();
 });
-
-
-
-// `
-//     <h2>Question ${questionId}</h2>
-//     <label for="question-title-${questionId}">Question title</label>
-//     <input type="text" id="question-title-${questionId}" class="form-control mb-2" placeholder="Question ${questionId} text" required />
-//     <label for="question-options-container">Question options:</label>
-//     <div class="question-options-container">
-//         <div id="question-options-${questionId}"></div>
-//         ${type === 'multiple-choice' ? `<button type="button" id="add-option-button-${questionId}" class="btn btn-secondary">Add Option</button>` : ''}
-//         <select id="correct-option-dropdown-${questionId}" class="form-control mt-2">
-//             <option value="" disabled selected>Select correct option</option>
-//         </select>
-//     </div>
-//     <label for="question-hint-${questionId}">Question hint:</label>
-//     <input type="text" id="question-hint-${questionId}" class="form-control mb-2" placeholder="This will be the hint for question ${questionId}" required />
-//     <label for="correct-option-description-${questionId}">Explain the answer:</label>
-//     <input type="text" id="correct-option-description-${questionId}" class="form-control mb-2" placeholder="Add the explanation for this questions answer here" required />
-//     <button type="button" id="remove-question-button-${questionId}" class="btn btn-danger">Remove Question</button>
-// `

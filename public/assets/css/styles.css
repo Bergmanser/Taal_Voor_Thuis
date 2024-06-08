@@ -1,9 +1,6 @@
-/* styles.css */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  /* background-color: rgb(250, 246, 241); */
-  /* background-color: #36454f; */
 }
 
 .header {
@@ -11,12 +8,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* background-color: #8d80ad; */
-  /* background-color: #6b4c83; */
-  padding: 10px 20px;
-  position: sticky;
   top: 0;
   z-index: 1000;
+  padding: 10px 20px;
+  background-color: #161223;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -52,7 +47,6 @@ body {
 
 .menu {
   position: fixed;
-  /* top: 5.75em; */
   top: 0;
   left: -500px;
   width: 30%;

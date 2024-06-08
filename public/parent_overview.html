@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../public/assets/css/parent_overview.css">
+  <!-- <link rel="stylesheet" href="../public/assets/css/parent_overview.css"> -->
   <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -24,6 +24,7 @@
   </style>
 </head>
 <body>
+<div id="header-container"></div>
   <div class="container">
       <div id="header" class="sticky-top">
           <h1 id="welcomeHeader">Welcome</h1> <!-- Dynamic Header -->
@@ -105,11 +106,16 @@
   </div>
 </div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script type="module" src="../public/assets/js/parent_overview.js"></script>
   <script type="module" src="../public/assets/js/add_student.js"></script>
+  <script>
+    $(document).ready(function() {
+        $('#header-container').load('index.html', function() {
+            $.getScript('app.js');
+        });
+    });
+</script>
 </body>
 </html>
-

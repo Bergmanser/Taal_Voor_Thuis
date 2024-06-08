@@ -1,0 +1,6 @@
+{
+  "firestore": {
+    "rules": "quizzes",
+    "indexes": "quizzes"
+  }
+}

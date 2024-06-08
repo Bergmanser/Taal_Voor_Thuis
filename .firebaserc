@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "project-plato-eb365",
+    "Nick B": "project-plato-eb365"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}

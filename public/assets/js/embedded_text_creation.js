@@ -1,5 +1,5 @@
 // embedded_text_creation.js
-export function initializeEmbeddedTextCreation() {
+export function initializeEmbeddedTextCreation(uploadImage) {
     var sortable = Sortable.create(document.getElementById('preview'), {
         delay: 1500,
         delayOnTouchOnly: true,
@@ -160,14 +160,11 @@ export function initializeEmbeddedTextCreation() {
             sectionContent.click(function () {
                 let input = $('<input type="file" accept="image/*">');
                 input.click();
-                input.change(function (e) {
+                input.change(async function (e) {
                     let file = e.target.files[0];
                     if (file) {
-                        let reader = new FileReader();
-                        reader.onload = function (event) {
-                            sectionContent.html('<img src="' + event.target.result + '" alt="Image" style="width: 100%;">');
-                        }
-                        reader.readAsDataURL(file);
+                        let imageURL = await uploadImage(file, `embedded_text/full/${file.name}`);
+                        sectionContent.html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
                     }
                 });
             });
@@ -217,15 +214,12 @@ export function initializeEmbeddedTextCreation() {
                 backgroundDiv1.find('.background-inner').click(function () {
                     let input = $('<input type="file" accept="image/*">');
                     input.click();
-                    input.change(function (e) {
+                    input.change(async function (e) {
                         let file = e.target.files[0];
                         if (file) {
-                            let reader = new FileReader();
-                            reader.onload = function (event) {
-                                backgroundDiv1.find('.background-inner').html('<img src="' + event.target.result + '" alt="Image" style="width: 100%;">');
-                                backgroundDiv1.find('.background-toolbar').css('visibility', 'visible');
-                            }
-                            reader.readAsDataURL(file);
+                            let imageURL = await uploadImage(file, `embedded_text/middle_1/${file.name}`);
+                            backgroundDiv1.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
+                            backgroundDiv1.find('.background-toolbar').css('visibility', 'visible');
                         }
                     });
                 });
@@ -233,15 +227,12 @@ export function initializeEmbeddedTextCreation() {
                 backgroundDiv2.find('.background-inner').click(function () {
                     let input = $('<input type="file" accept="image/*">');
                     input.click();
-                    input.change(function (e) {
+                    input.change(async function (e) {
                         let file = e.target.files[0];
                         if (file) {
-                            let reader = new FileReader();
-                            reader.onload = function (event) {
-                                backgroundDiv2.find('.background-inner').html('<img src="' + event.target.result + '" alt="Image" style="width: 100%;">');
-                                backgroundDiv2.find('.background-toolbar').css('visibility', 'visible');
-                            }
-                            reader.readAsDataURL(file);
+                            let imageURL = await uploadImage(file, `embedded_text/middle_2/${file.name}`);
+                            backgroundDiv2.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
+                            backgroundDiv2.find('.background-toolbar').css('visibility', 'visible');
                         }
                     });
                 });
@@ -257,15 +248,12 @@ export function initializeEmbeddedTextCreation() {
             backgroundDiv && backgroundDiv.find('.background-inner').click(function () {
                 let input = $('<input type="file" accept="image/*">');
                 input.click();
-                input.change(function (e) {
+                input.change(async function (e) {
                     let file = e.target.files[0];
                     if (file) {
-                        let reader = new FileReader();
-                        reader.onload = function (event) {
-                            backgroundDiv.find('.background-inner').html('<img src="' + event.target.result + '" alt="Image" style="width: 100%;">');
-                            backgroundDiv.find('.background-toolbar').css('visibility', 'visible');
-                        }
-                        reader.readAsDataURL(file);
+                        let imageURL = await uploadImage(file, `embedded_text/${type}/${file.name}`);
+                        backgroundDiv.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
+                        backgroundDiv.find('.background-toolbar').css('visibility', 'visible');
                     }
                 });
             });
@@ -594,15 +582,12 @@ export function initializeEmbeddedTextCreation() {
             backgroundDiv.find('.background-inner').click(function () {
                 let input = $('<input type="file" accept="image/*">');
                 input.click();
-                input.change(function (e) {
+                input.change(async function (e) {
                     let file = e.target.files[0];
                     if (file) {
-                        let reader = new FileReader();
-                        reader.onload = function (event) {
-                            backgroundDiv.find('.background-inner').html('<img src="' + event.target.result + '" alt="Image" style="width: 100%;">');
-                            backgroundDiv.find('.background-toolbar').css('visibility', 'visible');
-                        }
-                        reader.readAsDataURL(file);
+                        let imageURL = await uploadImage(file, `embedded_text/${newType}/${file.name}`);
+                        backgroundDiv.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
+                        backgroundDiv.find('.background-toolbar').css('visibility', 'visible');
                     }
                 });
             });
@@ -611,15 +596,12 @@ export function initializeEmbeddedTextCreation() {
             backgroundDiv1.find('.background-inner').click(function () {
                 let input = $('<input type="file" accept="image/*">');
                 input.click();
-                input.change(function (e) {
+                input.change(async function (e) {
                     let file = e.target.files[0];
                     if (file) {
-                        let reader = new FileReader();
-                        reader.onload = function (event) {
-                            backgroundDiv1.find('.background-inner').html('<img src="' + event.target.result + '" alt="Image" style="width: 100%;">');
-                            backgroundDiv1.find('.background-toolbar').css('visibility', 'visible');
-                        }
-                        reader.readAsDataURL(file);
+                        let imageURL = await uploadImage(file, `embedded_text/middle_1/${file.name}`);
+                        backgroundDiv1.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
+                        backgroundDiv1.find('.background-toolbar').css('visibility', 'visible');
                     }
                 });
             });
@@ -628,15 +610,12 @@ export function initializeEmbeddedTextCreation() {
             backgroundDiv2.find('.background-inner').click(function () {
                 let input = $('<input type="file" accept="image/*">');
                 input.click();
-                input.change(function (e) {
+                input.change(async function (e) {
                     let file = e.target.files[0];
                     if (file) {
-                        let reader = new FileReader();
-                        reader.onload = function (event) {
-                            backgroundDiv2.find('.background-inner').html('<img src="' + event.target.result + '" alt="Image" style="width: 100%;">');
-                            backgroundDiv2.find('.background-toolbar').css('visibility', 'visible');
-                        }
-                        reader.readAsDataURL(file);
+                        let imageURL = await uploadImage(file, `embedded_text/middle_2/${file.name}`);
+                        backgroundDiv2.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
+                        backgroundDiv2.find('.background-toolbar').css('visibility', 'visible');
                     }
                 });
             });
