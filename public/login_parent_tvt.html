@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taal Voor Thuis Account Login For The Parent Role</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/assets/css/login_tvt_parent.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="login-form card p-4 mt-5 bg-dark text-light">
+            <form class="form-content">
+                <div class="form-image text-center mb-3">
+                    <img src="./assets/images/puzzlePiece.png" alt="Icon" class="img-fluid" />
+                </div>
+                <div class="form-heading text-center mb-3">
+                    <h1 class="h3">Login</h1>
+                    <p>Please fill out all the required fields to login into your Parent account</p>
+                </div>
+                <div class="input-wrap mb-3">
+                    <div class="input mb-3">
+                        <input type="email" id="email-user-login" class="form-control bg-light text-dark" placeholder="Email" required />
+                    </div>
+                    <div class="input mb-3">
+                        <input type="password" id="password-user-login" class="form-control bg-light text-dark" placeholder="Password" required />
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="remember">
+                            <label><input type="checkbox" id="remember-me-user"> Remember me</label>
+                        </div>
+                        <div class="forgot-password">
+                            <a href="#" data-toggle="modal" data-target="#resetPasswordModal" class="text-light">Forgot Password?</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="button" id="login-button" class="btn btn-primary btn-block">Login</button>
+                </div>
+            </form>
+            <!-- Notification area -->
+            <div id="notification-area" class="w-100 mt-3"></div>
+        </div>
+    </div>
+
+    <!-- Password Reset Modal -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetPasswordModalLabel">Reset Password</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Please enter your email address to receive a password reset link.</p>
+                    <input type="email" id="reset-email" class="form-control mb-3 bg-light text-dark" placeholder="Email" required />
+                    <button type="button" id="reset-button" class="btn btn-primary btn-block" disabled>Send Reset Link</button>
+                </div>
+                <!-- Notification area for the modal -->
+                <div id="modal-notification-area" class="w-100 mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../public/assets/js/login_parent.js"></script>
+</body>
+</html>

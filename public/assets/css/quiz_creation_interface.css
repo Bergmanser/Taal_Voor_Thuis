@@ -1,0 +1,269 @@
+body {
+  font-family: Arial, sans-serif;
+  /* background-color: rgb(246, 238, 227); */
+}
+
+h1 {
+  text-align: center;
+  margin-top: 30px;
+}
+
+form {
+  background-color: #f5f5f5;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.text-center {
+  
+}
+
+.card {
+  margin: 20px 0;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card-title {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.card-text {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.question {
+  margin-bottom: 20px;
+}
+
+.option-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.option-section input[type="text"] {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.option-section button {
+  margin-left: 10px;
+}
+
+.text-danger {
+  font-size: 0.9rem;
+}
+
+/* Quiz Card Container */
+.quiz-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  background-color: #fff;
+}
+
+.quiz-card img {
+  width: 100%;
+  height: auto;
+}
+
+.quiz-card .card-body {
+  padding: 1rem;
+}
+
+.quiz-card .card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-card .card-text {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.quiz-card .remove-banner-btn,
+.quiz-card .hide-banner-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.quiz-card .hide-banner-btn {
+  top: 50px;
+  background: #ffc107;
+}
+
+.quiz-card .remove-banner-btn:hover,
+.quiz-card .hide-banner-btn:hover {
+  opacity: 0.8;
+}
+
+/* Hover State */
+.quiz-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quiz-card .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.quiz-card:hover .overlay {
+  opacity: 1;
+}
+
+/* Paused State */
+.quiz-card.paused-state .overlay {
+  background: rgba(255, 193, 7, 0.8);
+  opacity: 1;
+}
+
+.quiz-card.paused-state .resume-quiz-btn {
+  display: block;
+}
+
+/* Finished State */
+.quiz-card.finished-state .overlay {
+  background: rgba(23, 162, 184, 0.8);
+  opacity: 1;
+}
+
+.quiz-card.finished-state .score-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  padding: 1rem;
+}
+
+.quiz-card.finished-state .score-container div {
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Start, Resume, Retry Buttons */
+.start-quiz-btn,
+.resume-quiz-btn,
+.retry-quiz-btn {
+  display: none;
+  width: 80%;
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.start-quiz-btn:hover,
+.resume-quiz-btn:hover,
+.retry-quiz-btn:hover {
+  background-color: #218838;
+}
+
+/* Hide button */
+.hide-banner-btn {
+  top: 50px;
+  right: 10px;
+  background-color: #ffc107;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.hide-banner-btn:hover {
+  opacity: 0.8;
+}
+
+/* Adjusted layout for title color picker and font search bar */
+#title-style-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#title-style-options input[list="fonts"] {
+  flex: 0 0 30%;
+}
+
+#title-color-picker-container {
+  flex: 0 0 auto;
+}
+
+/* Adjusted layout for question type dropdown and add question button */
+#question-type {
+  /* display: inline-block; */
+  width: 30%;
+}
+
+#questions {
+  margin-top: 20px;
+}
+
+/* Centered submit button */
+button[type="submit"] {
+  display: block;
+  margin: 20px auto;
+}
+
+.form-group.d-flex .flex-grow-1,
+.form-group.d-flex .mr-2 {
+    /* margin-right: 0 !important; */
+    padding-right: 0 !important;
+}
+
+#add-question-button {
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+}

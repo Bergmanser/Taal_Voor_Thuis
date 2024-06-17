@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./assets/css/student_dashboard.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Quiz Student Dashboard</title>
+</head>
+<body>
+    <header>
+        <div id="header-container"></div>
+    </header>
+    <main>
+        <section class="hero">
+            <h2>Welcome to the Quiz Site!</h2>
+            <p>Select a quiz to start:</p>
+        </section>
+        <section id="quizzes" class="quiz-container"></section>
+        <div class="pagination">
+            <button id="prev-page" class="page-btn">Vorige</button>
+            <span id="page-numbers"></span>
+            <button id="next-page" class="page-btn">Volgende</button>
+        </div>
+    </main>
+    <script type="module" src="../public/assets/js/student_dashboard.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#header-container').load('index.html', function() {
+                $.getScript('app.js');
+            });
+        });
+    </script>
+</body>
+</html>

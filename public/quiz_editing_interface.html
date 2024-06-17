@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Edit Or Delete A Existing Quiz</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="./assets/css/quiz_creation_interface.css"/>
+    <link rel="stylesheet" href="./assets/css/embedded_text_creation.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.1/dist/pickr.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.1/dist/themes/nano.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Edit a existing quiz</h1>
+    <form id="quiz-form">
+        <div class="form-group">
+            <label for="title">Vul hier de titel van de toets in</label>
+            <input type="text" id="title" name="title" class="form-control" placeholder="Title" required />
+            <div id="title-error" class="text-danger"></div>
+        </div>
+        <div class="form-group">
+            <label for="description">Geef een korte beschrijving over de toets (max 80 woorden)(optioneel)</label>
+            <textarea id="description" name="description" class="form-control" placeholder="Deze toets gaat over het volgende onderwerp..." rows="4" maxlength="300"></textarea>
+            <div id="description-error" class="text-danger"></div>
+        </div>
+        <div class="form-group">
+            <label for="group-id-subject">Selecteer het niveau van de groep</label>
+            <select id="group-id-subject" class="form-control">
+                <option value="">Selecteer een groep niveau bij deze toets</option>
+                <option value="3000">Groep 3</option>
+                <option value="4000">Groep 4</option>
+                <option value="5000">Groep 5</option>
+                <option value="6000">Groep 6</option>
+                <option value="7000">Groep 7</option>
+                <option value="8000">Groep 8</option>
+            </select>
+            <div id="group-id-error" class="text-danger"></div>
+        </div>
+        <div class="form-group">
+            <label for="banner">Upload een afbeelding om te gebruiken de banner van deze toets</label>
+            <input type="file" id="banner" class="form-control-file" accept="image/jpeg,image/png,image/jpg" />
+            <div id="banner-error" class="text-danger"></div>
+        </div>
+        <div id="quiz-card-preview"></div>
+
+        <label>Voeg hier de bijhorende toets tekst toe</label>
+    <div class="container">
+        <div class="toolbar centered-toolbar">
+            <button id="addLeft" class="btn btn-primary" title="Add a new left section">Left</button>
+            <button id="addRight" class="btn btn-primary" title="Add a new right section">Right</button>
+            <button id="addMiddle" class="btn btn-primary" title="Add a new middle section">Middle</button>
+            <button id="addFull" class="btn btn-primary" title="Add a new full cover image section">Full Cover Img</button>
+            <button id="logContent" class="btn btn-secondary" title="Log Preview Content">Log Content</button>
+        </div>
+        <div id="preview" class="container-preview"></div>
+    </div>
+
+        <!-- <div class="form-group" id="embedded-text-creation"></div> -->
+
+
+        <div class="form-group">
+            <label for="quiz-type">Selecteer de type van de toets</label>
+            <select id="quiz-type" name="quiz-type" class="form-control" required>
+                <option value="">Selecteer een quiz type</option>
+                <option value="woordenschat">Woordenschat</option>
+                <option value="samenvatten">Samenvatten</option>
+                <option value="verwijswoorden&signaalwoorden">Verwijs- en signaalwoorden</option>
+                <option value="grammatica">Grammatica</option>
+                <option value="anders">Anders</option>
+            </select>
+            <div id="quiz-type-error" class="text-danger"></div>
+        </div>
+        <div id="questions"></div>
+        <div class="form-group">
+            <label for="question-type">Selecteer de type van de vraag</label>
+            <select id="question-type" class="form-control">
+                <option value="multiple-choice">Multiple Choice</option>
+                <option value="true-false">True/False</option>
+                <option value="short-answer">Short Answer</option>
+            </select>
+        </div>
+        <button type="button" id="add-question-button" class="btn btn-secondary mb-3">Add question</button>
+        <button type="submit" class="btn btn-primary">Submit quiz</button>
+    </form>
+</div>
+<script type="module" src="../public/assets/js/quiz_creation.js"></script>
+<script type="module" src="../public/assets/js/embedded_text_creation.js"></script>
+
+</body>
+</html>

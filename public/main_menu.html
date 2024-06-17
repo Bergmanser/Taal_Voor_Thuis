@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Student Overview Page Parent Dashboard</title>
+    <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+    <link rel="stylesheet" href="./assets/css/main_menu.css"/>
+  </head>
+  <body>
+    <section>
+        <button id="studentOverview-btn">Student Overview</button>
+        <button id="quizUpdate-btn">Add a new quiz to the DB</button>
+        <button id="quizSearchOverview-btn">Search for quizzes</button>
+    </section>
+    
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+      import { getDatabase, ref, set, update, } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+   
+      // Initialize Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
+        authDomain: "project-plato-eb365.firebaseapp.com",
+        databaseURL: "https://project-plato-eb365-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "project-plato-eb365",
+        storageBucket: "project-plato-eb365.appspot.com",
+        messagingSenderId: "753582080609",
+        appId: "1:753582080609:web:98b2db93e63a500a56e020",
+        measurementId: "G-KHJXGLJM4Y"
+      };
+      
+      // Your Firebase config.
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const auth = getAuth();
+      const database = getDatabase(app);
+
+      // Check if the user is logged in
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log('Current User Email:', user.email);
+          // Redirect the user to the 'add_students_tvt.html' page if the 'run-btn' is clicked
+          const studentOverwiewBtn = document.getElementById("studentOverview-btn");
+          const quizUpdateBtn = document.getElementById("quizUpdate-btn");
+          const quizSearchOverviewBtn = document.getElementById("quizSearchOverview-btn");
+          studentOverwiewBtn.addEventListener("click", () => {
+            window.location.href = "parent_overview.html";
+          });
+          quizSearchOverviewBtn.addEventListener("click", () => {
+            window.location.href = "quiz_search_interface.html";
+          });
+          quizUpdateBtn.addEventListener("click", () => {
+            window.location.href = "quiz_creation_interface.html";
+          });
+        } else {
+          // Redirect the user to the 'login_parent_tvt.html' page if the user is not logged in
+          window.location.href = "login_parent_tvt.html";
+        }
+      });
+    </script>
+  </body>
+</html>
+
+
+

@@ -1,0 +1,1086 @@
+/* CSS sources:
+https://personal-portfolio.freecodecamp.rocks/ */
+@import url('https://fonts.googleapis.com/css2?family=Tomorrow:wght@700&display=swap');
+
+/* Custom properties/variables  */
+:root {
+  --main-white: #f0f0f0;
+  --main-red: #be3144;
+  --main-blue: #45567d;
+  --main-gray: #303841;
+}
+
+/* Base reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+/* Box sizing and font sizing */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: auto;
+}
+
+header {
+  background-color: #6b4c83;
+  padding: 1rem;
+  text-align: center;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 102;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 0 1rem;
+  position: relative; /* Added position relative */
+}
+
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+ul {
+  list-style: none;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Header */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #6b4c83;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  padding: 1rem;
+}
+
+.nav-title {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.nav-list {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-list a {
+  color: white;
+  text-decoration: none;
+}
+
+.nav-list a:hover {
+  text-decoration: underline;
+}
+
+.container-embedded-text-hero.quiz-window-open {
+  max-width: calc(100% - 25rem); /* Set a maximum width for the container */
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  background-image: url(banner-image-url);
+  background-size: cover;
+  background-position: center;
+  height: 15vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 101;
+  grid-column: 1; /* span the first column */
+  /* max-width: calc(100% - 25rem); Set a maximum width for the container */
+}
+
+.hero .title {
+  position: relative;
+  font-family: 'Tomorrow', sans-serif;
+  font-weight: 700;
+  color: #6b4c83;
+  /* background-color: #ffffff; */
+  padding: 1.4rem;
+  margin: 0;
+  text-align: center;
+  font-size: 2rem;
+}
+
+.hero .title h1 {
+  font-size: 3rem;
+}
+
+/* Quiz */
+.quiz-container {
+  display: grid;
+  
+  gap: 1.4rem; /* add some gap between the columns */
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.quiz-container.layout-changed {
+  grid-template-columns: 2fr 1fr;
+  transition: grid-template-columns 0.3s ease-out;
+}
+
+.quiz-container.layout-changed .quiz-window-container {
+  width: 1fr;
+  transition: width 0.3s ease-out;
+}
+
+.quiz-container.layout-changed .embedded-text-section,
+.quiz-container.layout-changed .hero {
+  width: 2fr;
+  transition: width 0.3s ease-out;
+}
+
+.quiz-container.layout-changed .quiz-window {
+  width: 100%;
+  transition: width 0.3s ease-out;
+}
+
+#slider-container {
+  grid-column: 2;
+  align-self: start;
+  justify-self: center;
+}
+
+#range-slider {
+  width: 100%;
+}
+
+.custom-range-slider {
+  -webkit-appearance: slider-vertical;
+  width: 2rem;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.custom-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  background: #4CAF50;
+  border-radius: 50%;
+  margin-top: -0.5rem;
+}
+
+.quiz-window-container,
+.quiz-window,
+.embedded-text,
+.hero {
+  transition: width 0.3s ease-out;
+}
+
+.embedded-text-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  /* height: 100%; */
+  /* padding: 2rem; */
+  box-sizing: border-box;
+  z-index: 101; /* Adjust the z-index as needed */
+  grid-column: 1; /* span the first column */
+  /* max-width: calc(100% - 25rem); Set a maximum width for the container */
+}
+
+.embedded-text-container {
+  display: flex;
+  flex-direction: column;
+  /* gap: 1rem;
+  max-width: 300px; */
+  /* margin-right: 2rem; */
+}
+
+.embedded-text {
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: bold;
+  line-height: 1.6;
+  text-align: justify;
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.quiz-question-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+  width: 100%;
+}
+
+.quiz-question {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.question-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.question-window-title {
+  display: none;
+}
+
+.answer-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.answer-btn {
+  border: none;
+  background: #6b4c83;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.answer-btn:hover {
+  filter: brightness(90%);
+}
+
+.answer-btn:disabled {
+  background: #ccc;
+  color: white;
+  cursor: not-allowed;
+}
+
+/* Navigation */
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.prev-question-btn,
+.next-question-btn {
+  background: #4CAF50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.prev-question-btn:hover,
+.next-question-btn:hover {
+  filter: brightness(90%);
+}
+
+.prev-question-btn:disabled,
+.next-question-btn:disabled {
+  background: #ccc;
+  color: white;
+  cursor: not-allowed;
+}
+
+
+/* Hint and Answer fields*/
+/* .hint {
+  color: #6c757d;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+  display: none;
+  cursor: pointer;
+} */
+
+.hint-container {
+  padding: auto;
+  display: none;
+  border: 1px solid #6b4c83;
+  background-color: #f5f5dc;
+  border-top: none;
+}
+
+.correct-option-description-container {
+  display: none;
+}
+
+.correct-answer {
+  /* display: none; */
+  /* padding: auto;
+  margin: 1rem; */
+  border-bottom: none;
+  border: 1px solid #6b4c83;
+  background-color: #f5f5dc;
+}
+
+.hint-container h4, .correct-answer-container h4 {
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+}
+
+/* Next button main page */
+.start-quiz-button {
+  /* text-align: center; */
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 20px;
+  background-color: #6b4c83;
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.start-quiz-button:hover {
+  background-color: #4b345e;
+}
+
+/* Timers */
+.timer {
+  display: none;
+}
+
+
+/* Question window */
+.quiz-window-container {
+  /* position: fixed; */
+  /* background: #f5f5f5; */
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
+  top: 0;
+  right: 0;
+  height: 100%;
+  z-index: 101;
+  display: none;
+  transition: transform 0.3s ease-out;
+  position: relative;
+  display: flex;
+  grid-column: 2; /* span the second column */
+  align-self: start; /* align the quiz window to the top of the grid cell */
+}
+
+.quiz-window {
+  position: absolute;
+  /* top: 6.5rem; */
+  right: 0;
+  width: 100%; /* Adjust height as needed */
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 101;
+  display: none;
+  transition: transform 0.3s ease-out;
+
+  
+  /* position: fixed;
+  top: 6.5rem;
+  right: 0; */
+  /* width: 100%; 
+  height: 100%; */
+  /* background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
+  /* z-index: 101;
+  display: none; 
+  transition: transform 0.3s ease-out; /* Optional: Add transition effect */
+  /* display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  margin: 2rem auto;
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+} 
+
+.quiz-window-container .quiz-window.open {
+  display: block; /* Ensure the window is displayed when it has the open class */
+}
+
+.quiz-window.open {
+  transform: translateX(0);
+  display: block; /* Ensure the window is displayed when it has the open class */
+}
+
+.quiz-window-close {
+  background-color: #45567d;
+}
+
+.quiz-window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #d7a3ff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  color: white;
+  width: 100%;
+}
+
+.quiz-window-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.quiz-window-controls {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+}
+
+.quiz-window-controls button {
+  background: #45567d;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 1rem;
+}
+
+.quiz-window-controls button:hover {
+  filter: brightness(90%);
+}
+
+.quiz-window-controls button:disabled {
+  background: #ccc;
+  color: white;
+  cursor: not-allowed;
+}
+
+.quiz-window-content {
+  z-index: 102;
+  padding: 5rem;
+}
+
+.quiz-window-question {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* .quiz-window-answers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.quiz-window-answer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+} */
+
+.quiz-window-answer-btn {
+  border: none;
+  background: #4CAF50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.quiz-window-answer-btn:hover {
+  filter: brightness(90%);
+}
+
+.quiz-window-answer-btn:disabled {
+  background: #ccc;
+  color: white;
+  cursor: not-allowed;
+}
+
+.quiz-window-hint {
+  color: #6c757d;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+  display: none; /* Initially hidden */
+  cursor: pointer;
+}
+
+.quiz-window-hint.open {
+  display: block; /* Ensure the hint is displayed when it has the open class */
+}
+
+.quiz-window-resize {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 2rem;
+  margin-left: 0.5rem;
+}
+
+.quiz-window-resize:focus {
+  outline: none;
+}
+
+/* CSS class for the hint field */
+.quiz-window-hint {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+/* CSS class for the correct answer field (new) */
+.quiz-window-answer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 50%; /* Adjust this value as needed */
+  overflow-y: auto;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  /* background-color: #f8f9fa;
+  font-size: 14px;
+  color: #6c757d; */
+}
+
+/* CSS class for the container of question options */
+.question-options-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.625rem;
+}
+
+/* CSS class for the question options */
+.option {
+  margin-bottom: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.option:hover {
+  border-color: blue;
+  transition: border-color 0.3s ease;
+}
+
+.option.selected:hover {
+  border-color: blue; /* Add this line */
+}
+
+.option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  outline: none;
+}
+
+.option label {
+  padding-left: 25px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.option label::before {
+  /* content: ""; */
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.option input[type="radio"]:checked + label::before {
+  display: none;
+}
+
+.option input[type="radio"]:checked + label::after {
+  /* content: ""; */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.option.selected {
+  border-color: blue; /* Add this line */
+}
+
+.option input[type="radio"]:disabled + label {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.option input[type="radio"]:disabled + label::before {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.option input[type="radio"]:disabled + label::after {
+  background-color: #ccc;
+}
+
+/* CSS for styling the selected option */
+.selected {
+  background-color: beige;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.selected:active {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transform: translateY(2px);
+}
+
+.incorrect-retry {
+  background-color: #f8f9fa;
+  border: 1px solid #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #6c757d;
+}
+
+.incorrect {
+  background-color: #ffc107;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+
+/* Embedded Text border classes */
+.text-section-container, .text-section, .text-section-white-space {
+  box-sizing: border-box;
+}
+
+.embedded-text-left {
+  position: relative;
+  border: 2px solid #6b4c83; /* Change the color to your preference */
+  border-radius: 10px; /* Change the border radius to your preference */
+  padding: 10px; /* Add some padding to the text section */
+  width: 80%; /* Take up 80% of the width */
+  float: left; /* Float the text section to the left */
+  overflow: hidden;
+}
+
+.embedded-text-left:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: 20%;
+  border-left: 2px solid #6b4c83; /* Match the border color of the text section */
+  overflow: hidden;
+}
+
+.embedded-text-right {
+  position: relative;
+  border: 2px solid #6b4c83; /* Change the color to your preference */
+  border-radius: 10px; /* Change the border radius to your preference */
+  padding: 10px; /* Add some padding to the text section */
+  width: 80%; /* Take up 80% of the width */
+  float: right; /* Float the text section to the right */
+  overflow: hidden;
+}
+
+.embedded-text-right:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: 20%;
+  border-right: 2px solid #6b4c83; /* Match the border color of the text section */
+  overflow: hidden;
+}
+
+.embedded-text-middle {
+  position: relative;
+  border: 2px solid #6b4c83; /* Change the color to your preference */
+  border-radius: 10px; /* Change the border radius to your preference */
+  padding: 10px; /* Add some padding to the text section */
+  width: 80%; /* Take up 80% of the width */
+  margin: 0 auto; /* Center the text section */
+  overflow: hidden;
+}
+
+.embedded-text-middle:before,
+.embedded-text-middle:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10%;
+  border-right: 2px solid #6b4c83; /* Match the border color of the text section */
+  overflow: hidden;
+}
+
+.embedded-text-middle:before {
+  left: -10%;
+  overflow: hidden;
+}
+
+.embedded-text-middle:after {
+  right: -10%;
+  overflow: hidden;
+}
+
+.text-section-container {
+  overflow: hidden;
+}
+
+.text-section {
+  overflow: hidden;
+}
+
+.text-section-white-space {
+  height: 1rem;
+  /* border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd; */
+  /* margin: 0.5em 0; */
+  overflow: hidden;
+}
+
+/* Embedded Text html element classes */
+.embedded-text-h1,
+.embedded-text-h2,
+.embedded-text-h3,
+.embedded-text-h4,
+.embedded-text-p,
+.embedded-text-b,
+.embedded-text-strong,
+.embedded-text-span,
+.embedded-text-img,
+.embedded-text-default {
+  margin-bottom: 1.25rem; /* or 20px */
+}
+
+.embedded-text-h1 {
+  font-size: 2.5rem; /* or 40px */
+  font-weight: bold;
+}
+
+.embedded-text-h2 {
+  font-size: 2rem; /* or 32px */
+  font-weight: bold;
+}
+
+.embedded-text-h3 {
+  font-size: 1.5rem; /* or 24px */
+  font-weight: bold;
+}
+
+.embedded-text-h4 {
+  font-size: 1.25rem; /* or 20px */
+  font-weight: bold;
+}
+
+.embedded-text-p {
+  font-size: 1rem; /* or 16px */
+  line-height: 1.5;
+}
+
+.embedded-text-b {
+  font-weight: bold;
+  color: orange;
+}
+
+.embedded-text-strong {
+  color: #4CAF50;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.embedded-text-span {
+  color: orange;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.embedded-text-img {
+
+}
+
+.embedded-text-default {
+  font-size: 1rem; /* or 16px */
+  line-height: 1.5;
+}
+
+/* Throbber/Loading animation */
+.loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.si-icon-hourglass {
+  animation: spin 1s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(-360deg);
+  }
+}
+
+.si-icon-hourglass .si-icon {
+  position: relative;
+  display: inline-block;
+  animation: fall 1s linear infinite;
+}
+
+@keyframes fall {
+  0% {
+      transform: translateY(0%);
+  }
+  100% {
+      transform: translateY(100%);
+  }
+}
+
+#content-wrapper {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+/* Screen Reader */
+.current-word {
+  background-color: yellow;
+}
+
+.screenreader-toolbar-container {
+  text-align: center;
+  margin: 20px auto;
+}
+
+#toolbar {
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.toolbar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#toolbar button, #toolbar input[type="number"] {
+  margin: 10px;
+}
+
+.auto-scroll-options {
+  margin-top: 20px;
+}
+
+.auto-scroll-options label {
+  margin-right: 20px;
+}
+
+.green {
+  color: #2ecc71;
+}
+
+.red {
+  color: #e74c3c;
+}
+
+.open {
+  display: block;
+}
+
+#screenreader-button {
+  margin-bottom: 20px;
+}
+
+#close-toolbar-button {
+  margin-top: 20px;
+}
+
+.auto-scroll-options {
+  position: relative;
+  display: inline-block; /* Add this to make the dropdown inline */
+}
+
+#auto-scroll-dropdown {
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: none;
+}
+
+#auto-scroll-dropdown li {
+  padding: 10px;
+}
+
+#auto-scroll-dropdown li:hover {
+  background-color: #ddd;
+}
+
+.auto-scroll-option {
+  background-color: transparent;
+  border: none;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.auto-scroll-option:focus {
+  outline: none;
+}
+
+/* The css for the dictionary searchbar and overlay on the quiz page */
+      /* Make the search bar take up about 10% of the screen width */
+      .gsc-control-cs {
+        /* position: sticky !important; */
+        /* top: 10%;
+        left: 10px; */
+        /* z-index: 1000; */
+        /* border: 2px solid #007bff; */
+        /* border-radius: 5px;
+        padding: 5px; */
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+      }
+
+      .gsc-control-cse {
+      background-color: #ffffff !important;
+      border: 1px solid #6b4c83 !important;
+      padding: 10px 1px 8px 10px !important;
+      border-radius: 5px !important;
+      }
+
+      /* Autocomplete results */
+      .gsc-input-box ul.gsc-results {
+          position: fixed !important;
+      }
+
+      .google-search-box {
+          /* position: sticky !important; */
+          top: 10%;
+          z-index: 1000;
+          /* border-color: 1px solid red; */
+          width: 30%;
+          position: fixed;
+          padding: 5.5px;
+          border-radius: 20px;
+          /* background-color: blue; */
+      }
+
+     #cse .gsc-control-cse {
+  background-color: red;
+  border: 1px solid #fff;
+}
+      
+      #cse .gsc-search-box {
+      width: 100%;  
+      }​
+      
+      /* Style the input element */
+      .gsc-search-box .gsc-input-box {
+        width: 20%;
+        border: none;
+        padding: 5px;
+        box-sizing: border-box;
+      }
+      
+      /* Hide the submit button */
+      .gsc-search-box input[type="submit"] {
+        display: none;
+      }
+    
+      /* Hide the blue glass effect */
+      .gsc-input-box-hover,
+      .gsc-input-box-focus {
+        background-color: transparent;
+      }
+
+      .gsc-search-button {
+          display: none;
+      }
+      
+      .gsc-search-button-v2{
+
+      }
