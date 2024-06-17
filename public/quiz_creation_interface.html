@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="./assets/css/embedded_text_creation.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.1/dist/themes/nano.min.css"/>
     <link href="https://fonts.googleapis.com/css?family=Roboto|Open+Sans|Lato|Montserrat|Raleway&display=swap" rel="stylesheet">
-    <!-- <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script> -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
@@ -55,16 +54,15 @@
         <div id="quiz-card-preview"></div>
 
         <label>Voeg hier de bijhorende toets tekst toe</label>
-    <div class="container">
-        <div class="toolbar centered-toolbar">
-            <button id="addLeft" class="btn btn-primary" title="Add a new left section">Left</button>
-            <button id="addRight" class="btn btn-primary" title="Add a new right section">Right</button>
-            <button id="addMiddle" class="btn btn-primary" title="Add a new middle section">Middle</button>
-            <button id="addFull" class="btn btn-primary" title="Add a new full cover image section">Full Cover Img</button>
-            <button id="logContent" class="btn btn-secondary" title="Log Preview Content">Log Content</button>
+        <div class="container">
+            <div id="embedded-text-toolbar" class="toolbar centered-toolbar">
+                <button id="addLeft" class="btn btn-primary" title="Add a new left section">Left</button>
+                <button id="addRight" class="btn btn-primary" title="Add a new right section">Right</button>
+                <button id="addMiddle" class="btn btn-primary" title="Add a new middle section">Middle</button>
+                <button id="addFull" class="btn btn-primary" title="Add a new full cover image section">Full Cover Img</button>
+            </div>
+            <div id="preview" class="container-preview"></div>
         </div>
-        <div id="preview" class="container-preview"></div>
-    </div>
 
         <div class="form-group">
             <label for="quiz-type">Selecteer het type van de toets</label>
@@ -84,8 +82,6 @@
                 <label for="question-type">Selecteer het type van de vraag</label>
                 <select id="question-type" class="form-control">
                     <option value="multiple-choice">Multiple Choice</option>
-                    <!-- <option value="true-false">True/False</option>
-                    <option value="short-answer">Short Answer</option> -->
                 </select>
             </div>
             <div class="ml-0">

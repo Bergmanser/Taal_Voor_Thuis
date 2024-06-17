@@ -17,7 +17,7 @@ const firebaseConfig = {
 // Initialize Main Firebase App
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
-const database = getFirestore(app);
+const db = getFirestore(app);
 
 
 // firebase config keys for Project Plato Student Processing
@@ -43,4 +43,4 @@ const secondaryApp = initializeApp(secondaryFirebaseConfig, "Secondary");
 const secondaryAuth = getAuth(secondaryApp);
 const secondaryDatabase = getFirestore(secondaryApp);
 
-export { app, auth, database, secondaryApp, secondaryAuth, secondaryDatabase };
+export { app, auth, db, secondaryApp, secondaryAuth, secondaryDatabase };

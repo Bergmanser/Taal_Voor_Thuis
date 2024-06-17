@@ -3,6 +3,7 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { retrieveStudentsWithSameParentEmail } from "../js/parent_overview.js";
+// import { app, auth, db, secondaryApp, secondaryAuth } from "./firebase_config.js";
 
 // Main Config for Project Plato
 const firebaseConfig = {
@@ -33,7 +34,7 @@ const secondaryFirebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth();
-const database = getFirestore(app);
+const db = getFirestore(app);
 
 // Secondary Firebase app initialization
 const secondaryApp = initializeApp(secondaryFirebaseConfig, "secondary");
@@ -58,7 +59,7 @@ function getStudentCounter() {
 }
 
 async function getStudentsAmount(uid) {
-    const studentsRef = doc(database, `users/${uid}`);
+    const studentsRef = doc(db, `users/${uid}`);
     const studentDoc = await getDoc(studentsRef);
 
     if (studentDoc.exists()) {
@@ -116,7 +117,7 @@ async function generateUniqueEmail(parentEmail, counter) {
 }
 
 async function getStudent(email) {
-    const studentsRef = collection(database, "users");
+    const studentsRef = collection(db, "users");
     const studentQuery = query(studentsRef, where("email", "==", email));
     const studentSnapshot = await getDocs(studentQuery);
 
@@ -146,7 +147,7 @@ onAuthStateChanged(auth, async (user) => {
                 const user = userCredential.user;
 
                 // Send users info to Firestore
-                const userRef = doc(database, `users/${user.uid}`);
+                const userRef = doc(db, `users/${user.uid}`);
                 await setDoc(userRef, {
                     email: uniqueEmail,
                     username: username,
@@ -155,7 +156,7 @@ onAuthStateChanged(auth, async (user) => {
                     userRoleId: 0 // Set userRoleId to 0 for students
                 }, { merge: true });
 
-                const studentRef = doc(database, `studentdb/${user.uid}`);
+                const studentRef = doc(db, `studentdb/${user.uid}`);
                 await setDoc(studentRef, {
                     email: uniqueEmail,
                     username: username,

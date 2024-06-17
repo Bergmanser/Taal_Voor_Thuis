@@ -1,38 +1,62 @@
-// embedded_text_creation.js
+// Import necessary modules from Firebase and other sources
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+import { availableFonts } from './fonts.js';
+
+// Main Config for Project Plato
+const firebaseConfig = {
+    apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
+    authDomain: "project-plato-eb365.firebaseapp.com",
+    databaseURL: "https://project-plato-eb365-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "project-plato-eb365",
+    storageBucket: "project-plato-eb365.appspot.com",
+    messagingSenderId: "753582080609",
+    appId: "1:753582080609:web:98b2db93e63a500a56e020",
+    measurementId: "G-KHJXGLJM4Y"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+
+let storedRange = null;
+
 export function initializeEmbeddedTextCreation(uploadImage) {
-    var sortable = Sortable.create(document.getElementById('preview'), {
+    const sortable = Sortable.create(document.getElementById('preview'), {
         delay: 1500,
         delayOnTouchOnly: true,
         animation: 150,
         ghostClass: 'sortable-ghost',
-        onEnd: function (evt) {
-            saveOrder();
-        }
+        onEnd: saveOrder
     });
 
     function saveOrder() {
-        let order = $("#preview .section-container").map(function () {
+        const order = $("#preview .section-container").map(function () {
             return $(this).data('index');
         }).get();
 
-        let content = $("#preview .section-container").map(function () {
-            let section = $(this).find('.section');
-            let sectionType = section.hasClass('left-section') ? 'left' : (section.hasClass('right-section') ? 'right' : (section.hasClass('middle-section') ? 'middle' : 'full'));
-            let sectionContent = section.find('.section-content').html();
-            let borderColor = section.find('.section-content').css('border-color');
-            let textColor = section.find('.section-content').css('color');
-            let isBold = section.find('.section-content').css('font-weight') === '700';
-            let backgroundImages = {
-                background1: $(this).find('.background-middle-1 .background-inner img').attr('src') || $(this).find('.background-left .background-inner img').attr('src') || $(this).find('.background-right .background-inner img').attr('src') || '',
+        const content = $("#preview .section-container").map(function () {
+            const section = $(this).find('.section');
+            const sectionType = section.hasClass('left-section') ? 'left' :
+                section.hasClass('right-section') ? 'right' :
+                    section.hasClass('middle-section') ? 'middle' : 'full';
+            const sectionContent = section.find('.section-content').html();
+            const borderColor = section.find('.section-content').css('border-color');
+            const textColor = section.find('.section-content').css('color');
+            const isBold = section.find('.section-content').css('font-weight') === '700';
+            const backgroundImages = {
+                background1: $(this).find('.background-middle-1 .background-inner img').attr('src') ||
+                    $(this).find('.background-left .background-inner img').attr('src') ||
+                    $(this).find('.background-right .background-inner img').attr('src') || '',
                 background2: $(this).find('.background-middle-2 .background-inner img').attr('src') || ''
             };
             return {
                 type: sectionType,
                 content: sectionContent,
-                borderColor: borderColor,
-                textColor: textColor,
-                isBold: isBold,
-                backgroundImages: backgroundImages
+                borderColor,
+                textColor,
+                isBold,
+                backgroundImages
             };
         }).get();
 
@@ -41,42 +65,34 @@ export function initializeEmbeddedTextCreation(uploadImage) {
     }
 
     function loadOrder() {
-        let order = JSON.parse(localStorage.getItem('sectionOrder'));
-        let content = JSON.parse(localStorage.getItem('sectionContent'));
+        const order = JSON.parse(localStorage.getItem('sectionOrder'));
+        const content = JSON.parse(localStorage.getItem('sectionContent'));
         if (order && content) {
-            $('#preview').empty();  // Clear existing content
-            order.forEach(function (index, i) {
-                let sectionData = content[i];
+            $('#preview').empty();
+            order.forEach((index, i) => {
+                const sectionData = content[i];
                 if (sectionData && typeof sectionData === 'object') {
-                    let sectionType = sectionData.type;
-                    let sectionContent = sectionData.content;
-                    let borderColor = sectionData.borderColor;
-                    let textColor = sectionData.textColor;
-                    let isBold = sectionData.isBold;
-                    let backgroundImages = sectionData.backgroundImages;
-                    let container = addSection(sectionType, sectionContent, backgroundImages, borderColor, textColor, isBold);
+                    const { type, content, borderColor, textColor, isBold, backgroundImages } = sectionData;
+                    const container = addSection(type, content, backgroundImages, borderColor, textColor, isBold);
                     container.data('index', index);
                     $('#preview').append(container);
                 }
             });
+            reattachEventHandlers();
         }
     }
 
-    loadOrder();
-
     function createBackgroundToolbar() {
-        let toolbar = $('<div class="background-toolbar"></div>');
-        let removeButton = $('<button class="remove-btn">&times;</button>');
-        let zIndexDropdown = $('<select class="btn btn-sm btn-secondary z-index-dropdown" title="Set image layer"><option value="background">Background</option><option value="foreground">Foreground</option></select>');
-        let containmentDropdown = $('<select class="btn btn-sm btn-secondary containment-dropdown" title="Set image containment"><option value="contained">Contained</option><option value="uncontained">Uncontained</option></select>');
+        const toolbar = $('<div class="background-toolbar"></div>');
+        const removeButton = $('<button class="remove-btn">&times;</button>');
+        const zIndexDropdown = $('<select class="btn btn-sm btn-secondary z-index-dropdown" title="Set image layer"><option value="background">Background</option><option value="foreground">Foreground</option></select>');
+        const containmentDropdown = $('<select class="btn btn-sm btn-secondary containment-dropdown" title="Set image containment"><option value="contained">Contained</option><option value="uncontained">Uncontained</option></select>');
 
-        toolbar.append(removeButton);
-        toolbar.append(zIndexDropdown);
-        toolbar.append(containmentDropdown);
+        toolbar.append(removeButton, zIndexDropdown, containmentDropdown);
 
         zIndexDropdown.change(function () {
-            let zIndex = $(this).val() === 'foreground' ? 9999 : 1;
-            let img = $(this).closest('.background-section').find('img');
+            const zIndex = $(this).val() === 'foreground' ? 9999 : 1;
+            const img = $(this).closest('.background-section').find('img');
             if ($(this).closest('.background-section').find('.containment-dropdown').val() === 'uncontained') {
                 img.css('z-index', zIndex);
             }
@@ -88,9 +104,9 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         });
 
         containmentDropdown.change(function () {
-            let container = $(this).closest('.background-section');
-            let img = container.find('img');
-            let zIndex = container.find('.z-index-dropdown').val() === 'foreground' ? 9999 : 1;
+            const container = $(this).closest('.background-section');
+            const img = container.find('img');
+            const zIndex = container.find('.z-index-dropdown').val() === 'foreground' ? 9999 : 1;
             if ($(this).val() === 'uncontained') {
                 img.css({
                     'position': 'absolute',
@@ -126,13 +142,11 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         }
     }
 
-    let storedRange = null;
-
     function addSection(type, content = 'Edit this text...', background = null, borderColor = '#ddd', textColor = '#000', isBold = false) {
-        let container = $('<div class="section-container"></div>');
-        let section = $('<div class="section"></div>');
-        let toolbar = $('<div class="section-toolbar"></div>');
-        let sectionContent = $('<div class="section-content" contenteditable="true"></div>');
+        const container = $('<div class="section-container"></div>');
+        const section = $('<div class="section"></div>');
+        const toolbar = $('<div class="section-toolbar"></div>');
+        const sectionContent = $('<div class="section-content" contenteditable="true"></div>');
         let backgroundDiv, backgroundDiv1, backgroundDiv2;
 
         if (type !== 'full') {
@@ -140,13 +154,13 @@ export function initializeEmbeddedTextCreation(uploadImage) {
             toolbar.append('<button class="btn btn-sm btn-secondary color-picker" title="Change the border color">Border Color</button>');
             toolbar.append('<button class="btn btn-sm btn-secondary text-color-picker" title="Change the text color">Text Color</button>');
             toolbar.append('<button class="btn btn-sm btn-danger remove-section" title="Remove this section">Remove</button>');
-            toolbar.append('<button class="btn btn-sm btn-primary swap-button" title="Swap the content of the two background sections" style="display: none;">Swap</button>'); // Add swap button with display none
+            toolbar.append('<button class="btn btn-sm btn-primary swap-button" title="Swap the content of the two background sections" style="display: none;">Swap</button>');
         } else {
             toolbar.append('<button class="btn btn-sm btn-danger remove-section" title="Remove this section">Remove</button>');
         }
 
         if (type !== 'full') {
-            let dropdown = $('<select class="position-dropdown btn btn-sm btn-secondary" title="Change the section position"></select>');
+            const dropdown = $('<select class="position-dropdown btn btn-sm btn-secondary" title="Change the section position"></select>');
             dropdown.append('<option value="left">Left</option>');
             dropdown.append('<option value="middle">Middle</option>');
             dropdown.append('<option value="right">Right</option>');
@@ -158,12 +172,12 @@ export function initializeEmbeddedTextCreation(uploadImage) {
             sectionContent.html('Click to add an image...');
             sectionContent.addClass('full-cover-img');
             sectionContent.click(function () {
-                let input = $('<input type="file" accept="image/*">');
+                const input = $('<input type="file" accept="image/*">');
                 input.click();
                 input.change(async function (e) {
-                    let file = e.target.files[0];
+                    const file = e.target.files[0];
                     if (file) {
-                        let imageURL = await uploadImage(file, `embedded_text/full/${file.name}`);
+                        const imageURL = await uploadImage(file, `embedded_text/full/${file.name}`);
                         sectionContent.html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
                     }
                 });
@@ -196,7 +210,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
                 }
             } else if (type === 'middle') {
                 section.addClass('middle-section');
-                toolbar.find('.swap-button').show();  // Show swap button for middle sections
+                toolbar.find('.swap-button').show();
                 backgroundDiv1 = $('<div class="background-middle-1 background-section"><div class="background-inner">Click to add an image...</div></div>');
                 backgroundDiv2 = $('<div class="background-middle-2 background-section"><div class="background-inner">Click to add an image...</div></div>');
                 backgroundDiv1.prepend(createBackgroundToolbar());
@@ -209,15 +223,15 @@ export function initializeEmbeddedTextCreation(uploadImage) {
                     backgroundDiv2.find('.background-inner').html('<img src="' + background.background2 + '" alt="Image" style="width: 100%;">');
                     backgroundDiv2.find('.background-toolbar').css('visibility', 'visible');
                 }
-                container.append(backgroundDiv1, section, backgroundDiv2);  // Ensure proper order of elements
+                container.append(backgroundDiv1, section, backgroundDiv2);
 
                 backgroundDiv1.find('.background-inner').click(function () {
-                    let input = $('<input type="file" accept="image/*">');
+                    const input = $('<input type="file" accept="image/*">');
                     input.click();
                     input.change(async function (e) {
-                        let file = e.target.files[0];
+                        const file = e.target.files[0];
                         if (file) {
-                            let imageURL = await uploadImage(file, `embedded_text/middle_1/${file.name}`);
+                            const imageURL = await uploadImage(file, `embedded_text/middle_1/${file.name}`);
                             backgroundDiv1.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
                             backgroundDiv1.find('.background-toolbar').css('visibility', 'visible');
                         }
@@ -225,12 +239,12 @@ export function initializeEmbeddedTextCreation(uploadImage) {
                 });
 
                 backgroundDiv2.find('.background-inner').click(function () {
-                    let input = $('<input type="file" accept="image/*">');
+                    const input = $('<input type="file" accept="image/*">');
                     input.click();
                     input.change(async function (e) {
-                        let file = e.target.files[0];
+                        const file = e.target.files[0];
                         if (file) {
-                            let imageURL = await uploadImage(file, `embedded_text/middle_2/${file.name}`);
+                            const imageURL = await uploadImage(file, `embedded_text/middle_2/${file.name}`);
                             backgroundDiv2.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
                             backgroundDiv2.find('.background-toolbar').css('visibility', 'visible');
                         }
@@ -238,20 +252,20 @@ export function initializeEmbeddedTextCreation(uploadImage) {
                 });
 
                 toolbar.find('.swap-button').click(function () {
-                    let background1Content = backgroundDiv1.find('.background-inner').html();
-                    let background2Content = backgroundDiv2.find('.background-inner').html();
+                    const background1Content = backgroundDiv1.find('.background-inner').html();
+                    const background2Content = backgroundDiv2.find('.background-inner').html();
                     backgroundDiv1.find('.background-inner').html(background2Content);
                     backgroundDiv2.find('.background-inner').html(background1Content);
                 });
             }
 
             backgroundDiv && backgroundDiv.find('.background-inner').click(function () {
-                let input = $('<input type="file" accept="image/*">');
+                const input = $('<input type="file" accept="image/*">');
                 input.click();
                 input.change(async function (e) {
-                    let file = e.target.files[0];
+                    const file = e.target.files[0];
                     if (file) {
-                        let imageURL = await uploadImage(file, `embedded_text/${type}/${file.name}`);
+                        const imageURL = await uploadImage(file, `embedded_text/${type}/${file.name}`);
                         backgroundDiv.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
                         backgroundDiv.find('.background-toolbar').css('visibility', 'visible');
                     }
@@ -274,16 +288,16 @@ export function initializeEmbeddedTextCreation(uploadImage) {
             }
 
             sectionContent.attr('data-placeholder', 'Edit this text...');
-            sectionContent.html(content);  // Apply the content
+            sectionContent.html(content);
 
             if (borderColor) {
-                sectionContent.css('border-color', borderColor);  // Apply border color
+                sectionContent.css('border-color', borderColor);
             }
             if (textColor) {
-                sectionContent.css('color', textColor);  // Apply text color
+                sectionContent.css('color', textColor);
             }
             if (isBold) {
-                sectionContent.css('font-weight', 'bold');  // Apply bold text
+                sectionContent.css('font-weight', 'bold');
             }
 
             sectionContent.on('focus', function () {
@@ -300,7 +314,6 @@ export function initializeEmbeddedTextCreation(uploadImage) {
                 }
             });
 
-            // Handle focus event on section content
             section.find('.section-content').on('focus', function () {
                 const selection = window.getSelection();
                 if (selection && selection.rangeCount > 0) {
@@ -308,21 +321,17 @@ export function initializeEmbeddedTextCreation(uploadImage) {
                 }
             });
 
-            // Handle mouseup event on section content
             section.find('.section-content').on('mouseup', function () {
                 const selection = window.getSelection();
                 if (selection && selection.rangeCount > 0) {
                     storedRange = selection.getRangeAt(0);
-                    console.log('Selection stored:', storedRange);
                 }
             });
 
-            // Handle click event on bold button
             section.find('.bold-btn').click(function () {
                 setTimeout(function () {
                     if (storedRange !== null) {
-                        let selectedText = storedRange.toString();
-
+                        const selectedText = storedRange.toString();
                         if (selectedText !== '') {
                             if (sectionContent[0].contains(storedRange.commonAncestorContainer)) {
                                 let isBold = false;
@@ -341,7 +350,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
                                 if (isBold) {
                                     removeBoldFormatting(storedRange);
                                 } else {
-                                    let wrapBold = document.createElement('b');
+                                    const wrapBold = document.createElement('b');
                                     storedRange.surroundContents(wrapBold);
                                 }
                             }
@@ -483,7 +492,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
 
             if (type !== 'full') {
                 toolbar.find('.position-dropdown').change(function () {
-                    let newType = $(this).val();
+                    const newType = $(this).val();
                     changePosition(container, section, sectionContent, newType, backgroundDiv, backgroundDiv1, backgroundDiv2);
                     toolbar.find('.position-dropdown').val(newType);
                 });
@@ -542,10 +551,10 @@ export function initializeEmbeddedTextCreation(uploadImage) {
             }
             container.append(section);
             container.append(backgroundDiv);
-            section.find('.swap-button').hide();  // Hide swap button for non-middle sections
+            section.find('.swap-button').hide();
         } else if (newType === 'middle') {
             section.addClass('middle-section');
-            let toolbar = $('<div class="section-toolbar"></div>');  // Ensure toolbar is initialized
+            const toolbar = $('<div class="section-toolbar"></div>');
             toolbar.append('<button class="btn btn-sm btn-primary swap-button" title="Swap the content of the two background sections">Swap</button>');
             backgroundDiv1 = $('<div class="background-middle-1 background-section"><div class="background-inner">Click to add an image...</div></div>');
             backgroundDiv2 = $('<div class="background-middle-2 background-section"><div class="background-inner">Click to add an image...</div></div>');
@@ -560,7 +569,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
                 backgroundDiv2.find('.background-toolbar').css('visibility', 'visible');
             }
             container.append(backgroundDiv1, section, backgroundDiv2);
-            section.find('.swap-button').show();  // Show swap button for middle sections
+            section.find('.swap-button').show();
         } else if (newType === 'right') {
             section.addClass('right-section');
             backgroundDiv = $('<div class="background-right background-section"><div class="background-inner">Click to add an image...</div></div>');
@@ -571,7 +580,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
             }
             container.append(backgroundDiv);
             container.append(section);
-            section.find('.swap-button').hide();  // Hide swap button for non-middle sections
+            section.find('.swap-button').hide();
         }
 
         const newToolbar = section.find('.section-toolbar');
@@ -580,12 +589,12 @@ export function initializeEmbeddedTextCreation(uploadImage) {
 
         if (backgroundDiv) {
             backgroundDiv.find('.background-inner').click(function () {
-                let input = $('<input type="file" accept="image/*">');
+                const input = $('<input type="file" accept="image/*">');
                 input.click();
                 input.change(async function (e) {
-                    let file = e.target.files[0];
+                    const file = e.target.files[0];
                     if (file) {
-                        let imageURL = await uploadImage(file, `embedded_text/${newType}/${file.name}`);
+                        const imageURL = await uploadImage(file, `embedded_text/${newType}/${file.name}`);
                         backgroundDiv.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
                         backgroundDiv.find('.background-toolbar').css('visibility', 'visible');
                     }
@@ -594,12 +603,12 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         }
         if (backgroundDiv1) {
             backgroundDiv1.find('.background-inner').click(function () {
-                let input = $('<input type="file" accept="image/*">');
+                const input = $('<input type="file" accept="image/*">');
                 input.click();
                 input.change(async function (e) {
-                    let file = e.target.files[0];
+                    const file = e.target.files[0];
                     if (file) {
-                        let imageURL = await uploadImage(file, `embedded_text/middle_1/${file.name}`);
+                        const imageURL = await uploadImage(file, `embedded_text/middle_1/${file.name}`);
                         backgroundDiv1.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
                         backgroundDiv1.find('.background-toolbar').css('visibility', 'visible');
                     }
@@ -608,12 +617,12 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         }
         if (backgroundDiv2) {
             backgroundDiv2.find('.background-inner').click(function () {
-                let input = $('<input type="file" accept="image/*">');
+                const input = $('<input type="file" accept="image/*">');
                 input.click();
                 input.change(async function (e) {
-                    let file = e.target.files[0];
+                    const file = e.target.files[0];
                     if (file) {
-                        let imageURL = await uploadImage(file, `embedded_text/middle_2/${file.name}`);
+                        const imageURL = await uploadImage(file, `embedded_text/middle_2/${file.name}`);
                         backgroundDiv2.find('.background-inner').html('<img src="' + imageURL + '" alt="Image" style="width: 100%;">');
                         backgroundDiv2.find('.background-toolbar').css('visibility', 'visible');
                     }
@@ -622,7 +631,6 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         }
 
         $('#preview').append(container);
-
         reorderSections();
     }
 
@@ -647,11 +655,11 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         });
 
         toolbar.find('.bold-btn').off('click').click(function () {
-            let selection = window.getSelection();
+            const selection = window.getSelection();
             if (selection.rangeCount > 0) {
-                let range = selection.getRangeAt(0);
+                const range = selection.getRangeAt(0);
                 if (sectionContent[0].contains(range.commonAncestorContainer)) {
-                    let isBold = window.getComputedStyle(range.startContainer.parentNode).fontWeight === 'bold' || range.startContainer.parentNode.nodeName === 'B';
+                    const isBold = window.getComputedStyle(range.startContainer.parentNode).fontWeight === 'bold' || range.startContainer.parentNode.nodeName === 'B';
 
                     if (isBold) {
                         document.execCommand('removeFormat', false, null);
@@ -730,53 +738,53 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         });
 
         toolbar.find('.swap-button').off('click').click(function () {
-            let container = $(this).closest('.section-container');
-            let backgroundDiv1Inner = container.find('.background-middle-1 .background-inner');
-            let backgroundDiv2Inner = container.find('.background-middle-2 .background-inner');
-            let temp = backgroundDiv1Inner.html();
+            const container = $(this).closest('.section-container');
+            const backgroundDiv1Inner = container.find('.background-middle-1 .background-inner');
+            const backgroundDiv2Inner = container.find('.background-middle-2 .background-inner');
+            const temp = backgroundDiv1Inner.html();
             backgroundDiv1Inner.html(backgroundDiv2Inner.html());
             backgroundDiv2Inner.html(temp);
         });
 
         toolbar.find('.position-dropdown').off('change').change(function () {
-            let newType = $(this).val();
+            const newType = $(this).val();
             changePosition(section.closest('.section-container'), section, sectionContent, newType, section.closest('.background-left'), section.closest('.background-middle-1'), section.closest('.background-middle-2'));
         });
     }
 
     function reorderSections() {
-        let sections = $('#preview .section-container').get();
+        const sections = $('#preview .section-container').get();
         sections.sort((a, b) => $(a).data('index') - $(b).data('index'));
         $('#preview').append(sections);
     }
 
     $('#addLeft').click(function () {
-        let index = $('#preview .section-container').length;
-        let container = addSection('left');
+        const index = $('#preview .section-container').length;
+        const container = addSection('left');
         container.data('index', index);
         saveOrder();
     });
     $('#addRight').click(function () {
-        let index = $('#preview .section-container').length;
-        let container = addSection('right');
+        const index = $('#preview .section-container').length;
+        const container = addSection('right');
         container.data('index', index);
         saveOrder();
     });
     $('#addMiddle').click(function () {
-        let index = $('#preview .section-container').length;
-        let container = addSection('middle');
+        const index = $('#preview .section-container').length;
+        const container = addSection('middle');
         container.data('index', index);
         saveOrder();
     });
     $('#addFull').click(function () {
-        let index = $('#preview .section-container').length;
-        let container = addSection('full');
+        const index = $('#preview .section-container').length;
+        const container = addSection('full');
         container.data('index', index);
         saveOrder();
     });
 
     $('#logContent').click(function () {
-        let content = $("#preview").html();
+        const content = $("#preview").html();
         console.log('Preview Content:', content);
     });
 
@@ -786,6 +794,40 @@ export function initializeEmbeddedTextCreation(uploadImage) {
             delay: 1300
         }
     });
+
+    // Add font search bar
+    const fontSearchBar = document.createElement('input');
+    fontSearchBar.setAttribute('list', 'fonts');
+    fontSearchBar.setAttribute('placeholder', 'Search for fonts...');
+    fontSearchBar.className = 'form-control mb-2';
+
+    const fontDataList = document.createElement('datalist');
+    fontDataList.id = 'fonts';
+
+    availableFonts.forEach(font => {
+        const option = document.createElement('option');
+        option.value = font;
+        fontDataList.appendChild(option);
+    });
+
+    const embeddedTextToolbar = document.getElementById('embedded-text-toolbar');
+    embeddedTextToolbar.appendChild(fontSearchBar);
+    embeddedTextToolbar.appendChild(fontDataList);
+
+    fontSearchBar.addEventListener('input', (event) => {
+        const selectedFont = event.target.value;
+        if (availableFonts.includes(selectedFont)) {
+            document.getElementById('preview').style.fontFamily = selectedFont;
+            const link = document.createElement('link');
+            link.href = `https://fonts.googleapis.com/css?family=${selectedFont}&display=swap`;
+            link.rel = 'stylesheet';
+            document.head.appendChild(link);
+            saveOrder();
+        }
+    });
+
+    loadOrder();
+    setInterval(saveOrder, 5000);
 }
 
 export function getEmbeddedText() {

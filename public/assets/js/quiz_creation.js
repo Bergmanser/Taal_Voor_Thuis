@@ -1,9 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 import { initializeEmbeddedTextCreation, getEmbeddedText } from './embedded_text_creation.js';
+import { availableFonts } from './fonts.js';
+import { redirectUserBasedOnRole } from './roleRedirect.js';
 
 // Main Config for Project Plato
 const firebaseConfig = {
@@ -23,8 +25,6 @@ const analytics = getAnalytics(app);
 const auth = getAuth();
 const db = getFirestore(app);
 const storage = getStorage(app);
-const googleFontsApiUrl = 'https://www.googleapis.com/webfonts/v1/webfonts?key=YOUR_API_KEY';
-
 
 const quizForm = document.getElementById('quiz-form');
 const questionsContainer = document.getElementById('questions');
@@ -40,7 +40,7 @@ function decompressData(compressedData) {
         return JSON.parse(data);
     } catch (error) {
         console.error("Error decompressing data:", error);
-        return null; // Return null or some default value if decompression fails
+        return null;
     }
 }
 
@@ -51,7 +51,7 @@ function saveFormData() {
         titleFont: document.getElementById('title').style.fontFamily,
         description: document.getElementById('description').value,
         groupId: document.getElementById('group-id-subject').value,
-        banner: document.getElementById('banner').src || '',
+        banner: document.getElementById('quiz-card-preview').querySelector('img')?.src || '',
         quizType: document.getElementById('quiz-type').value,
         questions: Array.from(document.querySelectorAll('.question')).map((question) => {
             const questionId = question.id.split('-')[1];
@@ -61,10 +61,11 @@ function saveFormData() {
                 options: Array.from(document.querySelectorAll(`#question-options-${questionId} input[type="text"]`)).map(input => input.value),
                 hint: document.getElementById(`question-hint-${questionId}`).value,
                 correctOptionDescription: document.getElementById(`correct-option-description-${questionId}`).value,
+                correctOption: document.getElementById(`correct-option-dropdown-${questionId}`).value,
                 type: 'multiple-choice'
             };
         }),
-        embeddedText: document.getElementById('preview').innerHTML || '' // Save the embedded text HTML or an empty string
+        embeddedText: document.getElementById('preview').innerHTML || ''
     };
     localStorage.setItem('quizFormData', compressData(formData));
 }
@@ -81,15 +82,24 @@ function loadFormData() {
             const bannerPreview = document.createElement('img');
             bannerPreview.src = formData.banner;
             bannerPreview.alt = "Banner Image";
-            document.getElementById('quiz-card-preview').appendChild(bannerPreview);
+            bannerPreview.id = 'loaded-banner-img';  // Ensure this ID is unique
+            const existingBanner = document.getElementById('loaded-banner-img');
+            if (existingBanner) {
+                existingBanner.src = formData.banner;
+            } else {
+                document.getElementById('quiz-card-preview').innerHTML = '';
+                const quizCard = createQuizCard(formData.banner);
+                document.getElementById('quiz-card-preview').appendChild(quizCard);
+            }
         }
         document.getElementById('quiz-type').value = formData.quizType;
         formData.questions.forEach((question, index) => {
-            addQuestion(question.type, true); // Pass true to indicate reloading
+            addQuestion(question.type, true);
             document.getElementById(`question-title-${index + 1}`).value = question.title;
             question.options.forEach(option => addOption(index + 1, option));
             document.getElementById(`question-hint-${index + 1}`).value = question.hint;
             document.getElementById(`correct-option-description-${index + 1}`).value = question.correctOptionDescription;
+            document.getElementById(`correct-option-dropdown-${index + 1}`).value = question.correctOption;
         });
         if (document.getElementById('preview')) {
             document.getElementById('preview').innerHTML = formData.embeddedText || '';
@@ -100,6 +110,8 @@ function loadFormData() {
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log('Current User Email:', user.email);
+        // Call the function with the expected role for the parent dashboard (e.g., 1 and 2 for parents and organization users)
+        redirectUserBasedOnRole([3, 4]);
     } else {
         window.location.href = "login_parent_tvt.html";
     }
@@ -107,44 +119,43 @@ onAuthStateChanged(auth, (user) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFormData();
-    initializeEmbeddedTextCreation(uploadImage); // Initialize embedded text creation with the uploadImage function
+    initializeEmbeddedTextCreation(uploadImage);
 
     document.getElementById('add-question-button').addEventListener('click', () => {
         const questionType = document.getElementById('question-type').value;
-        addQuestion(questionType, false); // pass false for isReload
+        addQuestion(questionType, false);
         saveFormData();
-        console.log('Add question button clicked'); // Debugging log
+        console.log('Add question button clicked');
     });
 
     quizForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        console.log('Submit button clicked'); // Debugging log
+        console.log('Submit button clicked');
         const formValid = validateForm();
         if (formValid) {
-            console.log('Form is valid'); // Debugging log
+            console.log('Form is valid');
             const confirmUpload = confirm('Are you sure you want to upload this quiz? You can edit this quiz later through a different interface.');
             if (confirmUpload) {
                 try {
                     const newQuiz = await createQuizFromForm();
                     const quizId = await saveQuizToFirestore(newQuiz);
                     resetForm();
-                    localStorage.removeItem('quizFormData'); // Clear local storage after successful upload
-                    localStorage.removeItem('sectionOrder'); // Clear embedded text section order
-                    localStorage.removeItem('sectionContent'); // Clear embedded text section content
+                    localStorage.removeItem('quizFormData');
+                    localStorage.removeItem('sectionOrder');
+                    localStorage.removeItem('sectionContent');
                     alert(`Quiz uploaded successfully! Quiz ID: ${quizId}`);
-                    window.location.href = ''; // Add the redirect link here
-                    console.log('Form submitted successfully'); // Debugging log
+                    window.location.href = '';
+                    console.log('Form submitted successfully');
                 } catch (error) {
-                    console.error('Upload failed:', error); // Debugging log
+                    console.error('Upload failed:', error);
                     alert('Upload failed. Please contact the ICT department if the issue persists.');
                 }
             }
         } else {
-            console.log('Form is not valid'); // Debugging log
+            console.log('Form is not valid');
         }
     });
 
-    // Ensure the title color picker element exists
     const titleColorPickerElement = document.getElementById('title-color-picker-container');
     if (titleColorPickerElement) {
         const titleColorPicker = Pickr.create({
@@ -176,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Create a datalist and input for font selection
     const titleStyleOptionsElement = document.getElementById('title-style-options');
     if (titleStyleOptionsElement) {
         const fontSearchBar = document.createElement('input');
@@ -190,28 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
         titleStyleOptionsElement.appendChild(fontSearchBar);
         titleStyleOptionsElement.appendChild(fontDataList);
 
-        // Add available fonts to the datalist
-        const availableFonts = [
-            'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Oswald', 'Source Sans Pro',
-            'Slabo 27px', 'Slabo 13px', 'Raleway', 'PT Sans', 'Merriweather', 'Noto Sans',
-            'Nunito', 'Ubuntu', 'Playfair Display', 'Rubik', 'Poppins', 'Inconsolata',
-            'Cabin', 'Karla', 'Libre Baskerville', 'Anton', 'Abril Fatface', 'Lobster',
-            'Arimo', 'Varela Round', 'Dancing Script', 'Fira Sans', 'Josefin Sans',
-            'Quicksand', 'Barlow', 'Exo 2', 'Righteous', 'Pacifico', 'Muli', 'Work Sans',
-            'Titillium Web', 'Asap', 'Catamaran', 'Crete Round', 'Alegreya', 'Cinzel',
-            'Baloo', 'Bungee', 'Cairo', 'IBM Plex Sans', 'Heebo', 'Red Hat Display',
-            'Manrope', 'Saira', 'Space Mono', 'OpenDyslexic', 'Lexend Deca', 'Lexend Tera',
-            'Lexend Giga', 'Lexend Mega', 'Lexend Peta', 'Lexend Zetta', 'Lexend Exa',
-            'Comic Sans MS', 'Arial', 'Verdana', 'overlock'
-        ];
-
         availableFonts.forEach(font => {
             const option = document.createElement('option');
             option.value = font;
             fontDataList.appendChild(option);
         });
 
-        // Load the selected font
         fontSearchBar.addEventListener('input', (event) => {
             const selectedFont = event.target.value;
             if (availableFonts.includes(selectedFont)) {
@@ -245,17 +239,19 @@ banner.addEventListener('change', (event) => {
             const quizCard = createQuizCard(e.target.result);
             quizCardPreview.innerHTML = '';
             quizCardPreview.appendChild(quizCard);
+            saveFormData();  // Save the banner image immediately after it is loaded
         };
         reader.readAsDataURL(file);
     } else {
         quizCardPreview.innerHTML = '';
         const quizCard = createQuizCard('MeerDanBijles-Logo.png');
         quizCardPreview.appendChild(quizCard);
+        saveFormData();
     }
 });
 
 function addQuestion(type, isReload) {
-    console.log(`Adding question of type: ${type}, isReload: ${isReload}`); // Debugging log
+    console.log(`Adding question of type: ${type}, isReload: ${isReload}`);
     const question = document.createElement('div');
     question.className = 'question';
     question.id = `question-${questionId}`;
@@ -284,27 +280,27 @@ function addQuestion(type, isReload) {
 }
 
 function initializeQuestion(questionId, type, isReload) {
-    console.log(`Initializing question ${questionId}, type: ${type}, isReload: ${isReload}`); // Debugging log
+    console.log(`Initializing question ${questionId}, type: ${type}, isReload: ${isReload}`);
     if (type === 'multiple-choice' && !isReload) {
-        addOption(questionId); // Automatically add the first option
+        addOption(questionId);
     }
     const addOptionButton = document.getElementById(`add-option-button-${questionId}`);
     if (addOptionButton) {
         addOptionButton.addEventListener('click', () => {
             addOption(questionId);
             saveFormData();
-            console.log(`Option added to Question ${questionId}`); // Debugging log
+            console.log(`Option added to Question ${questionId}`);
         });
     } else {
         console.error(`Add option button not found for question ${questionId}`);
     }
-
 
     const removeQuestionButton = document.getElementById(`remove-question-button-${questionId}`);
     removeQuestionButton.addEventListener('click', () => {
         removeQuestion(questionId);
         saveFormData();
     });
+
     initializeCorrectOptionDropdown(questionId);
 }
 
@@ -358,7 +354,7 @@ function updateQuestionIds() {
 }
 
 function removeQuestion(questionId) {
-    console.log(`Removing question ${questionId}`); // Debugging log
+    console.log(`Removing question ${questionId}`);
     const question = document.getElementById(`question-${questionId}`);
     if (question) {
         questionsContainer.removeChild(question);
@@ -367,9 +363,8 @@ function removeQuestion(questionId) {
 }
 
 function addOption(questionId, optionText = '') {
-    console.log(`Adding option to question ${questionId}, optionText: ${optionText}`); // Debugging log
+    console.log(`Adding option to question ${questionId}, optionText: ${optionText}`);
 
-    // Check if the question container exists
     const optionsContainer = document.getElementById(`question-options-${questionId}`);
     if (!optionsContainer) {
         console.error(`Options container not found for question ${questionId}`);
@@ -407,7 +402,7 @@ function addOption(questionId, optionText = '') {
 }
 
 function removeOption(event, questionId) {
-    console.log(`Removing option from question ${questionId}`); // Debugging log
+    console.log(`Removing option from question ${questionId}`);
     const optionSection = event.target.parentNode;
     const optionsContainer = optionSection.parentNode;
     optionsContainer.removeChild(optionSection);
@@ -415,9 +410,8 @@ function removeOption(event, questionId) {
     saveFormData();
 }
 
-
 function populateCorrectOptionDropdown(questionId) {
-    console.log(`Populating correct option dropdown for question ${questionId}`); // Debugging log
+    console.log(`Populating correct option dropdown for question ${questionId}`);
     const correctOptionDropdown = document.getElementById(`correct-option-dropdown-${questionId}`);
     if (correctOptionDropdown) {
         const optionsContainer = document.getElementById(`question-options-${questionId}`);
@@ -437,11 +431,11 @@ function populateCorrectOptionDropdown(questionId) {
 }
 
 function initializeCorrectOptionDropdown(questionId) {
-    console.log(`Initializing correct option dropdown for question ${questionId}`); // Debugging log
+    console.log(`Initializing correct option dropdown for question ${questionId}`);
     const optionsContainer = document.getElementById(`question-options-${questionId}`);
     if (optionsContainer) {
         optionsContainer.addEventListener('input', (event) => {
-            if (event.target.tagName.toLowerCase() === 'input' && event.key !== 'Enter') {
+            if (event.target.tagName.toLowerCase() === 'input') {
                 populateCorrectOptionDropdown(questionId);
                 saveFormData();
             }
@@ -449,9 +443,10 @@ function initializeCorrectOptionDropdown(questionId) {
     }
     const correctOptionDropdown = document.getElementById(`correct-option-dropdown-${questionId}`);
     if (correctOptionDropdown) {
+        correctOptionDropdown.addEventListener('click', () => {
+            populateCorrectOptionDropdown(questionId);
+        });
         correctOptionDropdown.addEventListener('change', () => {
-            const selectedOptionIndex = correctOptionDropdown.value;
-            console.log(`Question ${questionId}: Correct option selected: ${selectedOptionIndex}`);
             saveFormData();
         });
     }
@@ -567,8 +562,8 @@ async function createQuizFromForm() {
         Title: title,
         Description: description,
         QuizGroupId: groupId,
-        Banner: banner ? await uploadImage(banner, banner.name) : 'default-banner.png',
-        EmbeddedText: getEmbeddedText(), // Use the function to get embedded text
+        Banner: banner ? await uploadImage(banner, banner.name) : document.getElementById('quiz-card-preview').querySelector('img')?.src || 'default-banner.png',
+        EmbeddedText: getEmbeddedText(),
         Difficulty: 'easy',
         QuizType: quizType,
         Questions: questions,
@@ -615,6 +610,7 @@ function createQuizCard(imageSrc) {
     quizCard.querySelector('.remove-banner-btn').addEventListener('click', () => {
         banner.value = '';
         quizCardPreview.innerHTML = '';
+        saveFormData();
     });
     quizCard.querySelector('.hide-banner-btn').addEventListener('click', () => {
         quizCard.style.display = 'none';
@@ -625,3 +621,5 @@ function createQuizCard(imageSrc) {
 document.addEventListener('embeddedTextChange', () => {
     saveFormData();
 });
+
+setInterval(saveFormData, 5000);  // Autosave every 5 seconds

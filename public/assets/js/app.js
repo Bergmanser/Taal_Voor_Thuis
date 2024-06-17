@@ -1,24 +1,6 @@
-// header.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-// Main Config for Project Plato
-const firebaseConfig = {
-    apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
-    authDomain: "project-plato-eb365.firebaseapp.com",
-    databaseURL: "https://project-plato-eb365-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "project-plato-eb365",
-    storageBucket: "project-plato-eb365.appspot.com",
-    messagingSenderId: "753582080609",
-    appId: "1:753582080609:web:98b2db93e63a500a56e020",
-    measurementId: "G-KHJXGLJM4Y"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const database = getFirestore(app);
+import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { auth, db } from "./firebase_config.js"
 
 $(document).ready(function () {
     const $menuButton = $("#menuButton");
@@ -30,42 +12,93 @@ $(document).ready(function () {
     const $closeModal = $("#closeModal");
     const $cancelLogout = $("#cancelLogout");
 
+    // Handle menu toggle
     $menuButton.click(function () {
         $menu.toggleClass("menu-open");
         $overlay.toggle();
     });
 
+    // Hide menu when overlay is clicked
     $overlay.click(function () {
         $menu.removeClass("menu-open");
         $overlay.hide();
     });
 
-    $homeLogo.click(function () {
-        window.location.href = "home.html";  // Redirect to home page
+    // Redirect to home page based on user role when logo is clicked
+    $homeLogo.click(async function () {
+        try {
+            const userRole = await getUserRole();
+            redirectToDashboard(userRole);
+        } catch (error) {
+            console.error('Error getting user role:', error);
+        }
     });
 
+    // Show logout modal when logout button is clicked
     $logoutButton.click(function () {
         $logoutModal.show();
     });
 
+    // Hide logout modal when close button is clicked
     $closeModal.click(function () {
         $logoutModal.hide();
     });
 
+    // Hide logout modal when cancel button is clicked
     $cancelLogout.click(function () {
         $logoutModal.hide();
     });
 
-    // Event listener for logout button
-    $('#confirmLogout').click(function () {
-        signOut(auth).then(() => {
+    // Handle user logout and redirect based on user role
+    $('#confirmLogout').click(async function () {
+        try {
+            const userRole = await getUserRole();
+            await signOut(auth);
             console.log('User logged out');
-            // Redirect to login page after logout
-            window.location.href = 'login.html';
-        }).catch((error) => {
+            redirectToLogin(userRole);
+        } catch (error) {
             console.error('Error logging out:', error);
-        });
+        }
     });
+
+    // Function to redirect user to the appropriate dashboard based on user role
+    function redirectToDashboard(userRole) {
+        switch (userRole) {
+            case 0: // student
+                window.location.href = 'student_dashboard.html';
+                break;
+            case 1: // private
+            case 2: // business
+                window.location.href = 'parent_dashboard.html';
+                break;
+            case 3: // admin
+            case 4: // editor
+                window.location.href = 'employee_dashboard.html';
+                break;
+            default:
+                console.error("Unknown user role");
+                break;
+        }
+    }
+
+    // Function to redirect user to the appropriate login page based on user role
+    function redirectToLogin(userRole) {
+        switch (userRole) {
+            case 0: // student
+                window.location.href = 'login_student_tvt.html';
+                break;
+            case 1: // private
+            case 2: // business
+                window.location.href = 'login_parent_tvt.html';
+                break;
+            case 3: // admin
+            case 4: // editor
+                window.location.href = 'login_employee_tvt.html';
+                break;
+            default:
+                window.location.href = 'https://www.taalvoorthuis.nl';
+        }
+    }
 
     // Function to populate menu based on user type
     async function populateMenu(userRole) {
@@ -130,6 +163,7 @@ $(document).ready(function () {
                 break;
         }
 
+        // Append menu links to the menu list
         links.forEach(link => {
             const $li = $("<li></li>");
             const $a = $("<a></a>").attr("href", link.url).text(link.text);
@@ -142,17 +176,24 @@ $(document).ready(function () {
     async function getUserRole() {
         const user = auth.currentUser;
         if (user) {
-            const userRef = collection(database, "users");
-            const userQuery = query(userRef, where("uid", "==", user.uid));
+            console.log('User found:', user.uid);
+            const usersRef = collection(db, "users");
+            const userQuery = query(usersRef, where("email", "==", user.email)); // Change to query by email
             const userSnapshot = await getDocs(userQuery);
 
-            if (userSnapshot.size === 1) {
+            if (userSnapshot.size > 0) {
+                userSnapshot.forEach(doc => {
+                    console.log('User document data:', doc.data());
+                });
                 const userData = userSnapshot.docs[0].data();
+                console.log('User data:', userData);
                 return userData.userRoleId;
             } else {
+                console.log('No user document found');
                 throw new Error("User not found.");
             }
         } else {
+            console.log('No user is logged in');
             throw new Error("No user is logged in.");
         }
     }
@@ -161,7 +202,9 @@ $(document).ready(function () {
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             try {
+                console.log('User state changed:', user.uid);
                 const userRole = await getUserRole();
+                console.log('User role:', userRole);
                 populateMenu(userRole);
             } catch (error) {
                 console.error("Error getting user role:", error);
