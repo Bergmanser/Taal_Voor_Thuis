@@ -4,7 +4,7 @@ Project Plato
 Installation guide:
 1. Sync a local project with your github account
 2. Pull the “main” project branch to your local project.
-the “main” will contain the most recent accepted changes to the project.
+The “main” project branch will contain the most recent accepted changes to the project.
 
 Notes
 Index.html contains header, merge with local index.html
