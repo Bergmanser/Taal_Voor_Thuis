@@ -17,7 +17,7 @@ Dependencies:
 -  "@cypress/webpack-dev-server": "^3.10.0",
 -   @cypress/webpack-preprocessor": "^6.0.2",
 -   "bootstrap": "^5.3.3",
--  "firebase": "^10.8.0",
+-    "firebase": "^10.8.0",
 -    "firebase-mock": "^2.3.2",
 -    "font-picker": "^3.5.1",
 -    "@babel/core": "^7.24.7",
@@ -27,7 +27,6 @@ Dependencies:
 
 
 Folderstructuur:
-
 devTools:
 - Cypress for automated testing 
 -	Firebase CLI
@@ -36,7 +35,7 @@ Nodemodules
 
 **public:**
 - html files
-  - assests folder:
+  - assets folder:
     - css folder
     - javascript folder
     - images folder
@@ -49,11 +48,7 @@ Root:
 - json.config
 - packages.json
 - cypress config
-
-Readme
-
-Documentation:
-
+- Readme
 
 
 
