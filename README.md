@@ -14,16 +14,16 @@ Dependencies:
 - node version 14.07.01
 - node installation of firebase
 - Firebase console admin account: taalvoorthuis@gmail.com google login credentials
--  "@cypress/webpack-dev-server": "^3.10.0",
--   @cypress/webpack-preprocessor": "^6.0.2",
--   "bootstrap": "^5.3.3",
--    "firebase": "^10.8.0",
--    "firebase-mock": "^2.3.2",
--    "font-picker": "^3.5.1",
--    "@babel/core": "^7.24.7",
--    "@babel/preset-env": "^7.24.7",
--    "babel-loader": "^9.1.3",
--    "cyress": "^13.11.0"
+- "@cypress/webpack-dev-server": "^3.10.0",
+- "@cypress/webpack-preprocessor": "^6.0.2",
+- "bootstrap": "^5.3.3",
+- "firebase": "^10.8.0",
+- "firebase-mock": "^2.3.2",
+- "font-picker": "^3.5.1",
+- "@babel/core": "^7.24.7",
+- "@babel/preset-env": "^7.24.7",
+- "babel-loader": "^9.1.3",
+- "cyress": "^13.11.0"
 
 
 Folderstructuur:
@@ -33,7 +33,7 @@ devTools:
 
 Nodemodules
 
-**public:**
+public folder:
 - html files
   - assets folder:
     - css folder
@@ -51,7 +51,4 @@ Root:
 - Readme
 
 
-
-
-![image](https://github.com/Bergmanser/Plato/assets/159016862/b197c104-27c0-4c74-baaa-b1896fe2e917)
 
