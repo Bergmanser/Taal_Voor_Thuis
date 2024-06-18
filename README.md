@@ -1,16 +1,16 @@
 # Plato
 Project Plato
 
-Installation guide:
+**Installation guide:**
 1. Sync a local project with your github account
 2. Pull the “main” project branch to your local project.
 The “main” project branch will contain the most recent accepted changes to the project.
 
-Notes
+**Notes:**
 Index.html contains header, merge with local index.html
 
 
-Dependencies:
+**Dependencies**:
 - node version 14.07.01
 - node installation of firebase
 - Firebase console admin account: taalvoorthuis@gmail.com google login credentials
@@ -26,7 +26,8 @@ Dependencies:
 - "cyress": "^13.11.0"
 
 
-Folderstructuur:
+**Folderstructuur**:
+
 devTools:
 - Cypress for automated testing 
 -	Firebase CLI
