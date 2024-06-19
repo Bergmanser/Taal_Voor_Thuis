@@ -1,105 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Upload een Quiz</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./assets/css/quiz.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="./assets/css/quiz_creation_interface.css"/>
-    <link rel="stylesheet" href="./assets/css/embedded_text_creation.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.1/dist/themes/nano.min.css"/>
-    <link href="https://fonts.googleapis.com/css?family=Roboto|Open+Sans|Lato|Montserrat|Raleway&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.1/dist/pickr.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <title>Singular Quiz Page</title>
 </head>
 <body>
-<div id="header-container"></div>
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Maak op deze pagina een nieuwe toets aan</h1>
-    <form id="quiz-form">
-        <div class="form-group">
-            <label for="title">Vul hier de titel van de toets in</label>
-            <input type="text" id="title" name="title" class="form-control" placeholder="Title" required />
-            <div id="title-error" class="text-danger"></div>
-            <div id="title-style-options"></div>
-            <div id="title-color-picker-container"></div>
+    <header>
+        <div id="header-container"></div>
+    </header>
+    <div class="content-wrapper">
+        <div class="loading-indicator">
+            <span class="si-icon si-icon-hourglass" data-icon-name="hourglass">
+                <svg height="64" version="1.1" width="64" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                    <desc>Created with Snap</desc>
+                    <defs></defs>
+                    <g>
+                        <path fill="none" stroke="#fff" stroke-width="5" d="m 15.177521,13.308356 33.644958,0 -11.214986,18.691643 11.214986,18.691645 -33.644958,0 11.214986,-18.691645 z" transform="matrix(-1,0,0,-1,64,64)"></path>
+                        <path fill="#fff" stroke="none" d="M22,17C22,17,42,17,42,17C42,17,33,32,33,32C33,32,31,32,31,32C31,32,31,32,31,32C31,32,22,17,22,17" transform="matrix(-1,0,0,-1,64,64)"></path>
+                    </g>
+                </svg>
+            </span>
         </div>
-        <div class="form-group">
-            <label for="description">Geef een korte beschrijving over de toets (max 80 woorden)(optioneel)</label>
-            <textarea id="description" name="description" class="form-control" placeholder="Deze toets gaat over het volgende onderwerp..." rows="4" maxlength="300"></textarea>
-            <div id="description-error" class="text-danger"></div>
-        </div>
-        <div class="form-group">
-            <label for="group-id-subject">Selecteer het niveau van de groep</label>
-            <select id="group-id-subject" class="form-control">
-                <option value="">Selecteer een groep niveau bij deze toets</option>
-                <option value="3000">Groep 3</option>
-                <option value="4000">Groep 4</option>
-                <option value="5000">Groep 5</option>
-                <option value="6000">Groep 6</option>
-                <option value="7000">Groep 7</option>
-                <option value="8000">Groep 8</option>
-            </select>
-            <div id="group-id-error" class="text-danger"></div>
-        </div>
-        <div class="form-group">
-            <label for="banner">Upload een afbeelding om te gebruiken de banner van deze toets</label>
-            <input type="file" id="banner" class="form-control-file" accept="image/jpeg,image/png,image/jpg" />
-            <div id="banner-error" class="text-danger"></div>
-        </div>
-        <div id="quiz-card-preview"></div>
-
-        <label>Voeg hier de bijhorende toets tekst toe</label>
-        <div class="container">
-            <div id="embedded-text-toolbar" class="toolbar centered-toolbar">
-                <button id="addLeft" class="btn btn-primary" title="Add a new left section">Left</button>
-                <button id="addRight" class="btn btn-primary" title="Add a new right section">Right</button>
-                <button id="addMiddle" class="btn btn-primary" title="Add a new middle section">Middle</button>
-                <button id="addFull" class="btn btn-primary" title="Add a new full cover image section">Full Cover Img</button>
+        <main id="quiz-main">
+            <div class="quiz-container"> 
+                <div id="slider-container">
+                    <div id="range-slider" class="custom-range-slider"></div>
+                </div>
+                <div class="container-embedded-text-hero">
+                    <div class="hero" style="background-image: url(banner-image-url);">
+                        <div class="title" id="quiz-title"></div>
+                    </div>
+                    <div class="text-section-container" id="text-section-container"></div>
+                    <div class="screenreader-text" style="display:none;"></div>
+                    <div class="google-search-box">
+                        <div class="gcse-search"></div>
+                    </div>
+                    <div class="screenreader-toolbar-container">
+                        <button id="screenreader-button">Screenreader</button>
+                        <div id="toolbar" class="hidden">
+                        <div class="toolbar-inner">
+                            <button id="play-button">Play</button>
+                            <button id="pause-button">Pause</button>
+                            <button id="reset-button">Reset</button>
+                            <input id="start-from-input" type="number" value="1" />
+                            <button id="start-from-button">Start from</button>
+                            <div class="auto-scroll-options">
+                                <button id="auto-scroll-dropdown-button" aria-haspopup="true" aria-expanded="false">
+                                    Screenreader auto scroll: <span id="auto-scroll-button-text"></span>
+                                  </button>
+                                <ul id="auto-scroll-dropdown" class="hidden">
+                                  <li><button class="auto-scroll-option" data-value="on"><span class="green">On</span></button></li>
+                                  <li><button class="auto-scroll-option" data-value="off"><span class="red">off</span></button></li>
+                                </ul>
+                              </div>
+                            <button id="close-toolbar-button">Close</button>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="embedded-text-section">
+                        <div class="embedded-text" id="embedded-text"></div>
+                    </div>
+                    <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
+                </div>
+                <div class="quiz-window-container hidden">
+                    <div class="quiz-window" id="quiz-window">
+                        <div class="quiz-window-header" id="quiz-window-header">
+                            <div class="question-number" id="question-number"></div>
+                            <button class="quiz-window-close btn btn-primary" id="quiz-window-close">X</button>
+                        </div>
+                        <div class="quiz-window-content">
+                            <div class="question-window-title" id="question-window-title"></div>
+                            <div class="question-container" id="question-container"></div>
+                            <div class="question-text"></div>
+                            <div class="answer-container"></div>
+                            <div class="hint-container"></div>
+                            <div class="correct-answer-container"></div>
+                            <div class="quiz-window-controls">
+                                <button class="prev-question-btn" disabled="">Previous</button>
+                                <button class="next-question-btn">Next</button>
+                            </div>
+                            <button class="submit-quiz-btn hidden" disabled>Submit Quiz</button>
+                        </div>
+                    </div>
+                </div> 
             </div>
-            <div id="preview" class="container-preview"></div>
-        </div>
-
-        <div class="form-group">
-            <label for="quiz-type">Selecteer het type van de toets</label>
-            <select id="quiz-type" name="quiz-type" class="form-control" required>
-                <option value="">Selecteer een quiz type</option>
-                <option value="woordenschat">Woordenschat</option>
-                <option value="samenvatten">Samenvatten</option>
-                <option value="verwijswoorden&signaalwoorden">Verwijs- en signaalwoorden</option>
-                <option value="grammatica">Grammatica</option>
-                <option value="anders">Anders</option>
-            </select>
-            <div id="quiz-type-error" class="text-danger"></div>
-        </div>
-        <div id="questions"></div>
-        <div class="form-group d-flex align-items-end">
-            <div class="flex-grow-1">
-                <label for="question-type">Selecteer het type van de vraag</label>
-                <select id="question-type" class="form-control">
-                    <option value="multiple-choice">Multiple Choice</option>
-                </select>
-            </div>
-            <div class="ml-0">
-                <button type="button" id="add-question-button" class="btn btn-secondary mb-3 ml-0">Add question</button>
-            </div>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Submit quiz</button>
-    </form>
-</div>
-<script type="module" src="../public/assets/js/quiz_creation.js"></script>
-<script type="module" src="../public/assets/js/embedded_text_creation.js"></script>
-<script>
-    $(document).ready(function() {
-        $('#header-container').load('index.html', function() {
-            $.getScript('app.js');
+        </main>
+    </div>
+    <script src="https://cse.google.com/cse.js?cx=111c176d9efa64756"></script>
+    <script type="module" src="../public/assets/js/quiz.js"></script>
+    <script type="module" src="../public/assets/js/screenreader_quiztext.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#header-container').load('index.html', function() {
+                $.getScript('app.js');
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>

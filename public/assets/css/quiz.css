@@ -36,22 +36,12 @@ body {
   width: auto;
 }
 
-header {
-  background-color: #6b4c83;
-  padding: 1rem;
-  text-align: center;
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 102;
-}
-
 main {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 0 0 0 1rem;
-  position: relative; /* Added position relative */
+  position: relative;
 }
 
 a {
@@ -116,8 +106,6 @@ ul {
   align-items: center;
   justify-content: center;
   z-index: 101;
-  grid-column: 1; /* span the first column */
-  /* max-width: calc(100% - 25rem); Set a maximum width for the container */
 }
 
 .hero .title {
@@ -125,7 +113,6 @@ ul {
   font-family: 'Tomorrow', sans-serif;
   font-weight: 700;
   color: #6b4c83;
-  /* background-color: #ffffff; */
   padding: 1.4rem;
   margin: 0;
   text-align: center;
@@ -139,8 +126,7 @@ ul {
 /* Quiz */
 .quiz-container {
   display: grid;
-  
-  gap: 1.4rem; /* add some gap between the columns */
+  gap: 1.4rem;
   padding: 0;
   width: 100%;
   height: 100%;
@@ -208,20 +194,14 @@ ul {
   justify-content: center;
   align-items: center;
   width: 100%;
-  /* height: 100%; */
-  /* padding: 2rem; */
   box-sizing: border-box;
-  z-index: 101; /* Adjust the z-index as needed */
-  grid-column: 1; /* span the first column */
-  /* max-width: calc(100% - 25rem); Set a maximum width for the container */
+  z-index: 101;
+  grid-column: 1;
 }
 
 .embedded-text-container {
   display: flex;
   flex-direction: column;
-  /* gap: 1rem;
-  max-width: 300px; */
-  /* margin-right: 2rem; */
 }
 
 .embedded-text {
@@ -255,6 +235,7 @@ ul {
   font-size: 1.2rem;
   font-weight: bold;
 }
+
 .question-window-title {
   display: none;
 }
@@ -314,17 +295,6 @@ ul {
   cursor: not-allowed;
 }
 
-
-/* Hint and Answer fields*/
-/* .hint {
-  color: #6c757d;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  margin-top: 1rem;
-  display: none;
-  cursor: pointer;
-} */
-
 .hint-container {
   padding: auto;
   display: none;
@@ -333,14 +303,7 @@ ul {
   border-top: none;
 }
 
-.correct-option-description-container {
-  display: none;
-}
-
 .correct-answer {
-  /* display: none; */
-  /* padding: auto;
-  margin: 1rem; */
   border-bottom: none;
   border: 1px solid #6b4c83;
   background-color: #f5f5dc;
@@ -352,9 +315,7 @@ ul {
   font-weight: bold;
 }
 
-/* Next button main page */
 .start-quiz-button {
-  /* text-align: center; */
   display: inline-block;
   padding: 10px 20px;
   margin: 20px;
@@ -372,17 +333,11 @@ ul {
   background-color: #4b345e;
 }
 
-/* Timers */
 .timer {
   display: none;
 }
 
-
-/* Question window */
 .quiz-window-container {
-  /* position: fixed; */
-  /* background: #f5f5f5; */
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
   top: 0;
   right: 0;
   height: 100%;
@@ -391,50 +346,28 @@ ul {
   transition: transform 0.3s ease-out;
   position: relative;
   display: flex;
-  grid-column: 2; /* span the second column */
-  align-self: start; /* align the quiz window to the top of the grid cell */
+  grid-column: 2;
+  align-self: start;
 }
 
 .quiz-window {
   position: absolute;
-  /* top: 6.5rem; */
   right: 0;
-  width: 100%; /* Adjust height as needed */
+  width: 100%;
   background: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   z-index: 101;
   display: none;
   transition: transform 0.3s ease-out;
-
-  
-  /* position: fixed;
-  top: 6.5rem;
-  right: 0; */
-  /* width: 100%; 
-  height: 100%; */
-  /* background: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
-  /* z-index: 101;
-  display: none; 
-  transition: transform 0.3s ease-out; /* Optional: Add transition effect */
-  /* display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 80%;
-  margin: 2rem auto;
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
-} 
+}
 
 .quiz-window-container .quiz-window.open {
-  display: block; /* Ensure the window is displayed when it has the open class */
+  display: block;
 }
 
 .quiz-window.open {
   transform: translateX(0);
-  display: block; /* Ensure the window is displayed when it has the open class */
+  display: block;
 }
 
 .quiz-window-close {
@@ -494,18 +427,6 @@ ul {
   margin-bottom: 1rem;
 }
 
-/* .quiz-window-answers {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.quiz-window-answer {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-} */
-
 .quiz-window-answer-btn {
   border: none;
   background: #4CAF50;
@@ -530,12 +451,12 @@ ul {
   padding: 0.5rem 1rem;
   border-radius: 4px;
   margin-top: 1rem;
-  display: none; /* Initially hidden */
+  display: none;
   cursor: pointer;
 }
 
 .quiz-window-hint.open {
-  display: block; /* Ensure the hint is displayed when it has the open class */
+  display: block;
 }
 
 .quiz-window-resize {
@@ -550,43 +471,12 @@ ul {
   outline: none;
 }
 
-/* CSS class for the hint field */
-.quiz-window-hint {
-  margin-top: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f8f9fa;
-  font-size: 14px;
-  color: #6c757d;
-}
-
-/* CSS class for the correct answer field (new) */
-.quiz-window-answer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  height: 50%; /* Adjust this value as needed */
-  overflow-y: auto;
-  margin-top: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  /* background-color: #f8f9fa;
-  font-size: 14px;
-  color: #6c757d; */
-}
-
-/* CSS class for the container of question options */
 .question-options-container {
   display: flex;
   flex-direction: column;
   margin-top: 0.625rem;
 }
 
-/* CSS class for the question options */
 .option {
   margin-bottom: 10px;
   position: relative;
@@ -605,7 +495,7 @@ ul {
 }
 
 .option.selected:hover {
-  border-color: blue; /* Add this line */
+  border-color: blue;
 }
 
 .option input[type="radio"] {
@@ -625,7 +515,6 @@ ul {
 }
 
 .option label::before {
-  /* content: ""; */
   position: absolute;
   left: 0;
   top: 50%;
@@ -642,7 +531,6 @@ ul {
 }
 
 .option input[type="radio"]:checked + label::after {
-  /* content: ""; */
   position: absolute;
   left: 50%;
   top: 50%;
@@ -654,7 +542,7 @@ ul {
 }
 
 .option.selected {
-  border-color: blue; /* Add this line */
+  border-color: blue;
 }
 
 .option input[type="radio"]:disabled + label {
@@ -671,7 +559,6 @@ ul {
   background-color: #ccc;
 }
 
-/* CSS for styling the selected option */
 .selected {
   background-color: beige;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
@@ -702,19 +589,17 @@ ul {
   color: #fff;
 }
 
-
-/* Embedded Text border classes */
 .text-section-container, .text-section, .text-section-white-space {
   box-sizing: border-box;
 }
 
 .embedded-text-left {
   position: relative;
-  border: 2px solid #6b4c83; /* Change the color to your preference */
-  border-radius: 10px; /* Change the border radius to your preference */
-  padding: 10px; /* Add some padding to the text section */
-  width: 80%; /* Take up 80% of the width */
-  float: left; /* Float the text section to the left */
+  border: 2px solid #6b4c83;
+  border-radius: 10px;
+  padding: 10px;
+  width: 80%;
+  float: left;
   overflow: hidden;
 }
 
@@ -725,17 +610,17 @@ ul {
   bottom: 0;
   right: 100%;
   width: 20%;
-  border-left: 2px solid #6b4c83; /* Match the border color of the text section */
+  border-left: 2px solid #6b4c83;
   overflow: hidden;
 }
 
 .embedded-text-right {
   position: relative;
-  border: 2px solid #6b4c83; /* Change the color to your preference */
-  border-radius: 10px; /* Change the border radius to your preference */
-  padding: 10px; /* Add some padding to the text section */
-  width: 80%; /* Take up 80% of the width */
-  float: right; /* Float the text section to the right */
+  border: 2px solid #6b4c83;
+  border-radius: 10px;
+  padding: 10px;
+  width: 80%;
+  float: right;
   overflow: hidden;
 }
 
@@ -746,17 +631,17 @@ ul {
   bottom: 0;
   left: 100%;
   width: 20%;
-  border-right: 2px solid #6b4c83; /* Match the border color of the text section */
+  border-right: 2px solid #6b4c83;
   overflow: hidden;
 }
 
 .embedded-text-middle {
   position: relative;
-  border: 2px solid #6b4c83; /* Change the color to your preference */
-  border-radius: 10px; /* Change the border radius to your preference */
-  padding: 10px; /* Add some padding to the text section */
-  width: 80%; /* Take up 80% of the width */
-  margin: 0 auto; /* Center the text section */
+  border: 2px solid #6b4c83;
+  border-radius: 10px;
+  padding: 10px;
+  width: 80%;
+  margin: 0 auto;
   overflow: hidden;
 }
 
@@ -767,7 +652,7 @@ ul {
   top: 0;
   bottom: 0;
   width: 10%;
-  border-right: 2px solid #6b4c83; /* Match the border color of the text section */
+  border-right: 2px solid #6b4c83;
   overflow: hidden;
 }
 
@@ -791,13 +676,9 @@ ul {
 
 .text-section-white-space {
   height: 1rem;
-  /* border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd; */
-  /* margin: 0.5em 0; */
   overflow: hidden;
 }
 
-/* Embedded Text html element classes */
 .embedded-text-h1,
 .embedded-text-h2,
 .embedded-text-h3,
@@ -808,31 +689,31 @@ ul {
 .embedded-text-span,
 .embedded-text-img,
 .embedded-text-default {
-  margin-bottom: 1.25rem; /* or 20px */
+  margin-bottom: 1.25rem;
 }
 
 .embedded-text-h1 {
-  font-size: 2.5rem; /* or 40px */
+  font-size: 2.5rem;
   font-weight: bold;
 }
 
 .embedded-text-h2 {
-  font-size: 2rem; /* or 32px */
+  font-size: 2rem;
   font-weight: bold;
 }
 
 .embedded-text-h3 {
-  font-size: 1.5rem; /* or 24px */
+  font-size: 1.5rem;
   font-weight: bold;
 }
 
 .embedded-text-h4 {
-  font-size: 1.25rem; /* or 20px */
+  font-size: 1.25rem;
   font-weight: bold;
 }
 
 .embedded-text-p {
-  font-size: 1rem; /* or 16px */
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -853,12 +734,8 @@ ul {
   font-weight: bold;
 }
 
-.embedded-text-img {
-
-}
-
 .embedded-text-default {
-  font-size: 1rem; /* or 16px */
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -950,66 +827,71 @@ ul {
 }
 
 .green {
-  color: #2ecc71;
+  color: green;
 }
 
 .red {
-  color: #e74c3c;
+  color: red;
 }
 
-.open {
-  display: block;
-}
-
-#screenreader-button {
-  margin-bottom: 20px;
-}
-
-#close-toolbar-button {
-  margin-top: 20px;
-}
-
-.auto-scroll-options {
-  position: relative;
-  display: inline-block; /* Add this to make the dropdown inline */
-}
-
-#auto-scroll-dropdown {
-  background-color: #f7f7f7;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  z-index: 1;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.auto-scroll-dropdown {
   display: none;
-}
-
-#auto-scroll-dropdown li {
-  padding: 10px;
-}
-
-#auto-scroll-dropdown li:hover {
-  background-color: #ddd;
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
 .auto-scroll-option {
-  background-color: transparent;
-  border: none;
-  color: inherit;
-  padding: 0;
-  margin: 0;
-  width: 100%;
+  padding: 10px;
   cursor: pointer;
 }
 
-.auto-scroll-option:focus {
+.auto-scroll-option:hover {
+  background: #f0f0f0;
+}
+
+#auto-scroll-dropdown-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+#auto-scroll-dropdown-button:focus {
   outline: none;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Results Overlay */
+.quiz-submission-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 1001;
+}
+
+.overlay-content {
+  background: white;
+  color: black;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.overlay-content h2 {
+  margin-bottom: 1rem;
 }
 
 /* The css for the dictionary searchbar and overlay on the quiz page */

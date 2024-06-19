@@ -8,6 +8,8 @@ module.exports = defineConfig({
     baseUrl: "http://127.0.0.1:5500", // Base URL for your local server
     supportFile: "cypress/support/e2e.js", // Support file location for E2E tests
     fixturesFolder: "cypress/fixtures", // Fixture folder location
+    video: true,
+    screenshotOnRunFailure: true,
   },
   component: {
     setupNodeEvents(on, config) {

@@ -1,20 +1,21 @@
-import { quizData } from "../js/quiz.js";
-
-// Get the text container and toolbar elements
-const toolbar = document.getElementById('toolbar');
-const playButton = document.getElementById('play-button');
-const pauseButton = document.getElementById('pause-button');
-const resetButton = document.getElementById('reset-button');
-const startFromInput = document.getElementById('start-from-input');
-const startFromButton = document.getElementById('start-from-button');
-
-// Initialize the screen reader
-let screenReader = null;
+// Exported functions and variables
 export let currentWordIndex = 0;
 let words = [];
 let autoScrollEnabled = true;
 
-// Parse the quizData object and render the text sections
+// Function to set auto-scroll
+export function setAutoScroll(enabled) {
+    autoScrollEnabled = enabled;
+    if (autoScrollEnabled) {
+        $('#auto-scroll-button-text').removeClass('red').addClass('green').text('On');
+        console.log("Auto-scroll is enabled");
+    } else {
+        $('#auto-scroll-button-text').removeClass('green').addClass('red').text('Off');
+        console.log("Auto-scroll is disabled");
+    }
+}
+
+// Function to render text sections
 export function renderTextSections(quizData) {
     const embeddedTextContainer = document.querySelector('.embedded-text');
     const hiddenTextContainer = document.querySelector('.screenreader-text');
@@ -35,14 +36,9 @@ export function renderTextSections(quizData) {
     });
 }
 
-// Wait for the DOM to be fully loaded before rendering the text sections
-document.addEventListener('DOMContentLoaded', () => {
-    renderTextSections(quizData);
-});
-
 // Initialize the screen reader with the text sections
 export function initScreenReader() {
-    screenReader = new SpeechSynthesisUtterance();
+    const screenReader = new SpeechSynthesisUtterance();
     screenReader.lang = 'nl-NL'; // Set the language to Dutch
     screenReader.rate = 1; // Set the speech rate to 1
     screenReader.pitch = 1; // Set the speech pitch to 1
@@ -55,6 +51,8 @@ export function initScreenReader() {
             readNextWord();
         }
     };
+
+    return screenReader;
 }
 
 // Read the next word
@@ -63,8 +61,7 @@ export function readNextWord() {
         return;
     }
     const word = words[currentWordIndex];
-    screenReader.text = word;
-    console.log("Reading word:", word);
+    const screenReader = new SpeechSynthesisUtterance(word);
     window.speechSynthesis.speak(screenReader);
 
     highlightCurrentWord();
@@ -83,83 +80,51 @@ export function highlightCurrentWord() {
         if (autoScrollEnabled) {
             currentWordElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-
-        console.log("Highlighted word:", currentWordElement.textContent);
     }
 }
 
-// Event listener for the play button
-playButton.addEventListener('click', () => {
-    console.log("Play button clicked");
-    initScreenReader();
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    renderTextSections(quizData);
+});
+
+document.getElementById('play-button').addEventListener('click', () => {
+    const screenReader = initScreenReader();
     readNextWord();
     setAutoScroll(true); // Enable auto-scroll when playing
 });
 
-// Event listener for the pause button
-pauseButton.addEventListener('click', () => {
-    console.log("Pause button clicked");
+document.getElementById('pause-button').addEventListener('click', () => {
     window.speechSynthesis.pause();
     setAutoScroll(false); // Disable auto-scroll when pausing
 });
 
-// Event listener for the reset button
-resetButton.addEventListener('click', () => {
-    console.log("Reset button clicked");
+document.getElementById('reset-button').addEventListener('click', () => {
     window.speechSynthesis.cancel();
     currentWordIndex = 0;
     setAutoScroll(false); // Disable auto-scroll when resetting
 });
 
-// Event listener for the start-from button
-startFromButton.addEventListener('click', () => {
-    console.log("Start from button clicked");
-    const startIndex = parseInt(startFromInput.value, 10);
+document.getElementById('start-from-button').addEventListener('click', () => {
+    const startIndex = parseInt(document.getElementById('start-from-input').value, 10);
     currentWordIndex = startIndex - 1;
-    initScreenReader();
+    const screenReader = initScreenReader();
     readNextWord();
     setAutoScroll(true); // Enable auto-scroll when starting from a specific point
 });
 
-// Event listener for the auto-scroll dropdown button
-$('#auto-scroll-dropdown-button').on('click', function () {
-    console.log("Auto-scroll dropdown button clicked");
+document.getElementById('auto-scroll-dropdown-button').addEventListener('click', function () {
     setAutoScroll(!autoScrollEnabled);
 });
 
-// Event listener for the auto-scroll dropdown options
-$(document).on('click', '.auto-scroll-option', function () {
-    console.log("Auto-scroll dropdown option clicked");
-    const value = $(this).data('value');
-    if (value === 'on') {
-        setAutoScroll(true);
-    } else {
-        setAutoScroll(false);
-    }
-    $(toolbar).find('#auto-scroll-dropdown').toggleClass('hidden');
+document.querySelectorAll('.auto-scroll-option').forEach(option => {
+    option.addEventListener('click', function () {
+        const value = this.dataset.value;
+        setAutoScroll(value === 'on');
+        document.getElementById('auto-scroll-dropdown').classList.add('hidden');
+    });
 });
 
-// Event listener for closing the toolbar
-$('#close-toolbar-button').on('click', function () {
-    console.log("Close toolbar button clicked");
-    $(toolbar).find('#toolbar-inner').toggleClass('hidden');
+document.getElementById('close-toolbar-button').addEventListener('click', function () {
+    document.getElementById('toolbar-inner').classList.add('hidden');
 });
-
-// Function to enable or disable auto-scroll
-function setAutoScroll(enabled) {
-    autoScrollEnabled = enabled;
-    if (autoScrollEnabled) {
-        $(toolbar).find('#auto-scroll-button-text').remove();
-        $(toolbar).find('#auto-scroll-dropdown-button').text('Screenreader auto scroll: ');
-        $(toolbar).find('#auto-scroll-dropdown-button').append('<span id="auto-scroll-button-text" class="green">On</span>');
-        console.log("Auto-scroll is enabled");
-    } else {
-        $(toolbar).find('#auto-scroll-button-text').remove();
-        $(toolbar).find('#auto-scroll-dropdown-button').text('Screenreader auto scroll: ');
-        $(toolbar).find('#auto-scroll-dropdown-button').append('<span id="auto-scroll-button-text" class="red">Off');
-        console.log("Auto-scroll is disabled");
-    }
-}
-
-// Set the initial state of auto-scroll to "on"
-setAutoScroll(true);
