@@ -1,6 +1,5 @@
 describe('Employee Login', () => {
     beforeEach(() => {
-        cy.mockFirebase();
         cy.visit('http://127.0.0.1:5500/public/login_employee.html');
     });
 
@@ -9,27 +8,21 @@ describe('Employee Login', () => {
     });
 
     it('should allow an employee user to log in', () => {
-        cy.get('#email-user-login').type('editor@gmail.co');
-        cy.get('#password-user-login').type('123456');
-        cy.get('#login-button').click();
+        cy.login('editor@gmail.co', '123456', 3);
 
-        cy.url().should('include', '/main_menu.html');
+        cy.url().should('include', '/public/main_menu.html');
         cy.get('h1').should('contain', 'Main Menu');
     });
 
     it('should prevent access with valid credentials but incorrect role', () => {
-        cy.get('#email-user-login').type('taalvoorthuis@gmail.com');
-        cy.get('#password-user-login').type('654321');
-        cy.get('#login-button').click();
+        cy.login('taalvoorthuis@gmail.com', '654321', 1);
 
         cy.url().should('eq', 'http://127.0.0.1:5500/public/login_employee.html');
         cy.get('#notification-area').should('contain', 'Invalid user or user role.');
     });
 
     it('should show an error message for invalid login', () => {
-        cy.get('#email-user-login').type('invalid@example.com');
-        cy.get('#password-user-login').type('wrongpassword');
-        cy.get('#login-button').click();
+        cy.login('invalid@example.com', 'wrongpassword', 3);
 
         cy.url().should('eq', 'http://127.0.0.1:5500/public/login_employee.html');
         cy.get('#notification-area').should('contain', 'Invalid user or user role.');

@@ -113,7 +113,7 @@ onAuthStateChanged(auth, (user) => {
         // Call the function with the expected role for the parent dashboard (e.g., 1 and 2 for parents and organization users)
         redirectUserBasedOnRole([3, 4]);
     } else {
-        window.location.href = "login_parent_tvt.html";
+        window.location.href = "login_employee.html";
     }
 });
 
@@ -623,3 +623,4 @@ document.addEventListener('embeddedTextChange', () => {
 });
 
 setInterval(saveFormData, 5000);  // Autosave every 5 seconds
+

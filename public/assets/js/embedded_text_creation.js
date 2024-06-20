@@ -1,4 +1,3 @@
-// Import necessary modules from Firebase and other sources
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 import { availableFonts } from './fonts.js';
@@ -15,13 +14,15 @@ const firebaseConfig = {
     measurementId: "G-KHJXGLJM4Y"
 };
 
-// Initialize Firebase
+// Initialize Firebase app and storage
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 let storedRange = null;
 
+// Function to initialize embedded text creation
 export function initializeEmbeddedTextCreation(uploadImage) {
+    // Create sortable for the preview area
     const sortable = Sortable.create(document.getElementById('preview'), {
         delay: 1500,
         delayOnTouchOnly: true,
@@ -30,6 +31,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         onEnd: saveOrder
     });
 
+    // Function to save the order of sections
     function saveOrder() {
         const order = $("#preview .section-container").map(function () {
             return $(this).data('index');
@@ -60,10 +62,12 @@ export function initializeEmbeddedTextCreation(uploadImage) {
             };
         }).get();
 
+        // Save order and content to localStorage
         localStorage.setItem('sectionOrder', JSON.stringify(order));
         localStorage.setItem('sectionContent', JSON.stringify(content));
     }
 
+    // Function to load the order of sections from localStorage
     function loadOrder() {
         const order = JSON.parse(localStorage.getItem('sectionOrder'));
         const content = JSON.parse(localStorage.getItem('sectionContent'));
@@ -82,6 +86,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         }
     }
 
+    // Function to create the background toolbar
     function createBackgroundToolbar() {
         const toolbar = $('<div class="background-toolbar"></div>');
         const removeButton = $('<button class="remove-btn">&times;</button>');
@@ -90,6 +95,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
 
         toolbar.append(removeButton, zIndexDropdown, containmentDropdown);
 
+        // Change z-index based on dropdown value
         zIndexDropdown.change(function () {
             const zIndex = $(this).val() === 'foreground' ? 9999 : 1;
             const img = $(this).closest('.background-section').find('img');
@@ -98,11 +104,13 @@ export function initializeEmbeddedTextCreation(uploadImage) {
             }
         });
 
+        // Remove background image on button click
         removeButton.click(function () {
             $(this).closest('.background-section').find('.background-inner').empty().html('Click to add an image...');
             toolbar.css('visibility', 'hidden');
         });
 
+        // Change containment based on dropdown value
         containmentDropdown.change(function () {
             const container = $(this).closest('.background-section');
             const img = container.find('img');
@@ -127,6 +135,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         return toolbar;
     }
 
+    // Function to adjust the background height based on section content
     function adjustBackgroundHeight(sectionContent, toolbar, backgroundDiv, backgroundDiv1, backgroundDiv2) {
         if (toolbar && toolbar.length) {
             const toolbarHeight = toolbar.outerHeight();
@@ -142,6 +151,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         }
     }
 
+    // Function to add a new section
     function addSection(type, content = 'Edit this text...', background = null, borderColor = '#ddd', textColor = '#000', isBold = false) {
         const container = $('<div class="section-container"></div>');
         const section = $('<div class="section"></div>');
@@ -508,6 +518,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         return container;
     }
 
+    // Function to change the position of a section
     function changePosition(container, section, sectionContent, newType, backgroundDiv, backgroundDiv1, backgroundDiv2) {
         section.removeClass('left-section right-section middle-section');
         let backgroundImage1 = null;
@@ -634,25 +645,28 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         reorderSections();
     }
 
+    // Function to reattach event handlers to elements
     function reattachEventHandlers(section, sectionContent, toolbar) {
-        sectionContent.off('focus blur input');
-        sectionContent.on('focus', function () {
-            if ($(this).text() === sectionContent.attr('data-placeholder')) {
-                $(this).text('');
-                $(this).removeClass('placeholder');
-            }
-        });
+        if (sectionContent) {
+            sectionContent.off('focus blur input');
+            sectionContent.on('focus', function () {
+                if ($(this).text() === sectionContent.attr('data-placeholder')) {
+                    $(this).text('');
+                    $(this).removeClass('placeholder');
+                }
+            });
 
-        sectionContent.on('blur', function () {
-            if ($(this).text() === '') {
-                $(this).text(sectionContent.attr('data-placeholder'));
-                $(this).addClass('placeholder');
-            }
-        });
+            sectionContent.on('blur', function () {
+                if ($(this).text() === '') {
+                    $(this).text(sectionContent.attr('data-placeholder'));
+                    $(this).addClass('placeholder');
+                }
+            });
 
-        sectionContent.on('input', function () {
-            adjustBackgroundHeight($(this), toolbar, section.closest('.background-left'), section.closest('.background-middle-1'), section.closest('.background-middle-2'));
-        });
+            sectionContent.on('input', function () {
+                adjustBackgroundHeight($(this), toolbar, section.closest('.background-left'), section.closest('.background-middle-1'), section.closest('.background-middle-2'));
+            });
+        }
 
         toolbar.find('.bold-btn').off('click').click(function () {
             const selection = window.getSelection();
@@ -752,30 +766,38 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         });
     }
 
+    // Function to reorder sections based on index
     function reorderSections() {
         const sections = $('#preview .section-container').get();
         sections.sort((a, b) => $(a).data('index') - $(b).data('index'));
         $('#preview').append(sections);
     }
 
+    // Add new left section on button click
     $('#addLeft').click(function () {
         const index = $('#preview .section-container').length;
         const container = addSection('left');
         container.data('index', index);
         saveOrder();
     });
+
+    // Add new right section on button click
     $('#addRight').click(function () {
         const index = $('#preview .section-container').length;
         const container = addSection('right');
         container.data('index', index);
         saveOrder();
     });
+
+    // Add new middle section on button click
     $('#addMiddle').click(function () {
         const index = $('#preview .section-container').length;
         const container = addSection('middle');
         container.data('index', index);
         saveOrder();
     });
+
+    // Add new full section on button click
     $('#addFull').click(function () {
         const index = $('#preview .section-container').length;
         const container = addSection('full');
@@ -783,11 +805,13 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         saveOrder();
     });
 
+    // Log the preview content to the console
     $('#logContent').click(function () {
         const content = $("#preview").html();
         console.log('Preview Content:', content);
     });
 
+    // Initialize tooltips for elements with title attribute
     $('[title]').tooltip({
         show: {
             effect: "slideDown",
@@ -795,7 +819,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         }
     });
 
-    // Add font search bar
+    // Add font search bar to toolbar
     const fontSearchBar = document.createElement('input');
     fontSearchBar.setAttribute('list', 'fonts');
     fontSearchBar.setAttribute('placeholder', 'Search for fonts...');
@@ -804,6 +828,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
     const fontDataList = document.createElement('datalist');
     fontDataList.id = 'fonts';
 
+    // Populate font data list
     availableFonts.forEach(font => {
         const option = document.createElement('option');
         option.value = font;
@@ -814,6 +839,7 @@ export function initializeEmbeddedTextCreation(uploadImage) {
     embeddedTextToolbar.appendChild(fontSearchBar);
     embeddedTextToolbar.appendChild(fontDataList);
 
+    // Event listener for font selection
     fontSearchBar.addEventListener('input', (event) => {
         const selectedFont = event.target.value;
         if (availableFonts.includes(selectedFont)) {
@@ -826,10 +852,12 @@ export function initializeEmbeddedTextCreation(uploadImage) {
         }
     });
 
+    // Load saved order and set interval to save order periodically
     loadOrder();
     setInterval(saveOrder, 5000);
 }
 
+// Function to get the embedded text content
 export function getEmbeddedText() {
     return document.getElementById('preview').innerHTML;
 }
