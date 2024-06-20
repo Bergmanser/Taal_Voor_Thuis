@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             console.log("No user logged in");
             // Redirect to login page or show message
+            window.location.href = "employee_login.html";
         }
     });
 });

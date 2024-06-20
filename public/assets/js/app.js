@@ -93,7 +93,7 @@ $(document).ready(function () {
                 break;
             case 3: // admin
             case 4: // editor
-                window.location.href = 'login_employee_tvt.html';
+                window.location.href = 'login_employee.html';
                 break;
             default:
                 window.location.href = 'https://www.taalvoorthuis.nl';

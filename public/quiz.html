@@ -12,20 +12,8 @@
     <title>Singular Quiz Page</title>
 </head>
 <body>
-    <header class="sticky">
-        <nav id="navbar" class="nav">
-            <ul class="nav-list">
-                <li>
-                    <a href="student_dashboard.html">Dashboard</a>
-                </li>
-                <li>
-                    <a href="#">Profile</a>
-                </li>
-                <li>
-                    <a href="#">Logout</a>
-                </li>
-            </ul>
-        </nav>
+    <header>
+        <div id="header-container"></div>
     </header>
     <div class="content-wrapper">
         <div class="loading-indicator">
@@ -50,71 +38,50 @@
                         <div class="title" id="quiz-title"></div>
                     </div>
                     <div class="text-section-container" id="text-section-container"></div>
-                    <div class="screenreader-text" style="display:none;">
-                        <p>In de zomer is zonnebrandcrème <b>onmisbaar</b>, je ziet veel mensen om je heen het gebruiken. Dat is ook logisch, want in de zomer schijnt de zon vaak en wil iedereen tijd buiten doorbrengen. We weten ook dat je van te lang in de zon spelen, kunt verbranden. Om <b>dat</b> te voorkomen gebruiken we zonnebrandcrème. Alleen hoe zit het dan met de dagen waarop de zon niet schijnt? Dan is zonnebrandcrème toch helemaal niet nodig, zou je denken...</p>   <p>De zon is eigenlijk een soort ster, maar in plaats van 's nachts te twinkelen zoals de sterren die we aan de hemel zien, straalt de zon altijd fel licht en warmte uit. Naast licht en warmte zendt de zon <b>straling</b> uit. Deze bestaat eigenlijk uit kleine, onzichtbare deeltjes die van de zon afkomen en door de ruimte reizen, helemaal tot aan onze aarde! De zon zendt verschillende soorten stralen uit, waaronder UV-stralen. Deze stralen kunnen goed zijn voor ons omdat ze ons lichaam helpen vitamine D te maken, die belangrijk is voor onze botten en ons immuunsysteem. Maar te veel blootstelling aan UV-stralen kan schadelijk zijn voor onze huid en tot verbranding leiden.</p>   <p>Om toch van de zon te genieten zonder te verbranden, kunnen we onszelf beschermen met zonnebrandcrème. Deze crème bevat speciale ingrediënten die een onzichtbare laag op je huid vormen en schadelijke UV-stralen van de zon tegenhouden. Het is hierbij wel belangrijk dat je minstens 30 minuten voordat je naar buiten gaat de zonnebrandcrème aanbrengt, zodat het goed kan intrekken. <b>Ook</b> zal je rekening moeten houden met het kiezen van de juiste zonnebrandcrème. Op elke zonnebrandcrème staat een <b>factor</b> vermeld. Dit is eigenlijk de sterkte waarmee de zonnebrandcrème je huid beschermt. Vaak wordt dit aangegeven in ‘SPF’, die staat voor ‘Sun Protection Factor’. De SPF is een getal dat aangeeft hoeveel langer je in de zon kunt blijven zonder te verbranden in vergelijking met wanneer je geen zonnebrandcrème gebruikt. Tot slot moet je niet vergeten om zonnebrandcrème om het paar uur opnieuw in te smeren!</p>   <p>De zon zendt dus constant straling uit. Dat betekent dat je lichaam elke dag wordt blootgesteld aan UV-stralen, zelfs wanneer je de zon niet ziet schijnen of als het niet warm is. UV-stralen kunnen namelijk door bewolking en glas heen dringen. Het is dus belangrijk om dagelijks zonnebrandcrème te smeren om een gezonde huid te behouden. Dan is zonnebrandcrème in de winter toch niet zo gek als het klinkt!</p>
-                    </div>
-
-                    <!-- Adds a searchbar for the dictionay and browser search function -->
-                    <!-- <input type="text" id="search-box">
-                    <div id="overlay" style="display:none;">
-                    <div id="google-search-results"></div>
-                    </div> -->
+                    <div class="screenreader-text" style="display:none;"></div>
                     <div class="google-search-box">
                         <div class="gcse-search"></div>
                     </div>
-                    
-
-                    <!-- Add a toolbar for controlling the screen reader -->
                     <div class="screenreader-toolbar-container">
                         <button id="screenreader-button">Screenreader</button>
                         <div id="toolbar" class="hidden">
-                        <div class="toolbar-inner">
-                            <button id="play-button">Play</button>
-                            <button id="pause-button">Pause</button>
-                            <button id="reset-button">Reset</button>
-                            <input id="start-from-input" type="number" value="1" />
-                            <button id="start-from-button">Start from</button>
-                            <div class="auto-scroll-options">
-                                <button id="auto-scroll-dropdown-button" aria-haspopup="true" aria-expanded="false">
-                                    Screenreader auto scroll: <span id="auto-scroll-button-text"></span>
-                                  </button>
-                                <ul id="auto-scroll-dropdown" class="hidden">
-                                  <li><button class="auto-scroll-option" data-value="on"><span class="green">On</span></button></li>
-                                  <li><button class="auto-scroll-option" data-value="off"><span class="red">off</span></button></li>
-                                </ul>
-                              </div>
-                            <button id="close-toolbar-button">Close</button>
-                        </div>
+                            <div class="toolbar-inner">
+                                <button id="play-button">Play</button>
+                                <button id="pause-button">Pause</button>
+                                <button id="reset-button">Reset</button>
+                                <input id="start-from-input" type="number" value="1" />
+                                <button id="start-from-button">Start from</button>
+                                <div class="auto-scroll-options">
+                                    <button id="auto-scroll-dropdown-button" aria-haspopup="true" aria-expanded="false">
+                                        Screenreader auto scroll: <span id="auto-scroll-button-text"></span>
+                                    </button>
+                                    <ul id="auto-scroll-dropdown" class="hidden">
+                                        <li><button class="auto-scroll-option" data-value="on"><span class="green">On</span></button></li>
+                                        <li><button class="auto-scroll-option" data-value="off"><span class="red">Off</span></button></li>
+                                    </ul>
+                                </div>
+                                <button id="close-toolbar-button">Close</button>
+                            </div>
                         </div>
                     </div>
-                                        
                     <div class="embedded-text-section">
                         <div class="embedded-text" id="embedded-text"></div>
                     </div>
                     <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
                 </div>
-            
                 <div class="quiz-window-container hidden">
                     <div class="quiz-window" id="quiz-window">
-                        <!-- <div id="slider-container">
-                            <div id="range-slider"></div>
-                        </div> -->
                         <div class="quiz-window-header" id="quiz-window-header">
                             <div class="question-number" id="question-number"></div>
                             <button class="quiz-window-close btn btn-primary" id="quiz-window-close">X</button>
                         </div>
                         <div class="quiz-window-content">
                             <div class="question-window-title" id="question-window-title"></div>
-                            
-                            <div class="question-container" id="question-container">
-                                
-                            </div>
-                            <!-- <div class="quiz-window-hint" id="quiz-window-hint"></div> -->
+                            <div class="question-container" id="question-container"></div>
                             <div class="question-text"></div>
                             <div class="answer-container"></div>
                             <div class="hint-container"></div>
                             <div class="correct-answer-container"></div>
-                            <!-- <div class="quiz-window-answer" id="quiz-window-answer"></div> -->
                             <div class="quiz-window-controls">
                                 <button class="prev-question-btn" disabled="">Previous</button>
                                 <button class="next-question-btn">Next</button>
@@ -127,9 +94,12 @@
         </main>
     </div>
     <script src="https://cse.google.com/cse.js?cx=111c176d9efa64756"></script>
-    <!-- <script type="module" src="../public/assets/js/dictionary_search.js"></script> -->
     <script type="module" src="../public/assets/js/quiz.js"></script>
     <script type="module" src="../public/assets/js/screenreader_quiztext.js"></script>
-</body>
+    <script>
+        $(document).ready(function() {
+            $('#header-container').load('index.html');
+        });
+    </script>
 </body>
 </html>

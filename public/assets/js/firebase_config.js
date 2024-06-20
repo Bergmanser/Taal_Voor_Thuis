@@ -2,6 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+// "Unlike how API keys are typically used, API keys for Firebase services are not used to control access to backend resources; 
+// That can only be done with Firebase Security Rules,
+// (to control which end users can access resources) and Firebase App Check (to control which apps can access resources).""
+
 // Main Config for Project Plato
 const firebaseConfig = {
     apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
@@ -24,7 +28,7 @@ const db = getFirestore(app);
 // mainly used for seperation of adding a new student user without logging in the newly added-
 // student user in the as the currently logged in user.
 // There is nothing that can be done about this, that is just how firebase functions.
-// But by having a secondary project handle the addition of new students this is prevented
+// But by having a secondary project handle the addition of new students this is prevented.
 
 // Secondary Config for Project Plato
 const secondaryFirebaseConfig = {
