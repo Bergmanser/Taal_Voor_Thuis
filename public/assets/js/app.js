@@ -214,3 +214,23 @@ $(document).ready(function () {
         }
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const header = document.querySelector(".header");
+
+    const setStickyHeader = () => {
+        const sticky = header.offsetTop;
+        if (window.pageYOffset > sticky) {
+            header.classList.add("sticky");
+        } else {
+            header.classList.remove("sticky");
+        }
+    };
+
+    window.onscroll = function () {
+        setStickyHeader();
+    };
+
+    // Initial check
+    setStickyHeader();
+});

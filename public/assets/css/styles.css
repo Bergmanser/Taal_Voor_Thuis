@@ -1,20 +1,22 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  /* background-color: #B8B8FF; */
   background-color: #f5f5f5;
+  padding-top: 60px; /* Adjust this value to the height of your header */
 }
 
 .header {
-  position: sticky;
+  position: fixed;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   top: 0;
-  z-index: 9990;
+  z-index: 10000; /* Ensure high z-index */
   padding: 10px 20px;
   background-color: #161223;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 90px; /* Specify the height of your header */
 }
 
 .menu-btn, .logout-btn {
@@ -44,20 +46,20 @@ body {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9988;
+  z-index: 9990; /* Lower than header */
 }
 
 .menu {
   position: fixed;
   top: 0;
-  left: -500px;
+  left: -2000px;
   width: 30%;
   height: 100vh;
   background-color: #fff;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   transition: left 0.3s ease;
-  z-index: 9989;
+  z-index: 9991; /* Lower than header */
 }
 
 .menu ul {
@@ -80,18 +82,16 @@ body {
   left: 0;
 }
 
-/* Modal styles */
 .modal {
   display: none;
   position: fixed;
-  z-index: 1;
+  z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
   overflow: auto;
   background-color: rgba(0,0,0,0.4);
-  z-index: 1000;
 }
 
 .modal-content {

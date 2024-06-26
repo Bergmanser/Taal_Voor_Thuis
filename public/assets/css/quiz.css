@@ -98,7 +98,7 @@ ul {
 /* Hero */
 .hero {
   position: relative;
-  background-image: url(banner-image-url);
+  background-image: url(../images/MDB-Background.png);
   background-size: cover;
   background-position: center;
   height: 15vh;
@@ -338,8 +338,10 @@ ul {
 }
 
 .quiz-window-container {
-  top: 0;
+  top: -9.5%;
   right: 0;
+  max-width: 100%;
+  min-width: none;
   height: 100%;
   z-index: 101;
   display: none;
@@ -922,7 +924,7 @@ ul {
       .google-search-box {
           /* position: sticky !important; */
           top: 10%;
-          z-index: 1000;
+          z-index: 101;
           /* border-color: 1px solid red; */
           width: 30%;
           position: fixed;

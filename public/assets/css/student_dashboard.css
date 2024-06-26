@@ -1,7 +1,4 @@
-/* CSS sources:
-https://personal-portfolio.freecodecamp.rocks */
-
-/* Custom properties/variables  */
+/* Custom properties/variables */
 :root {
   --main-white: #f0f0f0;
   --main-red: #be3144;
@@ -28,13 +25,12 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
-  }
-  
-  
-  main {
-    padding: 2rem;
-  }
-  
+}
+
+main {
+    /* padding: 2rem; */
+}
+
 a {
   text-decoration: none;
   color: #333;
@@ -83,16 +79,164 @@ ul {
   background: var(--main-blue);
 }
 
-
-.hero {
-  margin-top: 2rem;
-  background-color: #4CAF50;
-  color: white;    padding: 2rem;
-  text-align: center;
-  margin-bottom: 2rem;
+/* Parallax Hero Section */
+.parallax-container {
+    position: relative;
+    height: 30vh;
+    overflow: hidden;
 }
-  
-  .card {
+
+.parallax-background {
+    background-image: url('../images/MDB-Background.png');
+    height: 200%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transform: translateY(-25%);
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.stat-tracker-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin: 20px;
+}
+
+.chart-container {
+    position: relative;
+    width: 40%;
+    height: auto;
+}
+
+#averageScoreChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#average-score-text {
+    position: absolute;
+    top: 53%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    font-weight: bold;
+    /* color: #ffffff;
+    text-shadow: 
+        -2px -2px 0 #000,  
+         2px -2px 0 #000,
+        -2px  2px 0 #000,
+         2px  2px 0 #000,
+        -2px  0px 0 #000,
+         2px  0px 0 #000,
+         0px -2px 0 #000,
+         0px  2px 0 #000,
+        -2px -1px 0 #000,  
+         2px -1px 0 #000,
+        -2px  1px 0 #000,
+         2px  1px 0 #000,
+        -1px -2px 0 #000,  
+         1px -2px 0 #000,
+        -1px  2px 0 #000,
+         1px  2px 0 #000; */
+
+}
+
+.no-data-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    color: gray;
+    text-align: center;
+}
+
+.recent-scores-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.score-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+.score-card .score-title {
+    background-color: #45567d;
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+.score-card .score-values {
+    background-color: #e3f2fd;
+    font-size: 1.25em;
+    padding: 1rem;
+    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+[data-subject="woordenschat"] .score-title {
+    background-color: #5a92d6;
+}
+
+[data-subject="woordenschat"] .score-values {
+    background-color: #d4e8ff;
+}
+
+[data-subject="samenvatten"] .score-title {
+    background-color: #5ad675;
+}
+
+[data-subject="samenvatten"] .score-values {
+    background-color: #d4ffdf;
+}
+
+[data-subject="verwijs-signaalwoorden"] .score-title {
+    background-color: #d6a25a;
+}
+
+[data-subject="verwijs-signaalwoorden"] .score-values {
+    background-color: #ffe8d4;
+}
+
+[data-subject="grammatica"] .score-title {
+    background-color: #b75ad6;
+}
+
+[data-subject="grammatica"] .score-values {
+    background-color: #f4d4ff;
+}
+
+[data-subject="anders"] .score-title {
+    background-color: #d65a5a;
+}
+
+[data-subject="anders"] .score-values {
+    background-color: #ffd4d4;
+}
+
+.card {
     width: 100%;
     max-width: 300px;
     margin: 1rem;
@@ -100,31 +244,31 @@ ul {
     border-radius: 4px;
     overflow: hidden;
     background-color: #cdcdcd;
-  }
-  
-  .card-img-top {
+}
+
+.card-img-top {
     width: 100%;
     height: 200px;
     object-fit: cover;
-  }
-  
-  .card-body {
+}
+
+.card-body {
     padding: 1.25rem;
-  }
-  
-  .card-title {
-    margin-bottom:0.5rem;
+}
+
+.card-title {
+    margin-bottom: 0.5rem;
     font-size: 1.2rem;
     font-weight: 600;
-  }
-  
-  .card-text {
+}
+
+.card-text {
     margin-bottom: 1rem;
     font-size: 1.1rem;
     color: #666;
-  }
+}
 
-  .quiz-container {
+.quiz-container {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
@@ -170,22 +314,3 @@ ul {
     background-color: #cccccc;
     cursor: not-allowed;
 }
-
-  
-  /* @media (min-width: 768px) {
-    .card {
-      width: calc(50% - 2rem);
-    }
-  }
-  
-  @media (min-width: 992px) {
-    .card {
-      width: calc(33.333% - 2rem);
-    }
-  }
-  
-  @media (min-width: 1200px) {
-    .card {
-      width: calc(25% - 2rem);
-    }
-  } */

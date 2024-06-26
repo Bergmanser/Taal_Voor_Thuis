@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./assets/css/student_dashboard.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
     <title>Quiz Student Dashboard</title>
 </head>
 <body>
@@ -12,9 +20,35 @@
         <div id="header-container"></div>
     </header>
     <main>
-        <section class="hero">
-            <h2>Welcome to the Quiz Site!</h2>
-            <p>Select a quiz to start:</p>
+        <div class="parallax-container">
+            <div class="parallax-background"></div>
+            <div class="hero-content">
+                <h1>Welcome to the Quiz Site!</h1>
+                <p>Select a quiz to start:</p>
+            </div>
+        </div>
+        <section id="stat-tracker" class="stat-tracker-container">
+            <div class="stat-tracker-box">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div id="donut-chart" class="chart-container">
+                            <canvas id="averageScoreChart"></canvas>
+                            <div id="average-score-text">8.1</div>
+                            <div id="no-data-message" class="no-data-message d-none">"o wow so empty" or "Dit veld houd jouw gemiddeldes bij, maak eerst een van de opdrachten om deze om deze in te zien"</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div id="recent-scores" class="recent-scores-container">
+                            <!-- Recent scores will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+                <div id="subject-details" class="subject-details d-none">
+                    <h4 id="subject-name"></h4>
+                    <p id="average-with-hints"></p>
+                    <p id="average-without-hints"></p>
+                </div>
+            </div>
         </section>
         <section id="quizzes" class="quiz-container"></section>
         <div class="pagination">
@@ -26,9 +60,7 @@
     <script type="module" src="../public/assets/js/student_dashboard.js"></script>
     <script>
         $(document).ready(function() {
-            $('#header-container').load('index.html', function() {
-                $.getScript('app.js');
-            });
+            $('#header-container').load('index.html', function() { });
         });
     </script>
 </body>

@@ -16,7 +16,7 @@
         <div id="header-container"></div>
     </header>
     <div class="content-wrapper">
-        <div class="loading-indicator">
+        <!-- <div class="loading-indicator">
             <span class="si-icon si-icon-hourglass" data-icon-name="hourglass">
                 <svg height="64" version="1.1" width="64" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                     <desc>Created with Snap</desc>
@@ -27,7 +27,7 @@
                     </g>
                 </svg>
             </span>
-        </div>
+        </div> -->
         <main id="quiz-main">
             <div class="quiz-container"> 
                 <div id="slider-container">
@@ -69,26 +69,8 @@
                     </div>
                     <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
                 </div>
-                <div class="quiz-window-container hidden">
-                    <div class="quiz-window" id="quiz-window">
-                        <div class="quiz-window-header" id="quiz-window-header">
-                            <div class="question-number" id="question-number"></div>
-                            <button class="quiz-window-close btn btn-primary" id="quiz-window-close">X</button>
-                        </div>
-                        <div class="quiz-window-content">
-                            <div class="question-window-title" id="question-window-title"></div>
-                            <div class="question-container" id="question-container"></div>
-                            <div class="question-text"></div>
-                            <div class="answer-container"></div>
-                            <div class="hint-container"></div>
-                            <div class="correct-answer-container"></div>
-                            <div class="quiz-window-controls">
-                                <button class="prev-question-btn" disabled="">Previous</button>
-                                <button class="next-question-btn">Next</button>
-                            </div>
-                            <button class="submit-quiz-btn hidden" disabled>Submit Quiz</button>
-                        </div>
-                    </div>
+                <div class="quiz-window-container hidden" id="quiz-window-container">
+                    <!-- Placeholder for dynamic content -->
                 </div> 
             </div>
         </main>
@@ -99,6 +81,11 @@
     <script>
         $(document).ready(function() {
             $('#header-container').load('index.html');
+            $('#start-quiz-button').on('click', function() {
+                $('#quiz-window-container').load('quiz_question_proto.html', function() {
+                    $(this).removeClass('hidden');
+                });
+            });
         });
     </script>
 </body>

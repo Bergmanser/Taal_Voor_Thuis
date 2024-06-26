@@ -9,5 +9,5 @@ export const availableFonts = [
     'Baloo', 'Bungee', 'Cairo', 'IBM Plex Sans', 'Heebo', 'Red Hat Display',
     'Manrope', 'Saira', 'Space Mono', 'OpenDyslexic', 'Lexend Deca', 'Lexend Tera',
     'Lexend Giga', 'Lexend Mega', 'Lexend Peta', 'Lexend Zetta', 'Lexend Exa',
-    'Comic Sans MS', 'Arial', 'Verdana', 'Overlock'
+    'Comic Sans MS', 'Arial', 'Verdana', 'Overlock', 'calibri'
 ];
