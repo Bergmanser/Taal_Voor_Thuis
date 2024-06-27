@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="./assets/images/MeerDanBijles-Logo.png">
     <link rel="stylesheet" href="./assets/css/student_dashboard.css">
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -21,26 +22,32 @@
     </header>
     <main>
         <div class="parallax-container">
-            <div class="parallax-background"></div>
+            <div class="parallax-background">
+                <div class="parallax-image active" style="background-image: url('../public/assets/images/4k-Mysterious-Black-Hole-AI-Generated-4K-Desktop-Wallpaper.jpg');"></div>
+                <div class="parallax-image" style="background-image: url('../public/assets/images/archeron_shiro.jpeg');"></div>
+                <div class="parallax-image" style="background-image: url('../public/assets/images/void葬礼荧4 4k.jpeg');"></div>
+                <div class="parallax-image" style="background-image: url('../public/assets/images/chiori.jpeg');"></div>
+            </div>
             <div class="hero-content">
-                <h1>Welcome to the Quiz Site!</h1>
-                <p>Select a quiz to start:</p>
+                <h1>Welcome to Taal Voor Thuis!</h1>
+                <p>Select one of the available quizzes to start your learning endeavour!</p>
             </div>
         </div>
         <section id="stat-tracker" class="stat-tracker-container">
             <div class="stat-tracker-box">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-4">
                         <div id="donut-chart" class="chart-container">
                             <canvas id="averageScoreChart"></canvas>
-                            <div id="average-score-text">8.1</div>
-                            <div id="no-data-message" class="no-data-message d-none">"o wow so empty" or "Dit veld houd jouw gemiddeldes bij, maak eerst een van de opdrachten om deze om deze in te zien"</div>
+                            <div id="average-score-text"></div>
+                            <div id="no-data-message" class="no-data-message d-none">Come back later after having finished one of the exercises, Good Luck!</div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div id="recent-scores" class="recent-scores-container">
-                            <!-- Recent scores will be dynamically inserted here -->
-                        </div>
+                    <div class="col-md-4" id="dynamic-best-worst-scores">
+                        <!-- Best and Worst Scores will be dynamically inserted here -->
+                    </div>
+                    <div class="col-md-4" id="dynamic-recent-exercises">
+                        <!-- Recent exercises will be dynamically inserted here -->
                     </div>
                 </div>
                 <div id="subject-details" class="subject-details d-none">
@@ -50,7 +57,10 @@
                 </div>
             </div>
         </section>
-        <section id="quizzes" class="quiz-container"></section>
+        <div class="parallax-quiz-container">
+            <div class="parallax-quiz-background"></div>
+            <section id="quizzes" class="quiz-container"></section>
+        </div>
         <div class="pagination">
             <button id="prev-page" class="page-btn">Vorige</button>
             <span id="page-numbers"></span>

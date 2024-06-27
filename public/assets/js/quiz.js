@@ -173,3 +173,18 @@ window.addEventListener('message', (event) => {
         uploadQuizSummary(event.data.quizSummary);
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const startQuizButton = document.querySelector('.start-quiz-button');
+    const quizContainer = document.querySelector('.quiz-container');
+
+    if (startQuizButton) {
+        startQuizButton.addEventListener('click', () => {
+            // Change the grid template columns
+            quizContainer.classList.add('active');
+
+            // Hide the start quiz button
+            startQuizButton.classList.add('hidden');
+        });
+    }
+});

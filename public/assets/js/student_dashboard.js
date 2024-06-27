@@ -9,11 +9,11 @@ let currentPage = 1;
 const quizzesPerPage = 6;
 
 const subjectColors = {
-    woordenschat: '#e3f2fd',
-    samenvatten: '#e8f5e9',
-    'verwijs-signaalwoorden': '#fff3e0',
-    grammatica: '#f3e5f5',
-    anders: '#ffebee'
+    woordenschat: '#1A3A5F',  // Blue
+    samenvatten: '#5C7E9C',   // Muted Blue
+    'verwijs-signaalwoorden': '#D6A664', // Gold
+    grammatica: '#b75ad6',    // Purple
+    anders: '#C23A2b'         // Red
 };
 
 onAuthStateChanged(auth, (user) => {
@@ -33,28 +33,36 @@ async function fetchStudentData(userId) {
     if (studentDoc.exists()) {
         const studentData = studentDoc.data();
         const scores = [];
-        for (const [quiz, details] of Object.entries(studentData.quizzes)) {
-            scores.push({
-                title: details.title,
-                subject: details.type.toLowerCase(),
-                scoreWithHints: parseFloat(details.scoreWithHints),
-                scoreWithoutHints: parseFloat(details.scoreWithoutHints),
-                date: new Date(details.dateTime)
-            });
+        if (!studentData.quizzes || Object.keys(studentData.quizzes).length === 0) {
+            updateDashboard(scores);
+        } else {
+            for (const [quiz, details] of Object.entries(studentData.quizzes)) {
+                scores.push({
+                    title: details.title,
+                    subject: details.type.toLowerCase(),
+                    scoreWithHints: parseFloat(details.scoreWithHints),
+                    scoreWithoutHints: parseFloat(details.scoreWithoutHints),
+                    date: new Date(details.dateTime)
+                });
+            }
+            updateDashboard(scores);
         }
-        updateDashboard(scores);
     } else {
         console.log("No such document!");
     }
 }
 
 function updateDashboard(scores) {
+    const noDataMessage = document.getElementById('no-data-message');
     if (scores.length === 0) {
         document.getElementById('averageScoreChart').classList.add('d-none');
-        document.getElementById('no-data-message').classList.remove('d-none');
+        noDataMessage.classList.remove('d-none');
     } else {
+        document.getElementById('averageScoreChart').classList.remove('d-none');
+        noDataMessage.classList.add('d-none');
         updateChart(scores);
         updateRecentScores(scores);
+        updateBestWorstScores(scores);
     }
 }
 
@@ -92,8 +100,16 @@ function updateChart(scores) {
         }
     });
 
-    document.getElementById('average-score-text').innerText = calculateOverallAverage(scores).toFixed(1);
+    const overallAverageWithHints = calculateOverallAverageWithHints(scores);
+    const overallAverageWithoutHints = calculateOverallAverage(scores);
+
+    document.getElementById('average-score-text').innerHTML = `
+        <span data-tooltip="Total account average for each subject with hints">${overallAverageWithHints.toFixed(1)}</span>
+        <div class="divider"></div>
+        <span data-tooltip="Total account average for each subject without hints">${overallAverageWithoutHints.toFixed(1)}</span>
+    `;
 }
+
 
 function showSubjectDetails(subject, data) {
     document.getElementById('subject-name').innerText = `Subject: ${subject}`;
@@ -134,21 +150,77 @@ function calculateOverallAverage(scores) {
     return totalScore / scores.length;
 }
 
+function calculateOverallAverageWithHints(scores) {
+    const totalScore = scores.reduce((sum, score) => sum + score.scoreWithHints, 0);
+    return totalScore / scores.length;
+}
+
 function updateRecentScores(scores) {
+    const container = document.getElementById('dynamic-recent-exercises');
+    if (scores.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
     scores.sort((a, b) => b.date - a.date);
     const recentScores = scores.slice(0, 3);
 
-    const container = $('#recent-scores');
-    container.empty();
+    container.innerHTML = '<h5>The most recently finished exercises:</h5>';
 
     recentScores.forEach(score => {
-        container.append(`
+        container.innerHTML += `
             <div class="score-card" data-subject="${score.subject}">
-                <div class="score-title">${score.title}</div>
-                <div class="score-values">${score.scoreWithHints} | ${score.scoreWithoutHints}</div>
+                <div class="score-title" style="background-color: ${subjectColors[score.subject]}">${score.title}</div>
+                <div class="score-values">
+                    <span class="score with-hints" data-tooltip="Score with hints">${score.scoreWithHints}</span>
+                    <span class="score without-hints" data-tooltip="Score without hints">${score.scoreWithoutHints}</span>
+                </div>
             </div>
-        `);
+        `;
     });
+}
+
+function updateBestWorstScores(scores) {
+    if (scores.length === 0) return;
+
+    const container = document.getElementById('dynamic-best-worst-scores');
+    const averageScores = calculateAverageScores(scores);
+
+    let bestSubject = null;
+    let worstSubject = null;
+    let highestAverage = -Infinity;
+    let lowestAverage = Infinity;
+
+    for (const subject in averageScores.averagesWithoutHints) {
+        const average = averageScores.averagesWithoutHints[subject];
+        if (average > highestAverage) {
+            highestAverage = average;
+            bestSubject = subject;
+        }
+        if (average < lowestAverage) {
+            lowestAverage = average;
+            worstSubject = subject;
+        }
+    }
+
+    if (bestSubject !== null || worstSubject !== null) {
+        container.innerHTML = `
+            <div class="score-card" id="best-subject">
+                <div class="score-title" style="background-color: ${subjectColors[bestSubject]}">Best Subject: ${bestSubject}</div>
+                <div class="score-values">
+                    <span class="score with-hints" data-tooltip="Average score with hints">${averageScores.averagesWithHints[bestSubject].toFixed(1)}</span>
+                    <span class="score without-hints" data-tooltip="Average score without hints">${averageScores.averagesWithoutHints[bestSubject].toFixed(1)}</span>
+                </div>
+            </div>
+            <div class="score-card" id="worst-subject">
+                <div class="score-title" style="background-color: ${subjectColors[worstSubject]}">Subject with Room for Improvement: ${worstSubject}</div>
+                <div class="score-values">
+                    <span class="score with-hints" data-tooltip="Average score with hints">${averageScores.averagesWithHints[worstSubject].toFixed(1)}</span>
+                    <span class="score without-hints" data-tooltip="Average score without hints">${averageScores.averagesWithoutHints[worstSubject].toFixed(1)}</span>
+                </div>
+            </div>
+        `;
+    }
 }
 
 async function fetchQuizzes() {
@@ -220,9 +292,29 @@ function setupPagination() {
 }
 
 // parallax.js
-window.addEventListener('scroll', function() {
-    const parallax = document.querySelector('.parallax-background');
+window.addEventListener('scroll', function () {
+    const parallaxHero = document.querySelector('.parallax-background');
+    const parallaxQuiz = document.querySelector('.parallax-quiz-background');
     let scrollPosition = window.pageYOffset;
 
-    parallax.style.transform = 'translateY(' + scrollPosition * 0.5 + 'px)';
+    parallaxHero.style.transform = 'translateY(' + scrollPosition * 0.5 + 'px)';
+    parallaxQuiz.style.transform = 'translateY(' + scrollPosition * 0.3 + 'px)';
+});
+
+// carousel.js
+window.addEventListener('load', () => {
+    const images = document.querySelectorAll('.parallax-image');
+    let currentIndex = 0;
+    const duration = 4000; // 4 seconds
+    const transitionDuration = 1500; // 1.5 seconds
+
+    function changeBackground() {
+        images[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].classList.add('active');
+    }
+
+    setInterval(changeBackground, duration + transitionDuration);
+
+    images[currentIndex].classList.add('active');
 });
