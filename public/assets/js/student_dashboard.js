@@ -103,13 +103,13 @@ function updateChart(scores) {
     const overallAverageWithHints = calculateOverallAverageWithHints(scores);
     const overallAverageWithoutHints = calculateOverallAverage(scores);
 
+    document.getElementById('average-score-title').innerText = 'Total account average';
     document.getElementById('average-score-text').innerHTML = `
-        <span data-tooltip="Total account average for each subject with hints">${overallAverageWithHints.toFixed(1)}</span>
+        <span data-tooltip="With hints">${overallAverageWithHints.toFixed(1)}</span>
         <div class="divider"></div>
-        <span data-tooltip="Total account average for each subject without hints">${overallAverageWithoutHints.toFixed(1)}</span>
+        <span data-tooltip="Without hints">${overallAverageWithoutHints.toFixed(1)}</span>
     `;
 }
-
 
 function showSubjectDetails(subject, data) {
     document.getElementById('subject-name').innerText = `Subject: ${subject}`;

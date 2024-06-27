@@ -71,7 +71,7 @@
     display: block;
     font-size: 1.2rem;
     padding: 2rem;
-    color: var(--main-white);
+    color: var (--main-white);
   }
   
   .nav-list a:hover {
@@ -175,6 +175,21 @@
       height: 100% !important;
   }
   
+  #average-score-title {
+    position: absolute;
+    top: 33%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8em;
+    font-weight: bold;
+    color: var(--main-blue);
+    text-shadow: -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, -2px 0px 0 #fff, 2px 0px 0 #fff, 0px -2px 0 #fff, 0px 2px 0 #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
   #average-score-text {
       position: absolute;
       top: 50%;
@@ -210,17 +225,6 @@
       height: 100%;
       background-color: var(--main-blue);
   }
-  
-  /* #average-score-text span::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: -1.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.75rem;
-      color: var(--main-blue);
-      white-space: nowrap;
-  } */
   
   .no-data-message {
     display: flex;
