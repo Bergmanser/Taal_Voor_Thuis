@@ -235,13 +235,13 @@ async function fetchQuizzes() {
 function displayQuizzes() {
     const startIndex = (currentPage - 1) * quizzesPerPage;
     const endIndex = startIndex + quizzesPerPage;
-    const quizzesToDisplay = quizzes.slice(startIndex, endIndex);
+    const quizzesToDisplay = applyFilters(quizzes).slice(startIndex, endIndex);
 
     let cards = "";
     quizzesToDisplay.forEach((quizData) => {
         let subjectClass = 'unknown';
-        if (quizData.subject) {
-            subjectClass = quizData.subject.toLowerCase().replace(/\s/g, '-');
+        if (quizData.QuizType) {
+            subjectClass = quizData.QuizType.toLowerCase().replace(/\s/g, '-');
         }
         cards += `
             <div class="card subject-color-${subjectClass}">
@@ -249,7 +249,7 @@ function displayQuizzes() {
                 <div class="card-content">
                     <h5 class="card-title">${quizData.Title}</h5>
                     <p class="card-description">${quizData.Description}</p>
-                    <div class="card-footer">
+                    <div class="">
                         <button class="card-btn" data-quiz-id="${quizData.id}">Start Quiz</button>
                     </div>
                 </div>
@@ -278,7 +278,6 @@ function redirectToQuiz(quizId) {
     window.location.href = `quiz.html?id=${quizId}`;
 }
 
-
 function setupPagination() {
     const pageCount = Math.ceil(quizzes.length / quizzesPerPage);
     document.getElementById("page-numbers").innerText = `${currentPage} / ${pageCount}`;
@@ -300,6 +299,50 @@ function setupPagination() {
             setupPagination();
         }
     });
+}
+
+// Apply Filters immediately when any filter changes
+document.querySelectorAll('#quizTypeFilter, #sortOrderFilter, #quizGroupFilter, #questionTypeFilter').forEach(filterElement => {
+    filterElement.addEventListener('change', () => {
+        currentPage = 1;
+        displayQuizzes();
+        setupPagination();
+    });
+});
+
+function applyFilters(quizzes) {
+    const quizTypeFilter = document.getElementById("quizTypeFilter").value;
+    const sortOrderFilter = document.getElementById("sortOrderFilter").value;
+    const quizGroupFilter = document.getElementById("quizGroupFilter").value;
+    const questionTypeFilter = document.getElementById("questionTypeFilter").value;
+
+    let filteredQuizzes = quizzes;
+
+    if (quizTypeFilter) {
+        filteredQuizzes = filteredQuizzes.filter(quiz => quiz.QuizType === quizTypeFilter);
+    }
+
+    if (quizGroupFilter) {
+        filteredQuizzes = filteredQuizzes.filter(quiz => quiz.QuizGroupId === quizGroupFilter);
+    }
+
+    if (questionTypeFilter) {
+        filteredQuizzes = filteredQuizzes.filter(quiz => quiz.Questions.some(question => question.QuestionType === questionTypeFilter));
+    }
+
+    switch (sortOrderFilter) {
+        case "newFirst":
+            filteredQuizzes = filteredQuizzes.sort((a, b) => b.Created_at - a.Created_at);
+            break;
+        case "oldFirst":
+            filteredQuizzes = filteredQuizzes.sort((a, b) => a.Created_at - b.Created_at);
+            break;
+        case "random":
+            filteredQuizzes = filteredQuizzes.sort(() => Math.random() - 0.5);
+            break;
+    }
+
+    return filteredQuizzes;
 }
 
 // parallax.js

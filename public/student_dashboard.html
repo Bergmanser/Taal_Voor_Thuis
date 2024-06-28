@@ -60,6 +60,35 @@
         </section>
         <div class="parallax-quiz-container">
             <div class="parallax-quiz-background"></div>
+            <section id="filter-toolbar" class="filter-toolbar">
+                <select id="quizTypeFilter">
+                    <option value="">All Types</option>
+                    <option value="woordenschat">Woordenschat</option>
+                    <option value="samenvatten">Samenvatten</option>
+                    <option value="verwijswoorden&signaalwoorden">Verwijswoorden & Signaalwoorden</option>
+                    <option value="grammatica">Grammatica</option>
+                    <option value="anders">Anders</option>
+                </select>
+                <select id="sortOrderFilter">
+                    <option value="newFirst">New First</option>
+                    <option value="oldFirst">Old First</option>
+                    <option value="random">Random</option>
+                </select>
+                <select id="quizGroupFilter">
+                    <option value="">All Groups</option>
+                    <option value="3000">3000</option>
+                    <option value="4000">4000</option>
+                    <option value="5000">5000</option>
+                    <option value="6000">6000</option>
+                    <option value="7000">7000</option>
+                    <option value="8000">8000</option>
+                </select>
+                <select id="questionTypeFilter">
+                    <option value="">All Question Types</option>
+                    <option value="Multiple Choice">Multiple Choice</option>
+                    <!-- Future options can be added here -->
+                </select>
+            </section>
             <section id="quizzes" class="quiz-container"></section>
         </div>
         <div class="pagination">

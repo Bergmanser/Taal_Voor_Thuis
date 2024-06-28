@@ -563,3 +563,42 @@ ul {
     background-color: #cccccc;
     cursor: not-allowed;
 }
+
+/* Css related to filtering the quizcards */
+
+.filter-toolbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--main-gray);
+    color: white;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.filter-toolbar select {
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid var(--main-blue);
+}
+
+
+/* .filter-toolbar select,
+.filter-toolbar button {
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid var(--main-blue);
+} */
+
+.filter-toolbar button {
+    background-color: var(--main-blue);
+    color: white;
+    cursor: pointer;
+}
+
+.filter-toolbar button:hover {
+    background-color: var(--main-red);
+}
