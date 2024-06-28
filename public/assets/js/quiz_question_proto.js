@@ -48,6 +48,8 @@ const loadState = () => {
 const clearState = () => {
     localStorage.removeItem('quizState');
     console.log("State cleared from localStorage.");
+    currentQuestionIndex = 0;
+    attempts = {};
 };
 
 // Fetch quiz data
@@ -284,32 +286,28 @@ const showAnswer = () => {
 const endQuiz = () => {
     const endTime = new Date();
     const totalTime = endTime - startTime;
-    const scoreWithHints = calculateScore(true);
-    const scoreWithoutHints = calculateScore(false);
+    const scoreWithHints = formatScore(calculateScore(true));
+    const scoreWithoutHints = formatScore(calculateScore(false));
     const correctQuestions = Object.values(userResponses).filter(response => response !== undefined).length;
 
     console.log(`Score with hints: ${scoreWithHints}`);
     console.log(`Score without hints: ${scoreWithoutHints}`);
     console.log(`Total time: ${formatTime(totalTime)}`);
 
-    // Create an object with the required data
     quizSummary = {
         title: quizData.Title,
         groupId: quizData.QuizGroupId,
         type: quizData.QuizType,
         state: 'finished',
         time: formatTime(totalTime),
-        scoreWithoutHints: scoreWithoutHints.toFixed(1),
-        scoreWithHints: scoreWithHints.toFixed(1),
+        scoreWithoutHints: scoreWithoutHints,
+        scoreWithHints: scoreWithHints,
         correctQuestions,
         totalQuestions: quizData.length,
         dateTime: new Date().toISOString()
     };
 
-    // Log the quiz summary
     console.log('Quiz Summary:', quizSummary);
-
-    showQuizModal(scoreWithHints, scoreWithoutHints, formatTime(totalTime), correctQuestions, quizData.length);
 
     // Send quiz summary to parent window
     window.parent.postMessage({
@@ -318,7 +316,9 @@ const endQuiz = () => {
     }, '*');
 
     logEvent('Quiz Completed');
-    clearState(); // Clear state at the end of the quiz
+    clearState();
+
+    showQuizModal(quizSummary.scoreWithHints, quizSummary.scoreWithoutHints, quizSummary.time, quizSummary.correctQuestions, quizSummary.totalQuestions);
 };
 
 // Calculate score
@@ -333,6 +333,11 @@ const calculateScore = (withHints) => {
         }
     });
     return ((correctAnswers / totalQuestions) * 9 + 1);
+};
+
+// Format score
+const formatScore = (score) => {
+    return Math.round(score * 10) / 10;
 };
 
 // Format time
@@ -359,13 +364,6 @@ document.getElementById('prev-button').onclick = () => {
 
 document.getElementById('next-button').onclick = handleNextButtonClick;
 
-// document.getElementById('close-overlay-button').onclick = () => {
-//     document.getElementById('quiz-overlay').classList.add('hidden');
-//     document.getElementById('quiz-overlay').style.display = 'none'; // Ensure overlay is hidden when closed
-//     // Optionally reset quiz or navigate away
-// };
-
-// Add event listener to clear local storage button
 document.getElementById('clear-button').onclick = () => {
     clearState();
     alert('Local storage cleared.');
@@ -390,21 +388,7 @@ window.onload = () => {
     }
 };
 
-// Export the quizSummary object
-export { quizSummary };
-
-// New Overlay Functions
-
-function closeQuizModal() {
-    $('#quizOverlay').hide();
-    stopConfetti();
-    console.log("Confetti stopped and overlay hidden");
-    window.location.href = "student_dashboard.html"; // Redirect to student dashboard
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('.quiz-close').addEventListener('click', closeQuizModal);
-});
+// Overlay and Confetti Functions
 
 function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQuestions, totalQuestions) {
     $('#scoreWithHints').text(scoreWithHints);
@@ -413,17 +397,21 @@ function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQues
     $('#correctQuestions').text(correctQuestions);
     $('#totalQuestions').text(totalQuestions);
 
-    // Apply styles based on score values
     setCircleColor('#scoreWithHintsCircle', scoreWithHints);
     setCircleColor('#scoreWithoutHintsCircle', scoreWithoutHints);
-
-    // Set summary color
     setSummaryColor(correctQuestions, totalQuestions);
 
     $('#quizOverlay').show();
-    startConfetti(); // Start confetti when modal is shown
+    startConfetti();
     console.log("Confetti started and overlay displayed");
 }
+
+function closeQuizModal() {
+    $('#quizOverlay').hide();
+    stopConfetti();
+    window.location.href = "student_dashboard.html";
+}
+
 
 function setCircleColor(circleId, score) {
     const circle = $(circleId);
@@ -586,3 +574,7 @@ var removeConfetti; // call to stop the confetti animation and remove all confet
         }
     }
 })();
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.quiz-close').addEventListener('click', closeQuizModal);
+});

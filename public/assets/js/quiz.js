@@ -6,7 +6,6 @@ import { redirectUserBasedOnRole } from "./roleRedirect.js";
 
 export let quizData;
 
-// Applies predetermined css classes to the elements of the EmbeddedText
 const getCssClassForTag = (tag) => {
     const tagName = tag.toLowerCase();
     switch (tagName) {
@@ -148,17 +147,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// Function to clear the local storage and reset state
+const clearState = () => {
+    localStorage.removeItem('quizState');
+    console.log("State cleared from localStorage.");
+    currentQuestionIndex = 0;
+    attempts = {};
+};
+
 export async function uploadQuizSummary(quizSummary) {
     const user = auth.currentUser;
     if (user) {
         try {
             const userDocRef = doc(db, "studentdb", user.uid);
+            const quizKey = `${quizSummary.title}`;
             await setDoc(userDocRef, {
                 quizzes: {
-                    [quizSummary.title]: quizSummary
+                    [quizKey]: {
+                        dateTime: new Date().toISOString(),
+                        groupId: quizSummary.groupId,
+                        scoreWithHints: quizSummary.scoreWithHints,
+                        scoreWithoutHints: quizSummary.scoreWithoutHints,
+                        state: "finished",
+                        time: quizSummary.time,
+                        title: quizSummary.title,
+                        type: quizSummary.type
+                    }
                 }
             }, { merge: true });
             console.log("Quiz summary uploaded to Firestore:", quizSummary);
+
+            // Clear state and reset local storage after uploading quiz summary
+            clearState();
+            console.log("Local storage and quiz state cleared for next quiz.");
+
+            // Trigger confetti and show modal
+            triggerConfetti();
+            showQuizModal(quizSummary.scoreWithHints, quizSummary.scoreWithoutHints, quizSummary.time, quizSummary.correctQuestions, quizSummary.totalQuestions);
         } catch (error) {
             console.error("Error uploading quiz summary:", error);
         }
@@ -167,10 +192,28 @@ export async function uploadQuizSummary(quizSummary) {
     }
 }
 
-// Listen for quiz summary export
+function formatScore(score) {
+    return Math.round(score * 10) / 10;
+}
+
+function closeQuizModal() {
+    document.getElementById('quizOverlay').style.display = 'none';
+    window.location.href = "student_dashboard.html";
+}
+
+function triggerConfetti() {
+    // Placeholder for confetti animation implementation
+    // You can use an external library like 'canvas-confetti' for better effects
+    console.log("Confetti animation triggered");
+    startConfetti();
+}
+
 window.addEventListener('message', (event) => {
     if (event.data.type === 'quizSummary') {
-        uploadQuizSummary(event.data.quizSummary);
+        const quizSummary = event.data.quizSummary;
+        quizSummary.scoreWithHints = formatScore(quizSummary.scoreWithHints);
+        quizSummary.scoreWithoutHints = formatScore(quizSummary.scoreWithoutHints);
+        uploadQuizSummary(quizSummary);
     }
 });
 
@@ -180,11 +223,188 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (startQuizButton) {
         startQuizButton.addEventListener('click', () => {
-            // Change the grid template columns
             quizContainer.classList.add('active');
-
-            // Hide the start quiz button
             startQuizButton.classList.add('hidden');
         });
     }
 });
+
+function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQuestions, totalQuestions) {
+    $('#scoreWithHints').text(scoreWithHints);
+    $('#scoreWithoutHints').text(scoreWithoutHints);
+    $('#totalTime').text(totalTime);
+    $('#correctQuestions').text(correctQuestions);
+    $('#totalQuestions').text(totalQuestions);
+
+    // Apply styles based on score values
+    setCircleColor('#scoreWithHintsCircle', scoreWithHints);
+    setCircleColor('#scoreWithoutHintsCircle', scoreWithoutHints);
+
+    // Set summary color
+    setSummaryColor(correctQuestions, totalQuestions);
+
+    $('#quizOverlay').show();
+    console.log("Confetti started and overlay displayed");
+}
+
+function setCircleColor(circleId, score) {
+    const circle = $(circleId);
+    const coloredRing = circle.find('.colored-ring');
+    circle.removeClass('gold-ring pulsating-glow');
+    circle.find('.olive-crown').remove();
+    coloredRing.css('border-color', 'transparent');
+
+    if (score === 10) {
+        circle.addClass('gold-ring pulsating-glow');
+        circle.append('<img src="../public/assets/images/olive_crown.png" class="olive-crown" alt="Olive Crown">');
+        coloredRing.css('border-color', 'gold');
+    } else if (score >= 5.5 && score <= 9.9) {
+        coloredRing.css('border-color', 'green');
+    } else {
+        coloredRing.css('border-color', 'crimson');
+    }
+}
+
+function setSummaryColor(correctQuestions, totalQuestions) {
+    const summary = $('#correctQuestions');
+    if (correctQuestions >= totalQuestions / 2) {
+        summary.css('color', 'green');
+    } else {
+        summary.css('color', 'crimson');
+    }
+}
+
+// Confetti code
+var maxParticleCount = 150; // set max confetti count
+var particleSpeed = 2; // set the particle animation speed
+var startConfetti; // call to start confetti animation
+var stopConfetti; // call to stop adding confetti
+var toggleConfetti; // call to start or stop the confetti animation depending on whether it's already running
+var removeConfetti; // call to stop the confetti animation and remove all confetti immediately
+
+(function () {
+    startConfetti = startConfettiInner;
+    stopConfetti = stopConfettiInner;
+    toggleConfetti = toggleConfettiInner;
+    removeConfetti = removeConfettiInner;
+    var colors = ["DodgerBlue", "OliveDrab", "Gold", "Pink", "SlateBlue", "LightBlue", "Violet", "PaleGreen", "SteelBlue", "SandyBrown", "Chocolate", "Crimson"];
+    var streamingConfetti = false;
+    var animationTimer = null;
+    var particles = [];
+    var waveAngle = 0;
+
+    function resetParticle(particle, width, height) {
+        particle.color = colors[(Math.random() * colors.length) | 0];
+        particle.x = Math.random() * width;
+        particle.y = Math.random() * height - height;
+        particle.diameter = Math.random() * 10 + 5;
+        particle.tilt = Math.random() * 10 - 10;
+        particle.tiltAngleIncrement = Math.random() * 0.07 + 0.05;
+        particle.tiltAngle = 0;
+        return particle;
+    }
+
+    function startConfettiInner() {
+        console.log("Starting confetti animation");
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        window.requestAnimFrame = (function () {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function (callback) {
+                    return window.setTimeout(callback, 16.6666667);
+                };
+        })();
+        var canvas = document.getElementById("confetti-canvas");
+        if (canvas === null) {
+            canvas = document.createElement("canvas");
+            canvas.setAttribute("id", "confetti-canvas");
+            canvas.setAttribute("style", "display:block;z-index:999999;pointer-events:none");
+            document.body.appendChild(canvas);
+            canvas.width = width;
+            canvas.height = height;
+            window.addEventListener("resize", function () {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }, true);
+        }
+        var context = canvas.getContext("2d");
+        while (particles.length < maxParticleCount)
+            particles.push(resetParticle({}, width, height));
+        streamingConfetti = true;
+        if (animationTimer === null) {
+            (function runAnimation() {
+                context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+                if (particles.length === 0)
+                    animationTimer = null;
+                else {
+                    updateParticles();
+                    drawParticles(context);
+                    animationTimer = requestAnimFrame(runAnimation);
+                }
+            })();
+        }
+    }
+
+    function stopConfettiInner() {
+        console.log("Stopping confetti animation");
+        streamingConfetti = false;
+    }
+
+    function removeConfettiInner() {
+        stopConfetti();
+        particles = [];
+        console.log("Confetti removed");
+    }
+
+    function toggleConfettiInner() {
+        if (streamingConfetti)
+            stopConfettiInner();
+        else
+            startConfettiInner();
+    }
+
+    function drawParticles(context) {
+        var particle;
+        var x;
+        for (var i = 0; i < particles.length; i++) {
+            particle = particles[i];
+            context.beginPath();
+            context.lineWidth = particle.diameter;
+            context.strokeStyle = particle.color;
+            x = particle.x + particle.tilt;
+            context.moveTo(x + particle.diameter / 2, particle.y);
+            context.lineTo(x, particle.y + particle.tilt + particle.diameter / 2);
+            context.stroke();
+        }
+    }
+
+    function updateParticles() {
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var particle;
+        waveAngle += 0.01;
+        for (var i = 0; i < particles.length; i++) {
+            particle = particles[i];
+            if (!streamingConfetti && particle.y < -15)
+                particle.y = height + 100;
+            else {
+                particle.tiltAngle += particle.tiltAngleIncrement;
+                particle.x += Math.sin(waveAngle);
+                particle.y += (Math.cos(waveAngle) + particle.diameter + particleSpeed) * 0.5;
+                particle.tilt = Math.sin(particle.tiltAngle) * 15;
+            }
+            if (particle.x > width + 20 || particle.x < -20 || particle.y > height) {
+                if (streamingConfetti && particles.length <= maxParticleCount)
+                    resetParticle(particle, width, height);
+                else {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+    }
+})();

@@ -69,7 +69,7 @@ $(document).ready(function () {
                 break;
             case 1: // private
             case 2: // business
-                window.location.href = 'parent_dashboard.html';
+                window.location.href = 'parent_overview.html';
                 break;
             case 3: // admin
             case 4: // editor

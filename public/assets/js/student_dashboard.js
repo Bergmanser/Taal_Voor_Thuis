@@ -11,7 +11,7 @@ const quizzesPerPage = 6;
 const subjectColors = {
     woordenschat: '#1A3A5F',  // Blue
     samenvatten: '#5C7E9C',   // Muted Blue
-    'verwijs-signaalwoorden': '#D6A664', // Gold
+    'verwijswoorden&signaalwoorden': '#D6A664', // Gold
     grammatica: '#b75ad6',    // Purple
     anders: '#C23A2b'         // Red
 };
@@ -239,12 +239,22 @@ function displayQuizzes() {
 
     let cards = "";
     quizzesToDisplay.forEach((quizData) => {
+        let subjectClass = 'unknown';
+        if (quizData.subject) {
+            subjectClass = quizData.subject.toLowerCase().replace(/\s/g, '-');
+        }
         cards += `
-            <div class="card">
+            <div class="card subject-color-${subjectClass}">
                 <img class="card-img-top" src="${quizData.Banner}" alt="Quiz banner">
-                <div class="card-body">
+                <div class="card-content">
                     <h5 class="card-title">${quizData.Title}</h5>
-                    <button class="btn btn-primary card-btn" data-quiz-id="${quizData.id}">Start Quiz</button>
+                    <p class="card-description">${quizData.Description}</p>
+                    <div class="card-footer">
+                        <button class="card-btn" data-quiz-id="${quizData.id}">Start Quiz</button>
+                    </div>
+                </div>
+                <div class="overlay">
+                    <button class="card-btn" data-quiz-id="${quizData.id}">Start Quiz</button>
                 </div>
             </div>
         `;
@@ -267,6 +277,7 @@ function setupQuizButtons() {
 function redirectToQuiz(quizId) {
     window.location.href = `quiz.html?id=${quizId}`;
 }
+
 
 function setupPagination() {
     const pageCount = Math.ceil(quizzes.length / quizzesPerPage);

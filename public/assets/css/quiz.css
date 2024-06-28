@@ -38,6 +38,7 @@ main {
   align-items: center;
   padding: 0 0 0 5rem;
   position: relative;
+  padding-top: 8em;
 }
 
 a {
@@ -108,7 +109,7 @@ ul {
   position: relative;
   font-family: 'Tomorrow', sans-serif;
   font-weight: 700;
-  color: #6b4c83;
+  color: #1a3a5f;
   padding: 1.4rem;
   margin: 0;
   text-align: center;
@@ -273,7 +274,7 @@ ul {
   cursor: not-allowed;
 }
 
-.quiz-window-hint {
+/* .quiz-window-hint {
   color: #6c757d;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -414,7 +415,7 @@ ul {
   padding: 10px;
   margin-bottom: 10px;
   color: #fff;
-}
+} */
 
 .text-section-container, .text-section, .text-section-white-space {
   box-sizing: border-box;
@@ -804,5 +805,3 @@ ul {
 .gsc-search-button-v2 {
   display: none;
 }
-
-
