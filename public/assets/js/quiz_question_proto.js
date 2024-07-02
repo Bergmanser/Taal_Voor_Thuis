@@ -404,14 +404,23 @@ function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQues
     $('#quizOverlay').show();
     startConfetti();
     console.log("Confetti started and overlay displayed");
+
+    // Reattach the event listener every time the overlay is shown
+    const closeButton = document.getElementById('close-button');
+    if (closeButton) {
+        console.log("Close button found, adding event listener.");
+        closeButton.addEventListener('click', closeQuizModal);
+    } else {
+        console.error("Close button not found.");
+    }
 }
 
 function closeQuizModal() {
+    console.log("Close button clicked"); // Log to check if the click is registered
     $('#quizOverlay').hide();
     stopConfetti();
     window.location.href = "student_dashboard.html";
 }
-
 
 function setCircleColor(circleId, score) {
     const circle = $(circleId);
@@ -578,3 +587,4 @@ var removeConfetti; // call to stop the confetti animation and remove all confet
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('.quiz-close').addEventListener('click', closeQuizModal);
 });
+

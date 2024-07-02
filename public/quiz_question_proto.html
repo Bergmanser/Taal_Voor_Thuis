@@ -229,6 +229,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 24px;
+            z-index: 1001; /* Ensure button is on top */
         }
         .quiz-close:hover {
             background: #0056b3;
@@ -307,7 +308,7 @@
     <div id="quiz-container">
         <div id="quiz-header">
             <h2 id="quiz-title"></h2>
-            <button id="clear-button" class="hidden">Clear Local Storage</button>
+            <button id="clear-button" class="">Clear Local Storage</button>
         </div>
         <div id="question-container">
             <div id="question-tracker"></div>
@@ -347,12 +348,35 @@
             <div class="timer">
                 <span id="totalTime">3:41</span>
             </div>
-            <!-- <button class="quiz-close" onclick="closeQuizModal()">Close</button> -->
-            <!-- <div class="quiz-close btn btn-primary">Close</div> -->
+            <button id="close-button" class="quiz-close btn btn-primary">Close</button>
         </div>
     </div>
     
     <canvas id="confetti-canvas"></canvas>
     <script type="module" src="./assets/js/quiz_question_proto.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ensure event listener is attached when DOM is fully loaded
+            const closeButton = document.getElementById('close-button');
+            if (closeButton) {
+                console.log("Attaching event listener to close button.");
+                closeButton.addEventListener('click', closeQuizModal);
+            } else {
+                console.error("Close button not found.");
+            }
+        });
+
+        function closeQuizModal() {
+            console.log("Close button clicked"); // Log to check if the click is registered
+            $('#quizOverlay').hide();
+            // stopConfetti(); // Stop confetti is currently uncommted because the related error is interfering with the redirect
+            window.location.href("student_dashboard.html");
+
+            // Add a slight delay to ensure overlay hide completes before redirect
+            // setTimeout(() => {
+            //     window.location.assign("student_dashboard.html");
+            // }, 300);
+        }
+    </script>
 </body>
 </html>

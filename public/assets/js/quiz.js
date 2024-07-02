@@ -225,6 +225,12 @@ document.addEventListener('DOMContentLoaded', () => {
         startQuizButton.addEventListener('click', () => {
             quizContainer.classList.add('active');
             startQuizButton.classList.add('hidden');
+
+            // Scroll to the top of the page
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth' // Optional: Adds a smooth scrolling animation
+            });
         });
     }
 });

@@ -88,6 +88,16 @@ document.getElementById('login-button').addEventListener('click', async () => {
     }
 });
 
+// Add keypress event listener to trigger login on Enter key press
+const loginFormInputs = document.querySelectorAll('.form-content input');
+loginFormInputs.forEach(input => {
+    input.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            document.getElementById('login-button').click();
+        }
+    });
+});
+
 // Event listener for enabling/disabling the reset button based on email input
 document.getElementById('reset-email').addEventListener('input', () => {
     const email = document.getElementById('reset-email').value;

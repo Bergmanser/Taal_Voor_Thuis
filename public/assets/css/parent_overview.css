@@ -13,184 +13,161 @@ body {
     padding: 20px;
 }
 
+h4 {
+    color: #1A3A5F;
+}
+
 .table-responsive {
-    width: 100%;
+    margin-top: 20px;
 }
 
 table {
-    width: 100%; /* Ensure the table takes 100% width */
+    width: 100%;
     border-collapse: collapse;
 }
 
 th, td {
     padding: 10px;
-    border: 1px solid black;
     text-align: left;
 }
 
-th {
+/* Custom styles for answer sheets table */
+#answerSheetList th, #answerSheetList td {
+    border: none; /* Remove borders */
+}
+
+#answerSheetList th {
     background-color: #f2f2f2;
+    border-top: none; /* Remove top border */
 }
 
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-tr:hover {
-    background-color: #ddd;
-}
-
-td .row {
-    margin: 0; /* Ensure no margin around the row inside the td */
-}
-
-td .col-md-3 {
-    padding: 10px; /* Ensure consistent padding */
-}
-
-.btn {
-   
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1050; /* Ensure modal is above other content */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 10% auto; /* Adjust margin for better centering */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 60%; /* Make the modal slightly wider */
-    max-width: 600px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    z-index: 1060; /* Ensure modal content is above the background */
-}
-
-.close {
-    color: #aaaaaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-#childUserList {
-    display: block;
-    max-height: 400px; /* Adjust based on the height of 5 rows */
+.scrollable-table {
+    max-height: 300px; /* Adjust the height to display more rows */
     overflow-y: auto;
-    min-height: 400px; /* Set this to the height needed for 5 rows */
-    background-color: #f8f9fa; /* Light background to make it distinguishable even when empty */
 }
 
-.no-children {
+.scrollable-table tbody {
+    display: block;
+    height: 300px; /* Adjust the height to display more rows */
+    overflow-y: auto;
+}
+
+.scrollable-table thead,
+.scrollable-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.scrollable-table thead {
+    width: calc(100% - 1em);
+}
+
+/* Custom styles for answer sheets */
+.answer-sheet-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    height: 100%; /* Make the message stretch to fill the container */
-    background-color: #e0e0e0; /* Slightly darker grey for the message row */
-    color: white;
-    font-size: 16px;
-    text-align: center;
+    justify-content: space-between; /* Add spacing between title and button */
+    background-size: cover; /* Ensure the background covers the entire row */
+    background-position: center;
     padding: 20px;
+    margin-bottom: 0; /* Remove spacing between rows */
+    position: relative;
+    color: white; /* White text for better contrast */
+    background-repeat: no-repeat;
+    border-radius: 0; /* Remove border-radius */
+    cursor: pointer; /* Make entire row clickable */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    height: 120px; /* Increase height of the row */
 }
 
-/* Ensure welcome username has a lower z-index than the modal */
-#header {
+.answer-sheet-row::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Slightly darkened overlay */
+    border-bottom: 0.5px solid; /* Add bottom border */
+}
+
+.answer-sheet-row:hover::before {
+    background: rgba(0, 0, 0, 0.7); /* Darker overlay on hover */
+}
+
+.answer-sheet-row > * {
+    position: relative; /* Ensure content is above the overlay */
     z-index: 1;
 }
 
-#signupForm {
+.answer-sheet-row img {
+    display: none; /* Hide the img element since we use background image */
+}
+
+.answer-sheet-row div {
+    flex: 1;
+    font-size: 24px; /* Increase font size for title */
+    color: white; /* White text for better contrast */
     display: flex;
-    flex-direction: column;
+    align-items: center; /* Center vertically */
+    justify-content: flex-start; /* Align to the left */
 }
 
-#signupForm label {
-    margin-bottom: 5px;
-}
-
-#signupForm input[type="text"],
-#signupForm input[type="number"],
-#signupForm input[type="password"] {
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-#signupForm input[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
+.details-button {
+    padding: 6px 12px;
+    background-color: #1A3A5F;
+    color: #fff;
     border: none;
-    padding: 12px 20px;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin-top: 10px;
+    border-radius: 4px;
     cursor: pointer;
+    z-index: 1; /* Ensure button is above the overlay */
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center;
 }
 
-#children-table {
-    width: 100%;
-    border-collapse: collapse;
+.details-button:hover {
+    background-color: #163E73;
 }
 
-#children-table th, #children-table td {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
-}
-
-#children-table th {
-    background-color: #f2f2f2;
-}
-
-#children-table tr:hover {
-    background-color: #f2f2f2;
-}
-
-#openSignupBtn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin-top: 10px;
-    cursor: pointer;
-    margin-bottom: 20px;
-}
-
-#search-bar {
+/* Custom styles for child user table */
+#childUserList td {
+    position: relative;
+    text-align: left; /* Align text to the left */
     padding: 10px;
-    width: 50%;
-    margin-bottom: 10px;
 }
 
-/* Custom class to override Bootstrap modal-backdrop */
-.custom-modal-backdrop {
-    z-index: 1040 !important; /* Ensure backdrop is below modal */
-    background-color: rgba(0, 0, 0, 0.5) !important; /* Optional: customize backdrop color */
+#childUserList td button {
+    float: right; /* Align buttons to the right */
+    margin-left: 10px;
 }
 
-/* Ensuring the modal itself is above the backdrop */
-.modal {
-    z-index: 1050 !important;
+#childUserList th {
+    text-align: left; /* Align text to the left */
 }
 
-/* Ensuring modal content is above the backdrop */
-.modal-content {
-    z-index: 1060 !important;
+#childUserList th:nth-child(2),
+#childUserList td:nth-child(2) {
+    text-align: right; /* Align "Actions" and buttons to the right */
+}
+
+/* Hover animation for child user table rows */
+#childUserList tr:hover {
+    background-color: #f2f2f2; /* Light grey background on hover */
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+/* Minimum size for empty tables */
+table tbody:empty::before {
+    content: 'No data available';
+    display: table-row;
+    height: 60px; /* Set minimum height */
+    text-align: center;
+    color: #999;
+}
+
+/* Increase modal width */
+.modal-lg {
+    max-width: 80%;
 }

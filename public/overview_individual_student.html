@@ -1,24 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../public/assets/css/parent_overview.css">
-  <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
-  <title>Student Overview Page Parent Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Individual Student Overview</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="./assets/css/overview_individual_student.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<h1>Hello World!</h1>
+    <div id="header-container"></div>
+    <div class="container mt-5">
+        <div id="header" class="sticky-top mb-3">
+            <button class="btn btn-secondary" id="backButton">Back to Parent Overview</button>
+            <h1 id="studentNameHeader">Student: [Student Name]</h1>
+        </div>
 
-  <!-- Bootstrap JS, Popper.js, and jQuery -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script type="module" src="../public/assets/js/overview_individual_student.js"></script>
+        <!-- Stat Tracker Section -->
+        <section id="stat-tracker" class="stat-tracker-container mb-4">
+            <div class="stat-tracker-box">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div id="donut-chart" class="chart-container">
+                            <canvas id="averageScoreChart"></canvas>
+                            <div id="average-score-title"></div>
+                            <div id="average-score-text"></div>
+                            <div id="no-data-message" class="no-data-message d-none">No data available yet. Please complete some quizzes.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" id="dynamic-best-worst-scores">
+                        <!-- Best and Worst Scores will be dynamically inserted here -->
+                    </div>
+                    <div class="col-md-4" id="dynamic-recent-exercises">
+                        <!-- Recent exercises will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz List Section -->
+        <section id="quiz-list" class="quiz-list-container">
+            <h2>Quizzes</h2>
+            <input type="text" id="quizSearchBar" class="form-control mb-3" placeholder="Search by title">
+            <div id="quizCards" class="quiz-cards-container">
+                <!-- Quiz cards will be dynamically inserted here -->
+            </div>
+        </section>
+    </div>
+    <script type="module" src="../public/assets/js/overview_individual_student.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#header-container').load('index.html', function() {});
+        });
+    </script>
 </body>
 </html>
-
