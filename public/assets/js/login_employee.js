@@ -78,7 +78,7 @@ document.getElementById('login-button').addEventListener('click', async () => {
 
             showToast("User logged in!");
             setTimeout(() => {
-                window.location.href = "main_menu.html";
+                window.location.href = "employee_dashboard.html";
             }, 2000);
         } else {
             showToast("Invalid user or user role.", false);

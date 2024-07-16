@@ -77,6 +77,10 @@ document.getElementById('login-button').addEventListener('click', async () => {
                     last_login: new Date()
                 });
 
+                await updateDoc(doc(db, "studentdb", user.uid), {
+                    last_login: new Date()
+                });
+
                 showToast("User logged in!");
                 setTimeout(() => {
                     window.location.href = "student_dashboard.html";

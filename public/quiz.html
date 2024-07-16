@@ -53,17 +53,28 @@
                         <div class="embedded-text" id="embedded-text"></div>
                     </div>
                     <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
+                    <div class="swap-layers-button" id="swap-layers-button" style="display: none;">Swap Layers</div>
+
                 </div>
                 <div class="quiz-window-container hidden" id="quiz-window-container">
                 </div> 
             </div>
         </main>
     </div>
-    <canvas id="confetti-canvas"></canvas>
+    <!-- <canvas id="confetti-canvas"></canvas> -->
     <script src="https://cse.google.com/cse.js?cx=111c176d9efa64756"></script>
     <script type="module" src="../public/assets/js/quiz.js"></script>
     <script type="module" src="../public/assets/js/screenreader_quiztext.js"></script>
     <script>
+        // Ensure showAnswerSheet is defined globally
+        window.showAnswerSheet = () => {
+            quizData.forEach((_, index) => {
+                currentQuestionIndex = index;
+                displayQuestion();
+            });
+            document.getElementById('next-button').classList.add('hidden');
+        };
+
         $(document).ready(function() {
             $('#header-container').load('index.html');
             $('#start-quiz-button').on('click', function() {
@@ -71,6 +82,18 @@
                     $(this).removeClass('hidden');
                 });
             });
+
+            // Check for 'answersheet' parameter in the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const isAnswerSheet = urlParams.get('answersheet') === 'true';
+
+            if (isAnswerSheet) {
+                $('#quiz-window-container').load('quiz_question_proto.html', function() {
+                    $(this).removeClass('hidden');
+                    // Trigger the answer sheet logic
+                    window.showAnswerSheet();
+                });
+            }
         });
     </script>
 </body>

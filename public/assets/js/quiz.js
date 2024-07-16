@@ -32,16 +32,162 @@ const getCssClassForTag = (tag) => {
     }
 };
 
+const highlightBoldWords = (text, boldWords) => {
+    boldWords.forEach(word => {
+        const regex = new RegExp(`(${word})`, 'gi');
+        text = text.replace(regex, '<strong>$1</strong>');
+    });
+    return text;
+};
+
+const parseNewEmbeddedTextFormat = (htmlDoc) => {
+    const sections = htmlDoc.querySelectorAll('.section-container');
+    const structuredData = [];
+
+    sections.forEach((section, index) => {
+        const sectionType = section.querySelector('.section').classList[1];
+        const content = section.querySelector('.section-content');
+        const boldWords = Array.from(content.querySelectorAll('b')).map(b => b.innerText);
+        const borderColor = content.style.borderColor || 'rgb(12, 157, 18)';
+        const textColor = content.style.color || 'rgb(0, 0, 0)';
+        const images = section.querySelectorAll('img');
+        const imageDetails = Array.from(images).map(img => ({
+            src: img.src,
+            positionOnPage: img.style.position || [],
+            backOrForeground: img.closest('.background-section').querySelector('.z-index-dropdown').value || 'background',
+            containedOrUncontained: img.closest('.background-section').querySelector('.containment-dropdown').value || 'contained'
+        }));
+
+        let textContent = content.innerHTML.replace(/<b>|<\/b>/g, '');
+        textContent = highlightBoldWords(textContent, boldWords);
+
+        structuredData.push({
+            SectionNumber: index + 1,
+            Boldwords: boldWords,
+            BorderColor: borderColor,
+            TextColor: textColor,
+            SectionType: sectionType,
+            Images: Array.from(images).map(img => img.src),
+            ImageDetails: imageDetails,
+            Text: textContent
+        });
+    });
+
+    console.log("Structured Data:", structuredData); // Added log statement
+
+    return structuredData;
+};
+
+
 const textContainer = document.querySelector('.text-section-container');
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log('Current User Email:', user.email);
-        redirectUserBasedOnRole([0])
+        const currentUserUid = user.uid;
+        const quizId = getQuizIdFromURL();
+        const docRef = doc(db, 'quizzes', quizId);
+
+        getDoc(docRef)
+            .then((docSnap) => {
+                if (docSnap.exists()) {
+                    quizData = docSnap.data();
+                    document.getElementById('quiz-title').innerText = quizData.quizTitle;
+
+                    if (quizData.embedTextHTML) {
+                        const htmlDoc = new DOMParser().parseFromString(quizData.embedTextHTML, 'text/html');
+                        const sections = htmlDoc.querySelectorAll('*');
+
+                        let currentSection;
+                        let previousElementClass = '';
+
+                        sections.forEach((section, index) => {
+                            const tagName = section.tagName.toLowerCase();
+                            const cssClass = getCssClassForTag(tagName);
+                            const content = section.innerHTML.trim();
+
+                            if (tagName === 'h1') {
+                                if (currentSection) {
+                                    textContainer.appendChild(currentSection);
+                                }
+                                currentSection = document.createElement('div');
+                                currentSection.className = 'text-section';
+                            }
+
+                            if (currentSection) {
+                                const element = document.createElement('div');
+                                element.className = cssClass;
+                                element.innerHTML = content;
+                                currentSection.appendChild(element);
+                            }
+
+                            if (index === sections.length - 1 && currentSection) {
+                                textContainer.appendChild(currentSection);
+                            }
+
+                            previousElementClass = cssClass;
+                        });
+
+                        document.getElementById('start-quiz-button').style.display = 'block';
+                    } else {
+                        document.querySelector('.embedded-text-section').innerText = 'No embedded text provided.';
+                    }
+
+                    const screenReaderToolbar = document.querySelector('.screenreader-toolbar-container');
+                    screenReaderToolbar.classList.remove('hidden');
+                    const autoScrollDropdownButton = document.getElementById('auto-scroll-dropdown-button');
+                    const autoScrollDropdown = document.getElementById('auto-scroll-dropdown');
+                    const autoScrollOptions = document.querySelectorAll('.auto-scroll-option');
+
+                    autoScrollDropdownButton.addEventListener('click', () => {
+                        const isExpanded = autoScrollDropdownButton.getAttribute('aria-expanded') === 'true';
+                        autoScrollDropdownButton.setAttribute('aria-expanded', !isExpanded);
+                        autoScrollDropdown.style.display = !isExpanded ? 'block' : 'none';
+                    });
+
+                    autoScrollOptions.forEach((option) => {
+                        option.addEventListener('click', (event) => {
+                            const value = event.target.getAttribute('data-value');
+                            autoScrollDropdownButton.setAttribute('aria-expanded', 'false');
+                            autoScrollDropdown.style.display = 'none';
+                            document.getElementById('auto-scroll-button-text').textContent = value.charAt(0).toUpperCase() + value.slice(1);
+                        });
+                    });
+
+                    const swapButton = document.createElement('button');
+                    swapButton.id = 'swap-layers-button';
+                    swapButton.textContent = 'Swap Layers';
+                    swapButton.style.display = 'none';
+                    swapButton.addEventListener('click', () => {
+                        document.querySelector('.text-section-container').classList.toggle('hidden');
+                        document.querySelector('.quiz-window-container').classList.toggle('hidden');
+                    });
+                    document.body.appendChild(swapButton);
+
+                    document.getElementById('start-quiz-button').addEventListener('click', () => {
+                        swapButton.style.display = 'block';
+                        document.querySelector('.text-section-container').classList.add('hidden');
+                        document.querySelector('.quiz-window-container').classList.remove('hidden');
+                        document.getElementById('start-quiz-button').classList.add('hidden');
+                        console.log('Start quiz button clicked, switched to top layer');
+                    });
+
+                } else {
+                    console.log('No such document!');
+                }
+            })
+            .catch((error) => {
+                console.log('Error getting document:', error);
+            });
     } else {
-        window.location.href = "login_student_tvt.html";
+        redirectUserBasedOnRole(null);
     }
 });
+
+const getQuizIdFromURL = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('quizId');
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -65,80 +211,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(quizData.EmbeddedText, 'text/html');
 
-            const textElements = htmlDoc.body.childNodes;
-            const textSections = [];
+            const oldFormat = !htmlDoc.querySelector('.section-container');
 
-            textElements.forEach((element) => {
-                if (element.nodeType === Node.TEXT_NODE) {
-                    const text = element.textContent;
-                    textSections.push(text);
-                } else if (element.tagName) {
-                    const tagName = element.tagName.toLowerCase();
-                    const html = element.outerHTML;
-                    textSections.push(html);
-                }
-            });
+            let processedTextSections;
+            if (oldFormat) {
+                processedTextSections = parseOldEmbeddedTextFormat(htmlDoc);
+            } else {
+                processedTextSections = parseNewEmbeddedTextFormat(htmlDoc);
+            }
 
-            const processedTextSections = textSections.map((text) => {
-                const htmlElement = htmlDoc.createElement('div');
-                htmlElement.innerHTML = text;
-                const elements = htmlElement.childNodes;
-
-                function applyCssClasses(element) {
-                    if (element.nodeType === Node.TEXT_NODE) {
-                    } else if (element.tagName) {
-                        const tagName = element.tagName.toLowerCase();
-                        const cssClass = getCssClassForTag(tagName);
-                        if (cssClass) {
-                            element.className = cssClass;
-                        }
-                        Array.prototype.forEach.call(element.childNodes, applyCssClasses);
-                    }
-                }
-
-                Array.prototype.forEach.call(elements, applyCssClasses);
-
-                return htmlElement.outerHTML;
-            });
-
-            const container = document.createElement('div');
-            container.className = 'text-section-container';
-
-            let previousHeight = 0;
-            processedTextSections.forEach((textSection, index) => {
-                const sectionContainer = document.createElement('div');
-                sectionContainer.className = 'text-section';
-                sectionContainer.innerHTML = textSection;
-
-                sectionContainer.style.maxWidth = '100%';
-
-                const whiteSpaceContainer = document.createElement('div');
-                whiteSpaceContainer.className = 'text-section-white-space';
-                whiteSpaceContainer.style.height = index === 0 ? '1rem' : (processedTextSections[index - 1].height + previousHeight + 2) + 'rem';
-                previousHeight = whiteSpaceContainer.offsetHeight;
-                container.appendChild(whiteSpaceContainer);
-
-                const paragraphs = sectionContainer.querySelectorAll('p');
-                paragraphs.forEach((paragraph) => {
-                    const alignmentClasses = ['embedded-text-left', 'embedded-text-right', 'embedded-text-middle'];
-                    const randomIndex = Math.floor(Math.random() * alignmentClasses.length);
-                    const alignmentClass = alignmentClasses[randomIndex];
-                    paragraph.classList.add(alignmentClass);
-                });
-
-                container.appendChild(sectionContainer);
-            });
-
-            const hiddenTextContainer = document.createElement('div');
-            hiddenTextContainer.className = 'screenreader-text';
-            hiddenTextContainer.style.display = 'none';
-
-            const plainText = textSections.join(' ');
-            hiddenTextContainer.textContent = plainText;
-
-            document.querySelector('.embedded-text').innerHTML = '';
-            document.querySelector('.embedded-text').appendChild(container);
-            document.querySelector('.embedded-text').appendChild(hiddenTextContainer);
+            displayTextSections(processedTextSections, oldFormat);
 
             initScreenReader();
         } else {
@@ -146,6 +228,186 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 });
+
+const parseOldEmbeddedTextFormat = (htmlDoc) => {
+    const textElements = htmlDoc.body.childNodes;
+    const textSections = [];
+
+    textElements.forEach((element) => {
+        if (element.nodeType === Node.TEXT_NODE) {
+            const text = element.textContent;
+            textSections.push(text);
+        } else if (element.tagName) {
+            const tagName = element.tagName.toLowerCase();
+            const html = element.outerHTML;
+            textSections.push(html);
+        }
+    });
+
+    const processedTextSections = textSections.map((text) => {
+        const htmlElement = htmlDoc.createElement('div');
+        htmlElement.innerHTML = text;
+        const elements = htmlElement.childNodes;
+
+        function applyCssClasses(element) {
+            if (element.nodeType === Node.TEXT_NODE) {
+            } else if (element.tagName) {
+                const tagName = element.tagName.toLowerCase();
+                element.classList.add(getCssClassForTag(tagName));
+            }
+
+            element.childNodes.forEach(child => applyCssClasses(child));
+        }
+
+        elements.forEach(element => applyCssClasses(element));
+
+        return htmlElement.innerHTML;
+    });
+
+    return processedTextSections;
+};
+
+const displayTextSections = (processedTextSections, oldFormat) => {
+    const textContainer = document.getElementById('text-section-container');
+    textContainer.innerHTML = '';
+
+    if (oldFormat) {
+        processedTextSections.forEach((section, index) => {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'embedded-text-section';
+            sectionDiv.innerHTML = `<div class="embedded-text">${section}</div>`;
+            textContainer.appendChild(sectionDiv);
+        });
+    } else {
+        processedTextSections.forEach((section, index) => {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = `embedded-text-section ${section.SectionType}`;
+            sectionDiv.innerHTML = `
+                <div class="embedded-text" style="border-color: ${section.BorderColor}; color: ${section.TextColor};">
+                    ${section.Text}
+                </div>`;
+            textContainer.appendChild(sectionDiv);
+
+            if (section.Images.length) {
+                const imagesDiv = document.createElement('div');
+                imagesDiv.className = 'embedded-images';
+                section.Images.forEach((imgSrc, imgIndex) => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imgSrc;
+                    imgElement.alt = `Image ${imgIndex + 1}`;
+                    imgElement.style.position = section.ImageDetails[imgIndex].positionOnPage;
+
+                    if (section.SectionType === 'left-section') {
+                        imagesDiv.style.float = 'right';
+                        imagesDiv.style.marginLeft = '20px';
+                    } else if (section.SectionType === 'right-section') {
+                        imagesDiv.style.float = 'left';
+                        imagesDiv.style.marginRight = '20px';
+                    } else if (section.SectionType === 'middle-section') {
+                        imagesDiv.style.display = 'flex';
+                        imagesDiv.style.justifyContent = 'space-between';
+                    }
+
+                    imagesDiv.appendChild(imgElement);
+                });
+                sectionDiv.appendChild(imagesDiv);
+            }
+        });
+    }
+
+    // Add button for swapping between layers
+    const swapButton = document.createElement('button');
+    swapButton.id = 'swap-layers-button';
+    swapButton.textContent = 'Swap Layers';
+    swapButton.style.display = 'none';
+    swapButton.addEventListener('click', () => {
+        const textContainer = document.querySelector('.text-section-container');
+        const quizContainer = document.querySelector('.quiz-window-container');
+        const isTextLayerVisible = !textContainer.classList.contains('hidden');
+
+        if (isTextLayerVisible) {
+            textContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            console.log('Swapped to top layer');
+        } else {
+            textContainer.classList.remove('hidden');
+            quizContainer.classList.add('hidden');
+            console.log('Swapped to content layer');
+        }
+        logLayerVisibility();
+    });
+    document.body.appendChild(swapButton);
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const swapLayersButton = document.getElementById('swap-layers-button');
+
+    if (swapLayersButton) {
+        swapLayersButton.addEventListener('click', () => {
+            const contentLayer = document.querySelector('.text-section-container');
+            const topLayer = document.querySelector('.quiz-window-container');
+
+            if (contentLayer.classList.contains('hidden')) {
+                contentLayer.classList.remove('hidden');
+                topLayer.classList.add('hidden');
+                console.log('Swapped to content layer');
+            } else {
+                contentLayer.classList.add('hidden');
+                topLayer.classList.remove('hidden');
+                console.log('Swapped to top layer');
+            }
+        });
+    }
+});
+
+const logLayerVisibility = () => {
+    console.log('Content Layer Visible:', !document.querySelector('.text-section-container').classList.contains('hidden'));
+    console.log('Quiz Layer Visible:', !document.querySelector('.quiz-window-container').classList.contains('hidden'));
+};
+
+logLayerVisibility();
+
+// const adjustTextSectionWidth = () => {
+//     const quizContainerActive = document.querySelector('.quiz-container').classList.contains('active');
+//     document.querySelector('.container-embedded-text-hero').style.maxWidth = quizContainerActive ? '65%' : '100%';
+// };
+
+// document.getElementById('start-quiz-button').addEventListener('click', () => {
+//     document.querySelector('.quiz-container').classList.add('active');
+//     adjustTextSectionWidth();
+// });
+
+document.getElementById('start-quiz-button').addEventListener('click', () => {
+    const quizContainer = document.getElementById('quiz-window-container');
+    const textContainer = document.querySelector('.text-section-container');
+    quizContainer.classList.remove('hidden');
+    quizContainer.style.position = 'absolute';
+    quizContainer.style.top = `${textContainer.offsetTop}px`;
+    quizContainer.style.right = '0';
+    // textContainer.style.maxWidth = '65%';
+    document.getElementById('start-quiz-button').classList.add('hidden');
+    logLayerVisibility();
+});
+
+const hideEmptySections = () => {
+    const embeddedTexts = document.querySelectorAll('.embedded-text');
+    embeddedTexts.forEach(section => {
+        if (!section.innerHTML.trim()) {
+            section.closest('.embedded-text-section').classList.add('hidden');
+        }
+    });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    hideEmptySections();
+});
+
+
+// document.getElementById('swap-layers-button').addEventListener('click', () => {
+//     adjustTextSectionWidth();
+// });
+
+
 
 // Function to clear the local storage and reset state
 const clearState = () => {
@@ -231,6 +493,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 top: 0,
                 behavior: 'smooth' // Optional: Adds a smooth scrolling animation
             });
+
+            // Load the quiz window container
+            const quizWindowContainer = document.getElementById('quiz-window-container');
+            quizWindowContainer.classList.remove('hidden');
         });
     }
 });

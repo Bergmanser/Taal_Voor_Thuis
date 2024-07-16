@@ -186,7 +186,6 @@ $(document).ready(function () {
                     console.log('User document data:', doc.data());
                 });
                 const userData = userSnapshot.docs[0].data();
-                console.log('User data:', userData);
                 return userData.userRoleId;
             } else {
                 console.log('No user document found');

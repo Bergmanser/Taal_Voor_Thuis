@@ -24,10 +24,10 @@ export async function redirectUserBasedOnRole(allowedRoles) {
                             window.location.href = "parent_overview.html";
                             break;
                         case 3: // Admin
-                            window.location.href = "main_menu.html";
+                            window.location.href = "employee_dashboard.html";
                             break;
                         case 4: // Editor
-                            window.location.href = "main_menu.html";
+                            window.location.href = "employee_dashboard.html";
                             break;
                         // Add cases for more roles as needed
                         default:

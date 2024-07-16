@@ -15,12 +15,13 @@
             font-family: Arial, sans-serif;
         }
         #quiz-container {
-            width: 50%;
+            width: 38%;
             margin: auto;
             padding: 20px;
             border: 1px solid #ccc;
             box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
-            position: relative;
+            position: fixed;
+            background-color: #ffffff;
         }
         #quiz-header {
             display: flex;
@@ -369,7 +370,7 @@
         function closeQuizModal() {
             console.log("Close button clicked"); // Log to check if the click is registered
             $('#quizOverlay').hide();
-            // stopConfetti(); // Stop confetti is currently uncommted because the related error is interfering with the redirect
+            // stopConfetti(); // Stop confetti is currently uncommented because the related error is interfering with the redirect
             window.location.href("student_dashboard.html");
 
             // Add a slight delay to ensure overlay hide completes before redirect

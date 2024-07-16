@@ -15,31 +15,37 @@
   <div class="container mt-5">
     <div id="header" class="sticky-top mb-3">
       <h1 id="welcomeHeader">Welcome</h1>
+      <button id="toggleDesignButton" class="btn btn-secondary float-right">Toggle Design</button>
     </div>
+    <input type="text" id="searchBar" class="form-control mb-3" placeholder="Search by username">
     <!-- Child Users Table -->
-    <table class="table scrollable-table">
-      <thead>
-        <tr>
-          <th colspan="3">
-            <input type="text" id="searchBar" class="form-control" placeholder="Search by child name">
-          </th>
-        </tr>
-        <tr>
-          <th>Child Name</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="childUserList">
-        <!-- Child users will be populated here -->
-      </tbody>
-    </table>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addStudentModal">
-      Add Child
-    </button>
+    <div id="tableDesign">
+      <table class="table scrollable-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Last login Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="childUserList">
+          <!-- Child users will be populated here -->
+        </tbody>
+      </table>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addStudentModal">
+        Add Child
+      </button>
+    </div>
+    <!-- Card Design -->
+    <div id="cardDesign" style="display:none;">
+      <div class="card-container" id="cardUserList">
+        <!-- Cards will be populated here -->
+      </div>
+    </div>
     <!-- Answer Sheets Table -->
     <h2 class="mt-5">Answer Sheets</h2>
     <input type="text" id="answerSheetSearchBar" class="form-control mb-3" placeholder="Search by title">
-    <table class="table scrollable-table">
+    <table class="table">
       <thead>
         <tr>
           <th>Title</th>
@@ -68,7 +74,7 @@
             <div class="form-group">
               <input type="password" class="form-control" id="password-student-signup" placeholder="Password" required>
             </div>
-            <input type="submit" class="btn btn-success" value="Add User">
+            <input type="submit" class="add-student-btn btn btn-success" value="Add User">
           </form>
         </div>
       </div>
@@ -100,6 +106,12 @@
   <script>
     $(document).ready(function() {
       $('#header-container').load('index.html', function() {});
+
+      // Toggle Design
+      $('#toggleDesignButton').on('click', function() {
+        $('#tableDesign').toggle();
+        $('#cardDesign').toggle();
+      });
 
       // Close modal when clicking outside of it
       $(document).on('click', function(event) {

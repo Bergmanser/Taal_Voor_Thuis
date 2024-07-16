@@ -31,9 +31,24 @@ th, td {
     text-align: left;
 }
 
+#welcomeHeader {
+    padding-top: 5%;
+}
+
 /* Custom styles for answer sheets table */
 #answerSheetList th, #answerSheetList td {
     border: none; /* Remove borders */
+    font-size: 1.4rem;
+    color: #ffffff;
+    text-shadow: 
+    -2px -2px 0 #000000,  
+     2px -2px 0 #000000,
+    -2px  2px 0 #000000,
+     2px  2px 0 #000000,
+    -2px  0px 0 #000000,
+     2px   0px 0 #000000,
+     0px -2px 0 #000000,
+     0px   2px 0 #000000;
 }
 
 #answerSheetList th {
@@ -114,6 +129,10 @@ th, td {
     justify-content: flex-start; /* Align to the left */
 }
 
+#toggleDesignButton {
+    margin-bottom: 1em;
+}
+
 .details-button {
     padding: 6px 12px;
     background-color: #1A3A5F;
@@ -132,6 +151,13 @@ th, td {
 }
 
 /* Custom styles for child user table */
+.table thead th:nth-child(3) {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    text-align: right;
+    padding-right: 3em;
+}
+
 #childUserList td {
     position: relative;
     text-align: left; /* Align text to the left */
@@ -149,7 +175,7 @@ th, td {
 
 #childUserList th:nth-child(2),
 #childUserList td:nth-child(2) {
-    text-align: right; /* Align "Actions" and buttons to the right */
+    text-align: left; /* Align "Actions" and buttons to the right */
 }
 
 /* Hover animation for child user table rows */
@@ -171,3 +197,33 @@ table tbody:empty::before {
 .modal-lg {
     max-width: 80%;
 }
+
+/* Styling in regards to  the student cards */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .card {
+    width: 300px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+  }
+  
+  .card-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .card-body {
+    margin-top: 10px;
+  }
+  
+  .card-footer {
+    margin-top: 10px;
+    text-align: right;
+  }
+  

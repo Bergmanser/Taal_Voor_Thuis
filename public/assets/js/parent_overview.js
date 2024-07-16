@@ -6,6 +6,7 @@ import { redirectUserBasedOnRole } from "./roleRedirect.js";
 let currentUser;
 let studentList = [];
 let quizzesList = [];
+const colorMap = {}; // Store colors for each username
 
 document.addEventListener('DOMContentLoaded', function () {
     const searchBar = document.getElementById('searchBar');
@@ -45,6 +46,9 @@ async function retrieveStudentsWithSameParentEmail(parentEmail, searchText = '')
     const studentListTable = document.getElementById('childUserList');
     studentListTable.innerHTML = ''; // Clear existing rows
 
+    const cardListContainer = document.getElementById('cardUserList');
+    cardListContainer.innerHTML = ''; // Clear existing cards
+
     if (querySnapshot.empty) {
         const row = studentListTable.insertRow();
         const cell = row.insertCell(0);
@@ -60,8 +64,9 @@ async function retrieveStudentsWithSameParentEmail(parentEmail, searchText = '')
             const row = studentListTable.insertRow();
             row.onclick = () => redirectToChild(doc.id); // Make the entire row clickable
             row.insertCell(0).textContent = student.username;
+            row.insertCell(1).textContent = student.last_login ? new Date(student.last_login.seconds * 1000).toLocaleString() : "No login data available";
 
-            const actionsCell = row.insertCell(1);
+            const actionsCell = row.insertCell(2);
             actionsCell.appendChild(createActionButton('Delete', 'btn btn-danger', (event) => {
                 event.stopPropagation(); // Prevent row click
                 handleDeleteButton(doc.id, student.username);
@@ -70,10 +75,59 @@ async function retrieveStudentsWithSameParentEmail(parentEmail, searchText = '')
                 event.stopPropagation(); // Prevent row click
                 redirectToChild(doc.id);
             }));
+
+            // Create card for the card design
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.backgroundColor = getColorForUsername(student.username);
+
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'card-header';
+            cardHeader.textContent = student.username;
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+            cardBody.innerHTML = `
+                <p>Last login: ${student.last_login ? new Date(student.last_login.seconds * 1000).toLocaleString() : "No login data available"}</p>
+                <p>Avg Score with Hints: ${calculateAverageScore(student.quizzes, 'scoreWithHints')}</p>
+                <p>Avg Score without Hints: ${calculateAverageScore(student.quizzes, 'scoreWithoutHints')}</p>
+            `;
+
+            const cardFooter = document.createElement('div');
+            cardFooter.className = 'card-footer';
+            cardFooter.appendChild(createActionButton('Details', 'btn btn-info', () => redirectToChild(doc.id)));
+
+            card.appendChild(cardHeader);
+            card.appendChild(cardBody);
+            card.appendChild(cardFooter);
+
+            cardListContainer.appendChild(card);
         }
     });
 }
 
+function calculateAverageScore(quizzes, scoreType) {
+    if (!quizzes || Object.keys(quizzes).length === 0) return 'N/A';
+    const scores = Object.values(quizzes).map(quiz => parseFloat(quiz[scoreType]) || 0);
+    const sum = scores.reduce((acc, score) => acc + score, 0);
+    return (sum / scores.length).toFixed(2);
+}
+
+function getColorForUsername(username) {
+    if (!colorMap[username]) {
+        colorMap[username] = getRandomColor();
+    }
+    return colorMap[username];
+}
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 function createActionButton(text, className, onClick) {
     const button = document.createElement('button');
     button.textContent = text;
@@ -181,3 +235,14 @@ function redirectToQuizDetails(quizId) {
     console.log("Redirect to quiz details page with ID: ", quizId);
     window.location.href = `quiz_details.html?id=${quizId}`;
 }
+
+// Add keypress event listener to trigger sign-up on Enter key press
+const SignUpFormInputs = document.querySelectorAll('.form-content input');
+SignUpFormInputs.forEach(input => {
+    input.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            document.getElementById('add-student-btn').click();
+        }
+    });
+});
+
