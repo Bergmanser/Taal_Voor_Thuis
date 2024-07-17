@@ -78,14 +78,13 @@ const fetchQuizData = async (quizId) => {
     }
 };
 
-// Display current question
 const displayQuestion = () => {
     const question = quizData[currentQuestionIndex];
-    console.log(`Displaying question ${currentQuestionIndex + 1}:`, question);
     document.getElementById('question-text').innerText = question.Text;
     document.getElementById('question-tracker').innerText = `Question ${currentQuestionIndex + 1} out of ${quizData.length}`;
     const optionsContainer = document.getElementById('options-container');
     optionsContainer.innerHTML = '';
+
     question.Options.forEach((option, index) => {
         const optionElement = document.createElement('div');
         optionElement.className = 'option';
@@ -94,14 +93,20 @@ const displayQuestion = () => {
 
         // Apply styles if the option was previously selected
         if (feedback[currentQuestionIndex]) {
-            console.log(`Applying feedback for question ${currentQuestionIndex + 1}`);
             if (feedback[currentQuestionIndex].includes(index)) {
-                optionElement.classList.add(feedback[currentQuestionIndex][0] === index ? 'correct' : 'incorrect');
+                optionElement.classList.add('incorrect');
+            }
+        }
+
+        // Highlight the correct option if it was answered incorrectly twice
+        if (attempts[currentQuestionIndex] && attempts[currentQuestionIndex].length >= 2) {
+            if (index === question.CorrectOption) {
+                optionElement.classList.add('correct');
             }
         }
 
         // Disable options if the question has been completed
-        if (userResponses[currentQuestionIndex] !== undefined) {
+        if (userResponses[currentQuestionIndex] !== undefined || (attempts[currentQuestionIndex] && attempts[currentQuestionIndex].length >= 2)) {
             optionElement.style.pointerEvents = 'none';
             optionElement.style.opacity = '0.6';
         }
@@ -127,11 +132,11 @@ const displayQuestion = () => {
         document.getElementById('next-button').innerText = 'Next';
     }
 
-    // Ensure the next button has the correct event listener
     document.getElementById('next-button').onclick = handleNextButtonClick;
 
     questionStartTime = new Date();
 };
+
 
 // Select an option
 const selectOption = (index) => {
@@ -172,16 +177,7 @@ const checkAnswer = (index) => {
         attempts[currentQuestionIndex] = [];
     }
 
-    if (attempts[currentQuestionIndex].length >= 2) {
-        console.log(`Attempts exceeded for question ${currentQuestionIndex + 1}`);
-        document.getElementById('next-button').disabled = false; // Ensure next button is enabled
-        return (moveToNextQuestion());
-
-    }
-
     attempts[currentQuestionIndex].push(index);
-    console.log(`Checking answer for question ${currentQuestionIndex + 1}: selected option ${index}, correct option ${question.CorrectOption}`);
-
     const optionElements = document.getElementsByClassName('option');
     const selectedOptionElement = optionElements[index];
 
@@ -190,13 +186,14 @@ const checkAnswer = (index) => {
         userResponses[currentQuestionIndex] = index;
         selectedOptionElement.classList.add('correct');
         logEvent(`Question ${currentQuestionIndex + 1}: Correct on attempt ${attempts[currentQuestionIndex].length}`);
-        logCurrentScore();
-        disableOptions(optionElements); // Disable options immediately after a correct answer
-        clearSelectedClass(); // Clear selected class before moving to the next question
+        disableOptions(optionElements);
+        showAnswer();
         saveState();
         moveToNextQuestion();
     } else {
-        feedback[currentQuestionIndex] = feedback[currentQuestionIndex] || [];
+        if (!feedback[currentQuestionIndex]) {
+            feedback[currentQuestionIndex] = [];
+        }
         feedback[currentQuestionIndex].push(index);
         selectedOptionElement.classList.add('incorrect');
         logEvent(`Question ${currentQuestionIndex + 1}: Incorrect on attempt ${attempts[currentQuestionIndex].length}`);
@@ -205,21 +202,17 @@ const checkAnswer = (index) => {
             const correctOptionIndex = question.CorrectOption;
             const correctOptionElement = optionElements[correctOptionIndex];
             correctOptionElement.classList.add('correct');
-            logEvent(`Question ${currentQuestionIndex + 1}: Second attempt result checked`);
+            userResponses[currentQuestionIndex] = index;  // Mark question as finished
             document.getElementById('next-button').disabled = false; // Enable next button after second attempt
-        }
-
-        // Show hint and prevent next question navigation on first incorrect attempt
-        if (attempts[currentQuestionIndex].length === 1) {
+            showAnswer();
+            saveState();
+        } else {
             showHint();
             document.getElementById('next-button').disabled = true;
-        } else {
-            showAnswer();
-            document.getElementById('next-button').disabled = false;
         }
 
         if (attempts[currentQuestionIndex].length >= 2) {
-            disableOptions(optionElements); // Disable options if the question is completed
+            disableOptions(optionElements);
         }
 
         saveState();
@@ -260,12 +253,13 @@ const moveToNextQuestion = () => {
     if (currentQuestionIndex < quizData.length - 1) {
         currentQuestionIndex++;
         selectedOptionIndex = null;
-        clearSelectedClass(); // Clear selected class before displaying the next question
+        clearSelectedClass();
         displayQuestion();
     } else {
         endQuiz();
     }
 };
+
 
 // Show hint
 const showHint = () => {
