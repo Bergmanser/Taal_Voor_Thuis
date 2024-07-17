@@ -100,11 +100,20 @@ ul {
   position: relative;
   font-family: 'Tomorrow', sans-serif;
   font-weight: 700;
-  color: #1a3a5f;
+  color: #ffffff;
+  text-shadow:
+  -3.2px -3.2px 0 #193a5f,  
+   3.2px -3.2px 0 #193a5f,
+  -3.2px  3.2px 0 #193a5f,
+   2px  3.2px 0 #193a5f,
+  -3.2px  0px 0 #193a5f,
+   3.2px   0px 0 #193a5f,
+   0px -3.2px 0 #193a5f,
+   0px   3.2px 0 #193a5f;;
   padding: 1.4rem;
   margin: 0;
   text-align: center;
-  font-size: 2rem;
+  font-size: 2.8rem;
 }
 
 .hero .title h1 {
@@ -119,15 +128,6 @@ ul {
   width: 100%;
   height: 100%;
 }
-
-/* #quiz-container {
-width: 100%;
-margin: auto;
-padding: 20px;
-border: 1px solid #ccc;
-box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
-position: relative;
-} */
 
 .quiz-container.active {
   width: 65%;
@@ -251,6 +251,7 @@ position: relative;
   line-height: 1.6;
   padding: 20px;
   border: 4px solid #ccc;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
   border-radius: 8px;
   overflow-y: auto;
   background: #fbf9f9;

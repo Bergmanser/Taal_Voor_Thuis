@@ -1,10 +1,11 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { app, auth, db } from "./firebase_config.js";
+import { uploadQuizSummary } from "./quiz.js";
 
 // State Management
 let quizData = [];
-let currentQuestionIndex = 0;
+export let currentQuestionIndex = 0;
 let userResponses = {};
 let attempts = {};
 let feedback = {};
@@ -12,6 +13,7 @@ let selectedOptionIndex = null;
 let startTime;
 let questionStartTime;
 let quizSummary = {};
+let correctQuestions = 0;
 
 // Save state to localStorage
 const saveState = () => {
@@ -21,13 +23,14 @@ const saveState = () => {
         attempts,
         feedback,
         selectedOptionIndex,
-        startTime: startTime.getTime()
+        startTime: startTime.getTime(),
+        correctQuestions
     };
     localStorage.setItem('quizState', JSON.stringify(state));
     console.log("State saved to localStorage:", state);
 };
 
-// Load state from localStorage
+// Load state from local storage
 const loadState = () => {
     const state = JSON.parse(localStorage.getItem('quizState'));
     if (state) {
@@ -37,19 +40,24 @@ const loadState = () => {
         feedback = state.feedback;
         selectedOptionIndex = state.selectedOptionIndex;
         startTime = new Date(state.startTime);
+        correctQuestions = state.correctQuestions || 0;
         console.log("State loaded from localStorage:", state);
     } else {
         startTime = new Date();
+        correctQuestions = 0;
         console.log("No previous state found, starting new quiz.");
     }
 };
 
 // Clear state from localStorage
-const clearState = () => {
+export const clearState = () => {
     localStorage.removeItem('quizState');
     console.log("State cleared from localStorage.");
     currentQuestionIndex = 0;
     attempts = {};
+    feedback = {};
+    userResponses = {};
+    correctQuestions = 0;
 };
 
 // Fetch quiz data
@@ -91,18 +99,17 @@ const displayQuestion = () => {
         optionElement.innerText = `${String.fromCharCode(65 + index)}. ${option}`;
         optionElement.onclick = () => selectOption(index);
 
-        // Apply styles if the option was previously selected
+        // Apply styles based on the feedback
         if (feedback[currentQuestionIndex]) {
-            if (feedback[currentQuestionIndex].includes(index)) {
-                optionElement.classList.add('incorrect');
-            }
-        }
-
-        // Highlight the correct option if it was answered incorrectly twice
-        if (attempts[currentQuestionIndex] && attempts[currentQuestionIndex].length >= 2) {
-            if (index === question.CorrectOption) {
-                optionElement.classList.add('correct');
-            }
+            feedback[currentQuestionIndex].forEach(attempt => {
+                if (attempt.index === index) {
+                    if (attempt.correct) {
+                        optionElement.classList.add('correct');
+                    } else {
+                        optionElement.classList.add('incorrect');
+                    }
+                }
+            });
         }
 
         // Disable options if the question has been completed
@@ -137,7 +144,6 @@ const displayQuestion = () => {
     questionStartTime = new Date();
 };
 
-
 // Select an option
 const selectOption = (index) => {
     if (attempts[currentQuestionIndex] && attempts[currentQuestionIndex].length >= 2) {
@@ -161,12 +167,11 @@ const selectOption = (index) => {
 
 // Handle next button click
 const handleNextButtonClick = () => {
-    if (userResponses[currentQuestionIndex] === undefined) {
+    if (userResponses[currentQuestionIndex] !== undefined || (attempts[currentQuestionIndex] && attempts[currentQuestionIndex].length >= 2)) {
+        moveToNextQuestion();
+    } else {
         checkAnswer(selectedOptionIndex);
         clearSelectedClass();
-    } else {
-        clearSelectedClass();
-        moveToNextQuestion();
     }
 };
 
@@ -182,19 +187,19 @@ const checkAnswer = (index) => {
     const selectedOptionElement = optionElements[index];
 
     if (question.CorrectOption === index) {
-        feedback[currentQuestionIndex] = [index];
+        feedback[currentQuestionIndex] = feedback[currentQuestionIndex] || [];
+        feedback[currentQuestionIndex].push({ index, correct: true });
         userResponses[currentQuestionIndex] = index;
         selectedOptionElement.classList.add('correct');
         logEvent(`Question ${currentQuestionIndex + 1}: Correct on attempt ${attempts[currentQuestionIndex].length}`);
         disableOptions(optionElements);
         showAnswer();
+        correctQuestions++;
         saveState();
         moveToNextQuestion();
     } else {
-        if (!feedback[currentQuestionIndex]) {
-            feedback[currentQuestionIndex] = [];
-        }
-        feedback[currentQuestionIndex].push(index);
+        feedback[currentQuestionIndex] = feedback[currentQuestionIndex] || [];
+        feedback[currentQuestionIndex].push({ index, correct: false });
         selectedOptionElement.classList.add('incorrect');
         logEvent(`Question ${currentQuestionIndex + 1}: Incorrect on attempt ${attempts[currentQuestionIndex].length}`);
 
@@ -202,6 +207,7 @@ const checkAnswer = (index) => {
             const correctOptionIndex = question.CorrectOption;
             const correctOptionElement = optionElements[correctOptionIndex];
             correctOptionElement.classList.add('correct');
+            feedback[currentQuestionIndex].push({ index: correctOptionIndex, correct: true }); // Ensure correct option is added to feedback
             userResponses[currentQuestionIndex] = index;  // Mark question as finished
             document.getElementById('next-button').disabled = false; // Enable next button after second attempt
             showAnswer();
@@ -242,8 +248,8 @@ const clearSelectedClass = () => {
 
 // Log the current score
 const logCurrentScore = () => {
-    const scoreWithHints = calculateScore(true);
-    const scoreWithoutHints = calculateScore(false);
+    const scoreWithHints = calculateScoreWithHints();
+    const scoreWithoutHints = calculateScoreWithoutHints();
     console.log(`Current score with hints: ${scoreWithHints}`);
     console.log(`Current score without hints: ${scoreWithoutHints}`);
 };
@@ -259,7 +265,6 @@ const moveToNextQuestion = () => {
         endQuiz();
     }
 };
-
 
 // Show hint
 const showHint = () => {
@@ -280,9 +285,8 @@ const showAnswer = () => {
 const endQuiz = () => {
     const endTime = new Date();
     const totalTime = endTime - startTime;
-    const scoreWithHints = formatScore(calculateScore(true));
-    const scoreWithoutHints = formatScore(calculateScore(false));
-    const correctQuestions = Object.values(userResponses).filter(response => response !== undefined).length;
+    const scoreWithHints = calculateScoreWithHints();
+    const scoreWithoutHints = calculateScoreWithoutHints();
 
     console.log(`Score with hints: ${scoreWithHints}`);
     console.log(`Score without hints: ${scoreWithoutHints}`);
@@ -310,26 +314,28 @@ const endQuiz = () => {
     }, '*');
 
     logEvent('Quiz Completed');
-    clearState();
-
+    uploadQuizSummary(quizSummary);
     showQuizModal(quizSummary.scoreWithHints, quizSummary.scoreWithoutHints, quizSummary.time, quizSummary.correctQuestions, quizSummary.totalQuestions);
 };
 
 // Calculate score
-const calculateScore = (withHints) => {
-    let correctAnswers = 0;
-    let totalQuestions = quizData.length;
-    quizData.forEach((question, index) => {
-        if (feedback[index] && feedback[index][0] === question.CorrectOption) {
-            if (withHints || attempts[index].length === 1) {
-                correctAnswers++;
-            }
-        }
-    });
-    return ((correctAnswers / totalQuestions) * 9 + 1);
+const calculateScoreWithHints = () => {
+    const totalQuestions = quizData.length;
+    const correctAnswers = correctQuestions;
+    return formatScore((correctAnswers / totalQuestions) * 9 + 1);
 };
 
-// Format score
+const calculateScoreWithoutHints = () => {
+    const totalQuestions = quizData.length;
+    let correctFirstAttempt = 0;
+    for (let i = 0; i < totalQuestions; i++) {
+        if (attempts[i] && attempts[i].length === 1 && feedback[i] && feedback[i][0].correct) {
+            correctFirstAttempt++;
+        }
+    }
+    return formatScore((correctFirstAttempt / totalQuestions) * 9 + 1);
+};
+
 const formatScore = (score) => {
     return Math.round(score * 10) / 10;
 };
@@ -383,7 +389,7 @@ window.onload = () => {
 };
 
 // Overlay and Confetti Functions
-
+// Show quiz modal
 function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQuestions, totalQuestions) {
     $('#scoreWithHints').text(scoreWithHints);
     $('#scoreWithoutHints').text(scoreWithoutHints);
@@ -396,8 +402,8 @@ function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQues
     setSummaryColor(correctQuestions, totalQuestions);
 
     $('#quizOverlay').show();
-    startConfetti();
-    console.log("Confetti started and overlay displayed");
+    // startConfetti();
+    // console.log("Confetti started and overlay displayed");
 
     // Reattach the event listener every time the overlay is shown
     const closeButton = document.getElementById('close-button');
@@ -412,7 +418,7 @@ function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQues
 function closeQuizModal() {
     console.log("Close button clicked"); // Log to check if the click is registered
     $('#quizOverlay').hide();
-    stopConfetti();
+    // stopConfetti();
     window.location.href = "student_dashboard.html";
 }
 
@@ -581,4 +587,3 @@ var removeConfetti; // call to stop the confetti animation and remove all confet
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('.quiz-close').addEventListener('click', closeQuizModal);
 });
-
