@@ -35,29 +35,41 @@
         </div>
         <section id="stat-tracker" class="stat-tracker-container">
             <div class="stat-tracker-box">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div id="donut-chart" class="chart-container">
-                            <canvas id="averageScoreChart"></canvas>
-                            <div id="average-score-title"></div>
-                            <div id="average-score-text"></div>
-                            <div id="no-data-message" class="no-data-message d-none">Come back later after having finished one of the exercises, Good Luck!</div>
+                <div class="stat-tracker-header">
+                    <ul class="stat-tracker-titles">
+                        <li>Overall account score:</li>
+                        <li>Best and worst subject scores:</li>
+                        <li>The most recently finished exercises:</li>
+                    </ul>
+                </div>
+                <div class="no-data-message d-none" id="no-data-message">
+                    Come back later after having finished one of the exercises, Good Luck!
+                </div>
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div id="donut-chart" class="chart-container">
+                                <canvas id="averageScoreChart"></canvas>
+                                <div id="average-score-title"></div>
+                                <div id="average-score-text"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="dynamic-best-worst-scores">
+                            <!-- Best and Worst Scores will be dynamically inserted here -->
+                        </div>
+                        <div class="col-md-4" id="dynamic-recent-exercises">
+                            <!-- Recent exercises will be dynamically inserted here -->
                         </div>
                     </div>
-                    <div class="col-md-4" id="dynamic-best-worst-scores">
-                        <!-- Best and Worst Scores will be dynamically inserted here -->
+                    <div id="subject-details" class="subject-details d-none">
+                        <h4 id="subject-name"></h4>
+                        <p id="average-with-hints"></p>
+                        <p id="average-without-hints"></p>
                     </div>
-                    <div class="col-md-4" id="dynamic-recent-exercises">
-                        <!-- Recent exercises will be dynamically inserted here -->
-                    </div>
-                </div>
-                <div id="subject-details" class="subject-details d-none">
-                    <h4 id="subject-name"></h4>
-                    <p id="average-with-hints"></p>
-                    <p id="average-without-hints"></p>
                 </div>
             </div>
         </section>
+        
         <div class="parallax-quiz-container">
             <div class="parallax-quiz-background"></div>
             <section id="filter-toolbar" class="filter-toolbar">

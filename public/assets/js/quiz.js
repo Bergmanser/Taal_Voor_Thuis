@@ -165,13 +165,13 @@ onAuthStateChanged(auth, (user) => {
                     });
                     document.body.appendChild(swapButton);
 
-                    document.getElementById('start-quiz-button').addEventListener('click', () => {
-                        swapButton.style.display = 'block';
-                        document.querySelector('.text-section-container').classList.add('hidden');
-                        document.querySelector('.quiz-window-container').classList.remove('hidden');
-                        document.getElementById('start-quiz-button').classList.add('hidden');
-                        console.log('Start quiz button clicked, switched to top layer');
-                    });
+                    // document.getElementById('start-quiz-button').addEventListener('click', () => {
+                    //     swapButton.style.display = 'block';
+                    //     document.querySelector('.text-section-container').classList.add('hidden');
+                    //     document.querySelector('.quiz-window-container').classList.remove('hidden');
+                    //     document.getElementById('start-quiz-button').classList.add('hidden');
+                    //     console.log('Start quiz button clicked, switched to top layer');
+                    // });
 
                 } else {
                     console.log('No such document!');
@@ -283,38 +283,64 @@ const displayTextSections = (processedTextSections, oldFormat) => {
         processedTextSections.forEach((section, index) => {
             const sectionDiv = document.createElement('div');
             sectionDiv.className = `embedded-text-section ${section.SectionType}`;
-            sectionDiv.innerHTML = `
-                <div class="embedded-text" style="border-color: ${section.BorderColor}; color: ${section.TextColor};">
-                    ${section.Text}
-                </div>`;
-            textContainer.appendChild(sectionDiv);
 
-            if (section.Images.length) {
-                const imagesDiv = document.createElement('div');
-                imagesDiv.className = 'embedded-images';
-                section.Images.forEach((imgSrc, imgIndex) => {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = imgSrc;
-                    imgElement.alt = `Image ${imgIndex + 1}`;
-                    imgElement.style.position = section.ImageDetails[imgIndex].positionOnPage;
+            if (section.SectionType === 'middle-section') {
+                handleMiddleSection(section, sectionDiv);
+            } else {
+                const textDiv = document.createElement('div');
+                textDiv.className = 'embedded-text';
+                textDiv.style.borderColor = section.BorderColor;
+                textDiv.style.color = section.TextColor;
+                textDiv.innerHTML = section.Text;
+                sectionDiv.appendChild(textDiv);
 
-                    if (section.SectionType === 'left-section') {
-                        imagesDiv.style.float = 'right';
-                        imagesDiv.style.marginLeft = '20px';
-                    } else if (section.SectionType === 'right-section') {
-                        imagesDiv.style.float = 'left';
-                        imagesDiv.style.marginRight = '20px';
-                    } else if (section.SectionType === 'middle-section') {
-                        imagesDiv.style.display = 'flex';
-                        imagesDiv.style.justifyContent = 'space-between';
-                    }
-
-                    imagesDiv.appendChild(imgElement);
-                });
-                sectionDiv.appendChild(imagesDiv);
+                if (section.Images.length) {
+                    const imagesDiv = document.createElement('div');
+                    imagesDiv.className = 'embedded-images';
+                    section.Images.forEach((imgSrc, imgIndex) => {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = imgSrc;
+                        imgElement.alt = `Image ${imgIndex + 1}`;
+                        imgElement.style.position = section.ImageDetails[imgIndex].positionOnPage;
+                        imagesDiv.appendChild(imgElement);
+                    });
+                    sectionDiv.appendChild(imagesDiv);
+                }
             }
+
+            textContainer.appendChild(sectionDiv);
         });
     }
+};
+
+const handleMiddleSection = (section, sectionDiv) => {
+    const leftImgElement = document.createElement('div');
+    leftImgElement.className = 'embedded-image-middlesection';
+    if (section.Images[0]) {
+        const imgElement = document.createElement('img');
+        imgElement.src = section.Images[0];
+        imgElement.alt = 'Image 1';
+        leftImgElement.appendChild(imgElement);
+    }
+
+    const rightImgElement = document.createElement('div');
+    rightImgElement.className = 'embedded-image-middlesection';
+    if (section.Images[1]) {
+        const imgElement = document.createElement('img');
+        imgElement.src = section.Images[1];
+        imgElement.alt = 'Image 2';
+        rightImgElement.appendChild(imgElement);
+    }
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'embedded-text';
+    textDiv.style.borderColor = section.BorderColor;
+    textDiv.style.color = section.TextColor;
+    textDiv.innerHTML = section.Text;
+
+    sectionDiv.appendChild(leftImgElement);
+    sectionDiv.appendChild(textDiv);
+    sectionDiv.appendChild(rightImgElement);
 
     // Add button for swapping between layers
     const swapButton = document.createElement('button');
@@ -322,44 +348,45 @@ const displayTextSections = (processedTextSections, oldFormat) => {
     swapButton.textContent = 'Swap Layers';
     swapButton.style.display = 'none';
     swapButton.addEventListener('click', () => {
-        const textContainer = document.querySelector('.text-section-container');
-        const quizContainer = document.querySelector('.quiz-window-container');
-        const isTextLayerVisible = !textContainer.classList.contains('hidden');
 
-        if (isTextLayerVisible) {
-            textContainer.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            console.log('Swapped to top layer');
+        const quizContainer = document.querySelector('.quiz-container');
+        const quizWindow = document.querySelector('.quiz-window-container');
+
+        if (quizWindow.classList.contains('hidden')) {
+            quizWindow.classList.remove('hidden');
+            quizContainer.classList.add('active');
+            console.log('Reapplied active class to quiz container and removed hidden class from quiz window');
         } else {
-            textContainer.classList.remove('hidden');
-            quizContainer.classList.add('hidden');
-            console.log('Swapped to content layer');
+            quizWindow.classList.add('hidden');
+            quizContainer.classList.remove('active');
+            console.log('Added hidden class to quiz window and removed active class from quiz container');
         }
         logLayerVisibility();
     });
     document.body.appendChild(swapButton);
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    const swapLayersButton = document.getElementById('swap-layers-button');
+// document.addEventListener('DOMContentLoaded', () => {
+//     const swapLayersButton = document.getElementById('swap-layers-button');
 
-    if (swapLayersButton) {
-        swapLayersButton.addEventListener('click', () => {
-            const contentLayer = document.querySelector('.text-section-container');
-            const topLayer = document.querySelector('.quiz-window-container');
+//     if (swapLayersButton) {
+//         swapLayersButton.addEventListener('click', () => {
+//             const quizContainer = document.querySelector('.quiz-container');
+//             const quizWindow = document.querySelector('.quiz-window-container');
 
-            if (contentLayer.classList.contains('hidden')) {
-                contentLayer.classList.remove('hidden');
-                topLayer.classList.add('hidden');
-                console.log('Swapped to content layer');
-            } else {
-                contentLayer.classList.add('hidden');
-                topLayer.classList.remove('hidden');
-                console.log('Swapped to top layer');
-            }
-        });
-    }
-});
+//             if (quizWindow.classList.contains('hidden')) {
+//                 quizWindow.classList.remove('hidden');
+//                 quizContainer.classList.add('active');
+//                 console.log('Reapplied active class to quiz container and removed hidden class from quiz window');
+//             } else {
+//                 quizWindow.classList.add('hidden');
+//                 quizContainer.classList.remove('active');
+//                 console.log('Added hidden class to quiz window and removed active class from quiz container');
+//             }
+//         });
+//     }
+// });
+
 
 const logLayerVisibility = () => {
     console.log('Content Layer Visible:', !document.querySelector('.text-section-container').classList.contains('hidden'));
@@ -367,16 +394,6 @@ const logLayerVisibility = () => {
 };
 
 logLayerVisibility();
-
-// const adjustTextSectionWidth = () => {
-//     const quizContainerActive = document.querySelector('.quiz-container').classList.contains('active');
-//     document.querySelector('.container-embedded-text-hero').style.maxWidth = quizContainerActive ? '65%' : '100%';
-// };
-
-// document.getElementById('start-quiz-button').addEventListener('click', () => {
-//     document.querySelector('.quiz-container').classList.add('active');
-//     adjustTextSectionWidth();
-// });
 
 document.getElementById('start-quiz-button').addEventListener('click', () => {
     const quizContainer = document.getElementById('quiz-window-container');
@@ -402,13 +419,6 @@ const hideEmptySections = () => {
 document.addEventListener('DOMContentLoaded', () => {
     hideEmptySections();
 });
-
-
-// document.getElementById('swap-layers-button').addEventListener('click', () => {
-//     adjustTextSectionWidth();
-// });
-
-
 
 // // Function to clear the local storage and reset state
 const clearState = () => {
@@ -498,8 +508,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Load the quiz window container
             const quizWindowContainer = document.getElementById('quiz-window-container');
             quizWindowContainer.classList.remove('hidden');
+
+            // Display the swap button
+            const swapButton = document.getElementById('swap-layers-button');
+            if (swapButton) {
+                swapButton.style.display = 'block';
+            }
         });
     }
+
 });
 
 // function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQuestions, totalQuestions) {

@@ -54,12 +54,19 @@ async function fetchStudentData(userId) {
 
 function updateDashboard(scores) {
     const noDataMessage = document.getElementById('no-data-message');
+    const statTrackerHeader = document.querySelector('.stat-tracker-header');
+    const contentWrapper = document.querySelector('.content-wrapper');
+
     if (scores.length === 0) {
         document.getElementById('averageScoreChart').classList.add('d-none');
         noDataMessage.classList.remove('d-none');
+        statTrackerHeader.classList.add('d-none');
+        contentWrapper.classList.add('d-none');
     } else {
         document.getElementById('averageScoreChart').classList.remove('d-none');
         noDataMessage.classList.add('d-none');
+        statTrackerHeader.classList.remove('d-none');
+        contentWrapper.classList.remove('d-none');
         updateChart(scores);
         updateRecentScores(scores);
         updateBestWorstScores(scores);
@@ -165,8 +172,6 @@ function updateRecentScores(scores) {
     scores.sort((a, b) => b.date - a.date);
     const recentScores = scores.slice(0, 3);
 
-    container.innerHTML = '<h5>The most recently finished exercises:</h5>';
-
     recentScores.forEach(score => {
         container.innerHTML += `
             <div class="score-card" data-subject="${score.subject}">
@@ -221,7 +226,8 @@ function updateBestWorstScores(scores) {
             </div>
         `;
     }
-}
+};
+
 
 async function fetchQuizzes() {
     const querySnapshot = await getDocs(quizzesCollection);

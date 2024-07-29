@@ -15,6 +15,13 @@ let questionStartTime;
 let quizSummary = {};
 let correctQuestions = 0;
 
+// Feedback messages
+const feedbackMessages = {
+    correct: ["Correct!", "Dat klopt!", "Goed gedaan!"],
+    firstIncorrect: ["Dat is fout", "Incorrect", "Probeer het opnieuw!"],
+    secondIncorrect: ["Helaas, dat is nog steeds fout", "Niet correct", "Blijf oefenen!"]
+};
+
 // Save state to localStorage
 const saveState = () => {
     const state = {
@@ -193,6 +200,7 @@ const checkAnswer = (index) => {
         selectedOptionElement.classList.add('correct');
         logEvent(`Question ${currentQuestionIndex + 1}: Correct on attempt ${attempts[currentQuestionIndex].length}`);
         disableOptions(optionElements);
+        showFeedback('correct');
         showAnswer();
         correctQuestions++;
         saveState();
@@ -210,9 +218,11 @@ const checkAnswer = (index) => {
             feedback[currentQuestionIndex].push({ index: correctOptionIndex, correct: true }); // Ensure correct option is added to feedback
             userResponses[currentQuestionIndex] = index;  // Mark question as finished
             document.getElementById('next-button').disabled = false; // Enable next button after second attempt
+            showFeedback('secondIncorrect');
             showAnswer();
             saveState();
         } else {
+            showFeedback('firstIncorrect');
             showHint();
             document.getElementById('next-button').disabled = true;
         }
@@ -230,6 +240,27 @@ const checkAnswer = (index) => {
     } else if (attempts[currentQuestionIndex].length === 2) {
         console.log(`Question ${currentQuestionIndex + 1}: Answered ${index === question.CorrectOption ? 'correctly' : 'incorrectly'} on second attempt. Previous attempt: ${attempts[currentQuestionIndex][0]}`);
     }
+};
+
+// Show feedback message
+const showFeedback = (status) => {
+    const feedbackMessage = feedbackMessages[status][Math.floor(Math.random() * feedbackMessages[status].length)];
+    const feedbackElement = document.createElement('div');
+    feedbackElement.className = `feedback-message ${status}`;
+    feedbackElement.innerText = feedbackMessage;
+    document.body.appendChild(feedbackElement);
+
+    feedbackElement.style.opacity = 0;
+
+    setTimeout(() => {
+        feedbackElement.style.opacity = 1;
+        setTimeout(() => {
+            feedbackElement.style.opacity = 0;
+            setTimeout(() => {
+                document.body.removeChild(feedbackElement);
+            }, 5000);
+        }, 5000);
+    }, 10);
 };
 
 // Disable options

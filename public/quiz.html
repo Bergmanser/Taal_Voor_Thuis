@@ -15,13 +15,13 @@
     <header>
         <div id="header-container"></div>
     </header>
+    <div class="hero" style="background-image: url(banner-image-url);">
+        <div class="title" id="quiz-title"></div>
+    </div>
     <div class="content-wrapper">
         <main id="quiz-main">
             <div class="quiz-container"> 
                 <div class="container-embedded-text-hero">
-                    <div class="hero" style="background-image: url(banner-image-url);">
-                        <div class="title" id="quiz-title"></div>
-                    </div>
                     <div class="text-section-container" id="text-section-container"></div>
                     <div class="screenreader-text" style="display:none;"></div>
                     <div class="google-search-box">
@@ -53,15 +53,12 @@
                         <div class="embedded-text" id="embedded-text"></div>
                     </div>
                     <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
-                    <div class="swap-layers-button" id="swap-layers-button" style="display: none;">Swap Layers</div>
-
+                    <!-- <div class="swap-layers-button" id="swap-layers-button" style="display: none;">Swap Layers</div> -->
                 </div>
-                <div class="quiz-window-container hidden" id="quiz-window-container">
-                </div> 
+                <div class="quiz-window-container hidden" id="quiz-window-container"></div>
             </div>
         </main>
     </div>
-    <!-- <canvas id="confetti-canvas"></canvas> -->
     <script src="https://cse.google.com/cse.js?cx=111c176d9efa64756"></script>
     <script type="module" src="../public/assets/js/quiz.js"></script>
     <script type="module" src="../public/assets/js/screenreader_quiztext.js"></script>
