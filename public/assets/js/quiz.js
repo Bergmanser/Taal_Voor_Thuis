@@ -4,8 +4,30 @@ import { initScreenReader } from '../js/screenreader_quiztext.js';
 import { app, auth, db } from "./firebase_config.js";
 import { redirectUserBasedOnRole } from "./roleRedirect.js";
 
-
 export let quizData;
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Array of background image URLs
+    const backgroundImages = [
+        '../images/quiz_background_1.png',
+        '../images/quiz_background_2.png',
+        '../images/quiz_background_3.png',
+        '../images/quiz_background_4.png',
+        '../images/quiz_background_5.png'
+    ];
+
+    function setRandomBackground() {
+        const randomIndex = Math.floor(Math.random() * backgroundImages.length);
+        const selectedImage = backgroundImages[randomIndex];
+        console.log('Selected Image:', selectedImage); // Debugging line
+        document.body.style.backgroundImage = `url(${selectedImage})`;
+    }
+
+    console.log('Running setRandomBackground'); // Debugging line
+    setRandomBackground();
+});
+
 
 const getCssClassForTag = (tag) => {
     const tagName = tag.toLowerCase();
@@ -78,7 +100,6 @@ const parseNewEmbeddedTextFormat = (htmlDoc) => {
 
     return structuredData;
 };
-
 
 const textContainer = document.querySelector('.text-section-container');
 
@@ -164,15 +185,6 @@ onAuthStateChanged(auth, (user) => {
                         document.querySelector('.quiz-window-container').classList.toggle('hidden');
                     });
                     document.body.appendChild(swapButton);
-
-                    // document.getElementById('start-quiz-button').addEventListener('click', () => {
-                    //     swapButton.style.display = 'block';
-                    //     document.querySelector('.text-section-container').classList.add('hidden');
-                    //     document.querySelector('.quiz-window-container').classList.remove('hidden');
-                    //     document.getElementById('start-quiz-button').classList.add('hidden');
-                    //     console.log('Start quiz button clicked, switched to top layer');
-                    // });
-
                 } else {
                     console.log('No such document!');
                 }
@@ -341,52 +353,7 @@ const handleMiddleSection = (section, sectionDiv) => {
     sectionDiv.appendChild(leftImgElement);
     sectionDiv.appendChild(textDiv);
     sectionDiv.appendChild(rightImgElement);
-
-    // Add button for swapping between layers
-    const swapButton = document.createElement('button');
-    swapButton.id = 'swap-layers-button';
-    swapButton.textContent = 'Swap Layers';
-    swapButton.style.display = 'none';
-    swapButton.addEventListener('click', () => {
-
-        const quizContainer = document.querySelector('.quiz-container');
-        const quizWindow = document.querySelector('.quiz-window-container');
-
-        if (quizWindow.classList.contains('hidden')) {
-            quizWindow.classList.remove('hidden');
-            quizContainer.classList.add('active');
-            console.log('Reapplied active class to quiz container and removed hidden class from quiz window');
-        } else {
-            quizWindow.classList.add('hidden');
-            quizContainer.classList.remove('active');
-            console.log('Added hidden class to quiz window and removed active class from quiz container');
-        }
-        logLayerVisibility();
-    });
-    document.body.appendChild(swapButton);
 };
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     const swapLayersButton = document.getElementById('swap-layers-button');
-
-//     if (swapLayersButton) {
-//         swapLayersButton.addEventListener('click', () => {
-//             const quizContainer = document.querySelector('.quiz-container');
-//             const quizWindow = document.querySelector('.quiz-window-container');
-
-//             if (quizWindow.classList.contains('hidden')) {
-//                 quizWindow.classList.remove('hidden');
-//                 quizContainer.classList.add('active');
-//                 console.log('Reapplied active class to quiz container and removed hidden class from quiz window');
-//             } else {
-//                 quizWindow.classList.add('hidden');
-//                 quizContainer.classList.remove('active');
-//                 console.log('Added hidden class to quiz window and removed active class from quiz container');
-//             }
-//         });
-//     }
-// });
-
 
 const logLayerVisibility = () => {
     console.log('Content Layer Visible:', !document.querySelector('.text-section-container').classList.contains('hidden'));
@@ -398,11 +365,10 @@ logLayerVisibility();
 document.getElementById('start-quiz-button').addEventListener('click', () => {
     const quizContainer = document.getElementById('quiz-window-container');
     const textContainer = document.querySelector('.text-section-container');
-    quizContainer.classList.remove('hidden');
+    quizContainer.classList.remove('hidden', 'inactive-quiz-window-container');
     quizContainer.style.position = 'absolute';
     quizContainer.style.top = `${textContainer.offsetTop}px`;
     quizContainer.style.right = '0';
-    // textContainer.style.maxWidth = '65%';
     document.getElementById('start-quiz-button').classList.add('hidden');
     logLayerVisibility();
 });
@@ -420,7 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
     hideEmptySections();
 });
 
-// // Function to clear the local storage and reset state
 const clearState = () => {
     localStorage.removeItem('quizState');
     console.log("State cleared from localStorage.");
@@ -450,13 +415,9 @@ export async function uploadQuizSummary(quizSummary) {
             }, { merge: true });
             console.log("Quiz summary uploaded to Firestore:", quizSummary);
 
-            // Clear state and reset local storage after uploading quiz summary
             clearState();
             console.log("Local storage and quiz state cleared for next quiz.");
 
-            // Trigger confetti and show modal
-            // triggerConfetti();
-            // showQuizModal(quizSummary.scoreWithHints, quizSummary.scoreWithoutHints, quizSummary.time, quizSummary.correctQuestions, quizSummary.totalQuestions);
         } catch (error) {
             console.error("Error uploading quiz summary:", error);
         }
@@ -465,30 +426,48 @@ export async function uploadQuizSummary(quizSummary) {
     }
 }
 
-// function formatScore(score) {
-//     return Math.round(score * 10) / 10;
-// }
+// Add button for swapping between layers
+document.addEventListener('DOMContentLoaded', () => {
+    const swapButton = document.getElementById('swap-layers-button');
+    const quizContainer = document.querySelector('.quiz-container');
+    const quizWindow = document.querySelector('.quiz-window-container');
 
-// function closeQuizModal() {
-//     document.getElementById('quizOverlay').style.display = 'none';
-//     window.location.href = "student_dashboard.html";
-// }
+    swapButton.addEventListener('click', () => {
+        if (quizWindow.classList.contains('inactive-quiz-window-container')) {
+            quizWindow.classList.remove('inactive-quiz-window-container');
+            quizWindow.classList.remove('hidden');
+            quizContainer.classList.add('active');
+        } else {
+            quizWindow.classList.add('inactive-quiz-window-container');
+            quizContainer.classList.remove('active');
+        }
+    });
 
-// function triggerConfetti() {
-//     // Placeholder for confetti animation implementation
-//     // You can use an external library like 'canvas-confetti' for better effects
-//     console.log("Confetti animation triggered");
-//     startConfetti();
-// }
+    const startQuizButton = document.querySelector('.start-quiz-button');
 
-// window.addEventListener('message', (event) => {
-//     if (event.data.type === 'quizSummary') {
-//         const quizSummary = event.data.quizSummary;
-//         quizSummary.scoreWithHints = formatScore(quizSummary.scoreWithHints);
-//         quizSummary.scoreWithoutHints = formatScore(quizSummary.scoreWithoutHints);
-//         uploadQuizSummary(quizSummary);
-//     }
-// });
+    if (startQuizButton) {
+        startQuizButton.addEventListener('click', () => {
+            quizContainer.classList.add('active');
+            startQuizButton.classList.add('hidden');
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+
+            quizWindow.classList.remove('inactive-quiz-window-container', 'hidden');
+            swapButton.classList.remove('hidden');
+        });
+    }
+
+    quizWindow.addEventListener('transitionend', (event) => {
+        if (quizWindow.classList.contains('inactive-quiz-window-container')) {
+            quizWindow.classList.add('hidden');
+        } else {
+            quizWindow.classList.remove('hidden');
+        }
+    });
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     const startQuizButton = document.querySelector('.start-quiz-button');
@@ -499,202 +478,46 @@ document.addEventListener('DOMContentLoaded', () => {
             quizContainer.classList.add('active');
             startQuizButton.classList.add('hidden');
 
-            // Scroll to the top of the page
             window.scrollTo({
                 top: 0,
-                behavior: 'smooth' // Optional: Adds a smooth scrolling animation
+                behavior: 'smooth'
             });
 
-            // Load the quiz window container
             const quizWindowContainer = document.getElementById('quiz-window-container');
-            quizWindowContainer.classList.remove('hidden');
+            quizWindowContainer.classList.remove('inactive-quiz-window-container', 'hidden');
 
-            // Display the swap button
             const swapButton = document.getElementById('swap-layers-button');
             if (swapButton) {
                 swapButton.style.display = 'block';
             }
         });
     }
-
 });
 
-// function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQuestions, totalQuestions) {
-//     $('#scoreWithHints').text(scoreWithHints);
-//     $('#scoreWithoutHints').text(scoreWithoutHints);
-//     $('#totalTime').text(totalTime);
-//     $('#correctQuestions').text(correctQuestions);
-//     $('#totalQuestions').text(totalQuestions);
+// Add an event listener to set display to none after the transition ends
+document.getElementById('quiz-window-container').addEventListener('transitionend', (event) => {
+    const quizWindow = document.getElementById('quiz-window-container');
+    if (quizWindow.classList.contains('inactive-quiz-window-container')) {
+        quizWindow.classList.add('hidden');
+    } else {
+        quizWindow.classList.remove('hidden');
+    }
+});
 
-//     // Apply styles based on score values
-//     setCircleColor('#scoreWithHintsCircle', scoreWithHints);
-//     setCircleColor('#scoreWithoutHintsCircle', scoreWithoutHints);
+document.getElementById('swap-layers-button').addEventListener('click', function () {
+    const quizWindow = document.querySelector('.quiz-window-container');
+    this.classList.toggle('flipped');
 
-//     // Set summary color
-//     setSummaryColor(correctQuestions, totalQuestions);
+    if (quizWindow.classList.contains('inactive-quiz-window-container')) {
+        // Opening animation
+        // quizWindow.classList.remove('inactive-quiz-window-container');
+        // quizWindow.classList.add('active-quiz-window-container');
+        this.classList.remove('shifted');
+    } else {
+        // Closing animation
+        // quizWindow.classList.remove('active-quiz-window-container');
+        // quizWindow.classList.add('inactive-quiz-window-container');
+        this.classList.add('shifted');
+    }
+});
 
-//     // $('#quizOverlay').show();
-//     // console.log("Confetti started and overlay displayed");
-// }
-
-// function setCircleColor(circleId, score) {
-//     const circle = $(circleId);
-//     const coloredRing = circle.find('.colored-ring');
-//     circle.removeClass('gold-ring pulsating-glow');
-//     circle.find('.olive-crown').remove();
-//     coloredRing.css('border-color', 'transparent');
-
-//     if (score === 10) {
-//         circle.addClass('gold-ring pulsating-glow');
-//         circle.append('<img src="../public/assets/images/olive_crown.png" class="olive-crown" alt="Olive Crown">');
-//         coloredRing.css('border-color', 'gold');
-//     } else if (score >= 5.5 && score <= 9.9) {
-//         coloredRing.css('border-color', 'green');
-//     } else {
-//         coloredRing.css('border-color', 'crimson');
-//     }
-// }
-
-// function setSummaryColor(correctQuestions, totalQuestions) {
-//     const summary = $('#correctQuestions');
-//     if (correctQuestions >= totalQuestions / 2) {
-//         summary.css('color', 'green');
-//     } else {
-//         summary.css('color', 'crimson');
-//     }
-// }
-
-// Confetti code
-// var maxParticleCount = 150; // set max confetti count
-// var particleSpeed = 2; // set the particle animation speed
-// var startConfetti; // call to start confetti animation
-// var stopConfetti; // call to stop adding confetti
-// var toggleConfetti; // call to start or stop the confetti animation depending on whether it's already running
-// var removeConfetti; // call to stop the confetti animation and remove all confetti immediately
-
-// (function () {
-//     startConfetti = startConfettiInner;
-//     stopConfetti = stopConfettiInner;
-//     toggleConfetti = toggleConfettiInner;
-//     removeConfetti = removeConfettiInner;
-//     var colors = ["DodgerBlue", "OliveDrab", "Gold", "Pink", "SlateBlue", "LightBlue", "Violet", "PaleGreen", "SteelBlue", "SandyBrown", "Chocolate", "Crimson"];
-//     var streamingConfetti = false;
-//     var animationTimer = null;
-//     var particles = [];
-//     var waveAngle = 0;
-
-//     function resetParticle(particle, width, height) {
-//         particle.color = colors[(Math.random() * colors.length) | 0];
-//         particle.x = Math.random() * width;
-//         particle.y = Math.random() * height - height;
-//         particle.diameter = Math.random() * 10 + 5;
-//         particle.tilt = Math.random() * 10 - 10;
-//         particle.tiltAngleIncrement = Math.random() * 0.07 + 0.05;
-//         particle.tiltAngle = 0;
-//         return particle;
-//     }
-
-//     function startConfettiInner() {
-//         console.log("Starting confetti animation");
-//         var width = window.innerWidth;
-//         var height = window.innerHeight;
-//         window.requestAnimFrame = (function () {
-//             return window.requestAnimationFrame ||
-//                 window.webkitRequestAnimationFrame ||
-//                 window.mozRequestAnimationFrame ||
-//                 window.oRequestAnimationFrame ||
-//                 window.msRequestAnimationFrame ||
-//                 function (callback) {
-//                     return window.setTimeout(callback, 16.6666667);
-//                 };
-//         })();
-//         var canvas = document.getElementById("confetti-canvas");
-//         if (canvas === null) {
-//             canvas = document.createElement("canvas");
-//             canvas.setAttribute("id", "confetti-canvas");
-//             canvas.setAttribute("style", "display:block;z-index:999999;pointer-events:none");
-//             document.body.appendChild(canvas);
-//             canvas.width = width;
-//             canvas.height = height;
-//             window.addEventListener("resize", function () {
-//                 canvas.width = window.innerWidth;
-//                 canvas.height = window.innerHeight;
-//             }, true);
-//         }
-//         var context = canvas.getContext("2d");
-//         while (particles.length < maxParticleCount)
-//             particles.push(resetParticle({}, width, height));
-//         streamingConfetti = true;
-//         if (animationTimer === null) {
-//             (function runAnimation() {
-//                 context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-//                 if (particles.length === 0)
-//                     animationTimer = null;
-//                 else {
-//                     updateParticles();
-//                     drawParticles(context);
-//                     animationTimer = requestAnimFrame(runAnimation);
-//                 }
-//             })();
-//         }
-//     }
-
-//     function stopConfettiInner() {
-//         console.log("Stopping confetti animation");
-//         streamingConfetti = false;
-//     }
-
-//     function removeConfettiInner() {
-//         stopConfetti();
-//         particles = [];
-//         console.log("Confetti removed");
-//     }
-
-//     function toggleConfettiInner() {
-//         if (streamingConfetti)
-//             stopConfettiInner();
-//         else
-//             startConfettiInner();
-//     }
-
-//     function drawParticles(context) {
-//         var particle;
-//         var x;
-//         for (var i = 0; i < particles.length; i++) {
-//             particle = particles[i];
-//             context.beginPath();
-//             context.lineWidth = particle.diameter;
-//             context.strokeStyle = particle.color;
-//             x = particle.x + particle.tilt;
-//             context.moveTo(x + particle.diameter / 2, particle.y);
-//             context.lineTo(x, particle.y + particle.tilt + particle.diameter / 2);
-//             context.stroke();
-//         }
-//     }
-
-//     function updateParticles() {
-//         var width = window.innerWidth;
-//         var height = window.innerHeight;
-//         var particle;
-//         waveAngle += 0.01;
-//         for (var i = 0; i < particles.length; i++) {
-//             particle = particles[i];
-//             if (!streamingConfetti && particle.y < -15)
-//                 particle.y = height + 100;
-//             else {
-//                 particle.tiltAngle += particle.tiltAngleIncrement;
-//                 particle.x += Math.sin(waveAngle);
-//                 particle.y += (Math.cos(waveAngle) + particle.diameter + particleSpeed) * 0.5;
-//                 particle.tilt = Math.sin(particle.tiltAngle) * 15;
-//             }
-//             if (particle.x > width + 20 || particle.x < -20 || particle.y > height) {
-//                 if (streamingConfetti && particles.length <= maxParticleCount)
-//                     resetParticle(particle, width, height);
-//                 else {
-//                     particles.splice(i, 1);
-//                     i--;
-//                 }
-//             }
-//         }
-//     }
-// })();

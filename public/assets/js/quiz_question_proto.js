@@ -79,7 +79,6 @@ const fetchQuizData = async (quizId) => {
             quizData = quizDoc.Questions;
             console.log("Quiz questions:", quizData);
             document.getElementById('quiz-title').innerText = quizDoc.Title;
-            // Store metadata in quizData
             quizData.Title = quizDoc.Title;
             quizData.QuizGroupId = quizDoc.QuizGroupId;
             quizData.QuizType = quizDoc.QuizType;
@@ -102,24 +101,22 @@ const displayQuestion = () => {
 
     question.Options.forEach((option, index) => {
         const optionElement = document.createElement('div');
-        optionElement.className = 'option';
+        optionElement.className = 'proto-option';
         optionElement.innerText = `${String.fromCharCode(65 + index)}. ${option}`;
         optionElement.onclick = () => selectOption(index);
 
-        // Apply styles based on the feedback
         if (feedback[currentQuestionIndex]) {
             feedback[currentQuestionIndex].forEach(attempt => {
                 if (attempt.index === index) {
                     if (attempt.correct) {
-                        optionElement.classList.add('correct');
+                        optionElement.classList.add('proto-correct');
                     } else {
-                        optionElement.classList.add('incorrect');
+                        optionElement.classList.add('proto-incorrect');
                     }
                 }
             });
         }
 
-        // Disable options if the question has been completed
         if (userResponses[currentQuestionIndex] !== undefined || (attempts[currentQuestionIndex] && attempts[currentQuestionIndex].length >= 2)) {
             optionElement.style.pointerEvents = 'none';
             optionElement.style.opacity = '0.6';
@@ -131,10 +128,9 @@ const displayQuestion = () => {
     document.getElementById('prev-button').disabled = currentQuestionIndex === 0;
     document.getElementById('next-button').disabled = selectedOptionIndex === null && userResponses[currentQuestionIndex] === undefined;
 
-    document.getElementById('dialogue-hint').classList.add('hidden');
-    document.getElementById('dialogue-answer').classList.add('hidden');
+    document.getElementById('dialogue-hint').classList.add('proto-hidden');
+    document.getElementById('dialogue-answer').classList.add('proto-hidden');
 
-    // Show hint and answer if navigating back to a completed question
     if (userResponses[currentQuestionIndex] !== undefined && attempts[currentQuestionIndex]) {
         showHint();
         showAnswer();
@@ -151,20 +147,19 @@ const displayQuestion = () => {
     questionStartTime = new Date();
 };
 
-// Select an option
 const selectOption = (index) => {
     if (attempts[currentQuestionIndex] && attempts[currentQuestionIndex].length >= 2) {
-        return; // Prevent re-attempting already completed questions
+        return;
     }
 
     selectedOptionIndex = index;
-    const options = document.getElementsByClassName('option');
+    const options = document.getElementsByClassName('proto-option');
     Array.from(options).forEach((option, idx) => {
-        if (!option.classList.contains('correct') && !option.classList.contains('incorrect')) {
-            option.classList.remove('selected');
+        if (!option.classList.contains('proto-correct') && !option.classList.contains('proto-incorrect')) {
+            option.classList.remove('proto-selected');
         }
         if (idx === index) {
-            option.classList.add('selected');
+            option.classList.add('proto-selected');
         }
     });
 
@@ -172,7 +167,6 @@ const selectOption = (index) => {
     saveState();
 };
 
-// Handle next button click
 const handleNextButtonClick = () => {
     if (userResponses[currentQuestionIndex] !== undefined || (attempts[currentQuestionIndex] && attempts[currentQuestionIndex].length >= 2)) {
         moveToNextQuestion();
@@ -182,7 +176,6 @@ const handleNextButtonClick = () => {
     }
 };
 
-// Check answer
 const checkAnswer = (index) => {
     const question = quizData[currentQuestionIndex];
     if (!attempts[currentQuestionIndex]) {
@@ -190,14 +183,14 @@ const checkAnswer = (index) => {
     }
 
     attempts[currentQuestionIndex].push(index);
-    const optionElements = document.getElementsByClassName('option');
+    const optionElements = document.getElementsByClassName('proto-option');
     const selectedOptionElement = optionElements[index];
 
     if (question.CorrectOption === index) {
         feedback[currentQuestionIndex] = feedback[currentQuestionIndex] || [];
         feedback[currentQuestionIndex].push({ index, correct: true });
         userResponses[currentQuestionIndex] = index;
-        selectedOptionElement.classList.add('correct');
+        selectedOptionElement.classList.add('proto-correct');
         logEvent(`Question ${currentQuestionIndex + 1}: Correct on attempt ${attempts[currentQuestionIndex].length}`);
         disableOptions(optionElements);
         showFeedback('correct');
@@ -208,16 +201,16 @@ const checkAnswer = (index) => {
     } else {
         feedback[currentQuestionIndex] = feedback[currentQuestionIndex] || [];
         feedback[currentQuestionIndex].push({ index, correct: false });
-        selectedOptionElement.classList.add('incorrect');
+        selectedOptionElement.classList.add('proto-incorrect');
         logEvent(`Question ${currentQuestionIndex + 1}: Incorrect on attempt ${attempts[currentQuestionIndex].length}`);
 
         if (attempts[currentQuestionIndex].length === 2) {
             const correctOptionIndex = question.CorrectOption;
             const correctOptionElement = optionElements[correctOptionIndex];
-            correctOptionElement.classList.add('correct');
-            feedback[currentQuestionIndex].push({ index: correctOptionIndex, correct: true }); // Ensure correct option is added to feedback
-            userResponses[currentQuestionIndex] = index;  // Mark question as finished
-            document.getElementById('next-button').disabled = false; // Enable next button after second attempt
+            correctOptionElement.classList.add('proto-correct');
+            feedback[currentQuestionIndex].push({ index: correctOptionIndex, correct: true });
+            userResponses[currentQuestionIndex] = index;
+            document.getElementById('next-button').disabled = false;
             showFeedback('secondIncorrect');
             showAnswer();
             saveState();
@@ -234,7 +227,6 @@ const checkAnswer = (index) => {
         saveState();
     }
 
-    // Log question results
     if (attempts[currentQuestionIndex].length === 1) {
         console.log(`Question ${currentQuestionIndex + 1}: Answered ${index === question.CorrectOption ? 'correctly' : 'incorrectly'} on first attempt.`);
     } else if (attempts[currentQuestionIndex].length === 2) {
@@ -242,11 +234,10 @@ const checkAnswer = (index) => {
     }
 };
 
-// Show feedback message
 const showFeedback = (status) => {
     const feedbackMessage = feedbackMessages[status][Math.floor(Math.random() * feedbackMessages[status].length)];
     const feedbackElement = document.createElement('div');
-    feedbackElement.className = `feedback-message ${status}`;
+    feedbackElement.className = `proto-feedback-message ${status}`;
     feedbackElement.innerText = feedbackMessage;
     document.body.appendChild(feedbackElement);
 
@@ -263,7 +254,6 @@ const showFeedback = (status) => {
     }, 10);
 };
 
-// Disable options
 const disableOptions = (optionElements) => {
     Array.from(optionElements).forEach((option) => {
         option.style.pointerEvents = 'none';
@@ -271,13 +261,11 @@ const disableOptions = (optionElements) => {
     });
 };
 
-// Clear the selected class from options
 const clearSelectedClass = () => {
-    const options = document.getElementsByClassName('option');
-    Array.from(options).forEach(option => option.classList.remove('selected'));
+    const options = document.getElementsByClassName('proto-option');
+    Array.from(options).forEach(option => option.classList.remove('proto-selected'));
 };
 
-// Log the current score
 const logCurrentScore = () => {
     const scoreWithHints = calculateScoreWithHints();
     const scoreWithoutHints = calculateScoreWithoutHints();
@@ -285,7 +273,6 @@ const logCurrentScore = () => {
     console.log(`Current score without hints: ${scoreWithoutHints}`);
 };
 
-// Move to next question
 const moveToNextQuestion = () => {
     if (currentQuestionIndex < quizData.length - 1) {
         currentQuestionIndex++;
@@ -297,22 +284,19 @@ const moveToNextQuestion = () => {
     }
 };
 
-// Show hint
 const showHint = () => {
     console.log(`Showing hint for question ${currentQuestionIndex + 1}`);
     document.getElementById('dialogue-hint').innerText = quizData[currentQuestionIndex].Hint;
-    document.getElementById('dialogue-hint').classList.remove('hidden');
+    document.getElementById('dialogue-hint').classList.remove('proto-hidden');
 };
 
-// Show answer
 const showAnswer = () => {
     console.log(`Showing answer for question ${currentQuestionIndex + 1}`);
     document.getElementById('dialogue-answer').innerText = quizData[currentQuestionIndex].CorrectOptionDescription;
-    document.getElementById('dialogue-answer').classList.remove('hidden');
+    document.getElementById('dialogue-answer').classList.remove('proto-hidden');
     document.getElementById('next-button').disabled = false;
 };
 
-// End quiz
 const endQuiz = () => {
     const endTime = new Date();
     const totalTime = endTime - startTime;
@@ -338,7 +322,6 @@ const endQuiz = () => {
 
     console.log('Quiz Summary:', quizSummary);
 
-    // Send quiz summary to parent window
     window.parent.postMessage({
         type: 'quizSummary',
         quizSummary
@@ -349,7 +332,6 @@ const endQuiz = () => {
     showQuizModal(quizSummary.scoreWithHints, quizSummary.scoreWithoutHints, quizSummary.time, quizSummary.correctQuestions, quizSummary.totalQuestions);
 };
 
-// Calculate score
 const calculateScoreWithHints = () => {
     const totalQuestions = quizData.length;
     const correctAnswers = correctQuestions;
@@ -371,24 +353,21 @@ const formatScore = (score) => {
     return Math.round(score * 10) / 10;
 };
 
-// Format time
 const formatTime = (milliseconds) => {
     const minutes = Math.floor(milliseconds / 60000);
     const seconds = ((milliseconds % 60000) / 1000).toFixed(0);
     return `${minutes}:${(seconds < 10 ? '0' : '')}${seconds}`;
 };
 
-// Log event
 const logEvent = (message) => {
     console.log(message);
 };
 
-// Event listeners
 document.getElementById('prev-button').onclick = () => {
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
         selectedOptionIndex = null;
-        clearSelectedClass(); // Clear selected class when navigating to the previous question
+        clearSelectedClass();
         displayQuestion();
     }
 };
@@ -398,20 +377,18 @@ document.getElementById('next-button').onclick = handleNextButtonClick;
 document.getElementById('clear-button').onclick = () => {
     clearState();
     alert('Local storage cleared.');
-    window.location.reload(); // Reload the page to start fresh
+    window.location.reload();
 };
 
-// Initialize quiz
 const urlParams = new URLSearchParams(window.location.search);
-const quizId = urlParams.get('id'); // Assuming the URL has a parameter like ?id=0
+const quizId = urlParams.get('id');
 if (quizId) {
     fetchQuizData(quizId);
 }
 startTime = new Date();
-document.getElementById('quiz-overlay').classList.add('hidden'); // Ensure overlay is hidden when page loads
-document.getElementById('quiz-overlay').style.display = 'none'; // Ensure overlay is hidden when page loads
+document.getElementById('quiz-overlay').classList.add('proto-hidden');
+document.getElementById('quiz-overlay').style.display = 'none';
 
-// Ensure the last unanswered question is displayed on page load
 window.onload = () => {
     if (quizId) {
         loadState();
@@ -419,8 +396,6 @@ window.onload = () => {
     }
 };
 
-// Overlay and Confetti Functions
-// Show quiz modal
 function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQuestions, totalQuestions) {
     $('#scoreWithHints').text(scoreWithHints);
     $('#scoreWithoutHints').text(scoreWithoutHints);
@@ -433,10 +408,7 @@ function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQues
     setSummaryColor(correctQuestions, totalQuestions);
 
     $('#quizOverlay').show();
-    // startConfetti();
-    // console.log("Confetti started and overlay displayed");
 
-    // Reattach the event listener every time the overlay is shown
     const closeButton = document.getElementById('close-button');
     if (closeButton) {
         console.log("Close button found, adding event listener.");
@@ -447,9 +419,8 @@ function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQues
 }
 
 function closeQuizModal() {
-    console.log("Close button clicked"); // Log to check if the click is registered
+    console.log("Close button clicked");
     $('#quizOverlay').hide();
-    // stopConfetti();
     window.location.href = "student_dashboard.html";
 }
 
@@ -479,142 +450,3 @@ function setSummaryColor(correctQuestions, totalQuestions) {
         summary.css('color', 'crimson');
     }
 }
-
-// Confetti code
-var maxParticleCount = 150; // set max confetti count
-var particleSpeed = 2; // set the particle animation speed
-var startConfetti; // call to start confetti animation
-var stopConfetti; // call to stop adding confetti
-var toggleConfetti; // call to start or stop the confetti animation depending on whether it's already running
-var removeConfetti; // call to stop the confetti animation and remove all confetti immediately
-
-(function () {
-    startConfetti = startConfettiInner;
-    stopConfetti = stopConfettiInner;
-    toggleConfetti = toggleConfettiInner;
-    removeConfetti = removeConfettiInner;
-    var colors = ["DodgerBlue", "OliveDrab", "Gold", "Pink", "SlateBlue", "LightBlue", "Violet", "PaleGreen", "SteelBlue", "SandyBrown", "Chocolate", "Crimson"];
-    var streamingConfetti = false;
-    var animationTimer = null;
-    var particles = [];
-    var waveAngle = 0;
-
-    function resetParticle(particle, width, height) {
-        particle.color = colors[(Math.random() * colors.length) | 0];
-        particle.x = Math.random() * width;
-        particle.y = Math.random() * height - height;
-        particle.diameter = Math.random() * 10 + 5;
-        particle.tilt = Math.random() * 10 - 10;
-        particle.tiltAngleIncrement = Math.random() * 0.07 + 0.05;
-        particle.tiltAngle = 0;
-        return particle;
-    }
-
-    function startConfettiInner() {
-        console.log("Starting confetti animation");
-        var width = window.innerWidth;
-        var height = window.innerHeight;
-        window.requestAnimFrame = (function () {
-            return window.requestAnimationFrame ||
-                window.webkitRequestAnimationFrame ||
-                window.mozRequestAnimationFrame ||
-                window.oRequestAnimationFrame ||
-                window.msRequestAnimationFrame ||
-                function (callback) {
-                    return window.setTimeout(callback, 16.6666667);
-                };
-        })();
-        var canvas = document.getElementById("confetti-canvas");
-        if (canvas === null) {
-            canvas = document.createElement("canvas");
-            canvas.setAttribute("id", "confetti-canvas");
-            canvas.setAttribute("style", "display:block;z-index:999999;pointer-events:none");
-            document.body.appendChild(canvas);
-            canvas.width = width;
-            canvas.height = height;
-            window.addEventListener("resize", function () {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }, true);
-        }
-        var context = canvas.getContext("2d");
-        while (particles.length < maxParticleCount)
-            particles.push(resetParticle({}, width, height));
-        streamingConfetti = true;
-        if (animationTimer === null) {
-            (function runAnimation() {
-                context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-                if (particles.length === 0)
-                    animationTimer = null;
-                else {
-                    updateParticles();
-                    drawParticles(context);
-                    animationTimer = requestAnimFrame(runAnimation);
-                }
-            })();
-        }
-    }
-
-    function stopConfettiInner() {
-        console.log("Stopping confetti animation");
-        streamingConfetti = false;
-    }
-
-    function removeConfettiInner() {
-        stopConfetti();
-        particles = [];
-        console.log("Confetti removed");
-    }
-
-    function toggleConfettiInner() {
-        if (streamingConfetti)
-            stopConfettiInner();
-        else
-            startConfettiInner();
-    }
-
-    function drawParticles(context) {
-        var particle;
-        var x;
-        for (var i = 0; i < particles.length; i++) {
-            particle = particles[i];
-            context.beginPath();
-            context.lineWidth = particle.diameter;
-            context.strokeStyle = particle.color;
-            x = particle.x + particle.tilt;
-            context.moveTo(x + particle.diameter / 2, particle.y);
-            context.lineTo(x, particle.y + particle.tilt + particle.diameter / 2);
-            context.stroke();
-        }
-    }
-
-    function updateParticles() {
-        var width = window.innerWidth;
-        var height = window.innerHeight;
-        var particle;
-        waveAngle += 0.01;
-        for (var i = 0; i < particles.length; i++) {
-            particle = particles[i];
-            if (!streamingConfetti && particle.y < -15)
-                particle.y = height + 100;
-            else {
-                particle.tiltAngle += particle.tiltAngleIncrement;
-                particle.x += Math.sin(waveAngle);
-                particle.y += (Math.cos(waveAngle) + particle.diameter + particleSpeed) * 0.5;
-                particle.tilt = Math.sin(particle.tiltAngle) * 15;
-            }
-            if (particle.x > width + 20 || particle.x < -20 || particle.y > height) {
-                if (streamingConfetti && particles.length <= maxParticleCount)
-                    resetParticle(particle, width, height);
-                else {
-                    particles.splice(i, 1);
-                    i--;
-                }
-            }
-        }
-    }
-})();
-
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelector('.quiz-close').addEventListener('click', closeQuizModal);
-});

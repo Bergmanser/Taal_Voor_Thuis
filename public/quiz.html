@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
     <title>Singular Quiz Page</title>
@@ -20,7 +21,7 @@
     </div>
     <div class="content-wrapper">
         <main id="quiz-main">
-            <div class="quiz-container"> 
+            <div class="quiz-container">
                 <div class="container-embedded-text-hero">
                     <div class="text-section-container" id="text-section-container"></div>
                     <div class="screenreader-text" style="display:none;"></div>
@@ -53,45 +54,133 @@
                         <div class="embedded-text" id="embedded-text"></div>
                     </div>
                     <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
-                    <!-- <div class="swap-layers-button" id="swap-layers-button" style="display: none;">Swap Layers</div> -->
                 </div>
-                <div class="quiz-window-container hidden" id="quiz-window-container"></div>
+                <div class="quiz-controls">
+                    <button id="swap-layers-button" class="custom-button hidden">
+                        <span class="icon">arrow_forward_ios</span>
+                    </button>                    
+                    <div class="quiz-window-container hidden" id="quiz-window-container">
+                        <div class="proto-quiz-container">
+                            <div class="proto-quiz-header">
+                                <button id="clear-button" class="proto-clear-button">Clear Local Storage</button>
+                                <div class="proto-number-display" id="number-display">1 / 10</div>
+                            </div>
+                            <div class="proto-question-container">
+                                <div id="question-tracker"></div>
+                                <div id="question-text"></div>
+                                <div id="options-container"></div>
+                                <div class="proto-character-container">
+                                    <div id="character" class="proto-character"></div>
+                                    <div id="dialogue-hint" class="proto-dialogue proto-hidden"></div>
+                                    <div id="dialogue-answer" class="proto-dialogue proto-hidden"></div>
+                                </div>
+                            </div>
+                            <div class="proto-navigation-container">
+                                <button id="prev-button" class="btn btn-secondary" disabled>Previous</button>
+                                <button id="next-button" class="btn btn-primary" disabled>Next</button>
+                            </div>
+                        </div>
+                        <div id="quizOverlay" class="proto-quiz-overlay">
+                            <div class="proto-quiz-modal">
+                                <div class="proto-score-container">
+                                    <div id="scoreWithHintsCircle" class="proto-score-circle">
+                                        <div class="proto-score-title">Score with Hints</div>
+                                        <div class="proto-black-ring"></div>
+                                        <div class="proto-colored-ring"></div>
+                                        <span id="scoreWithHints">8</span>
+                                    </div>
+                                    <div class="proto-divider-vertical"></div>
+                                    <div id="scoreWithoutHintsCircle" class="proto-score-circle">
+                                        <div class="proto-score-title">Score without Hints</div>
+                                        <div class="proto-black-ring"></div>
+                                        <div class="proto-colored-ring"></div>
+                                        <span id="scoreWithoutHints">10</span>
+                                    </div>
+                                </div>
+                                <div id="scoreSummary" class="proto-score-summary">
+                                    <span id="correctQuestions" class="proto-correct-questions">X</span> out of <span id="totalQuestions">Y</span> questions were correctly answered.
+                                </div>
+                                <div class="proto-timer">
+                                    <span id="totalTime">3:41</span>
+                                </div>
+                                <button id="close-button" class="proto-quiz-close btn btn-primary">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
     <script src="https://cse.google.com/cse.js?cx=111c176d9efa64756"></script>
     <script type="module" src="../public/assets/js/quiz.js"></script>
+    <script type="module" src="../public/assets/js/quiz_question_proto.js"></script>
     <script type="module" src="../public/assets/js/screenreader_quiztext.js"></script>
     <script>
-        // Ensure showAnswerSheet is defined globally
-        window.showAnswerSheet = () => {
-            quizData.forEach((_, index) => {
-                currentQuestionIndex = index;
-                displayQuestion();
-            });
-            document.getElementById('next-button').classList.add('hidden');
-        };
+        // // JavaScript for dynamically updating the question number and handling quiz logic
 
+        // let currentQuestionIndex = 0;
+        // let totalQuestions = 10; // Example total, update dynamically as needed
+
+        // // Example function to display a question
+        // const displayQuestion = () => {
+        //     const question = quizData[currentQuestionIndex];
+        //     const questionTextElement = document.getElementById('question-text');
+        //     const numberDisplayElement = document.getElementById('number-display');
+
+        //     // Update the question text with the number
+        //     questionTextElement.innerHTML = `${currentQuestionIndex + 1}. ${question.text}`;
+            
+        //     // Update the number display (e.g., "2 / 10")
+        //     numberDisplayElement.innerHTML = `${currentQuestionIndex + 1} / ${totalQuestions}`;
+
+        //     // Other logic for displaying options, updating navigation, etc.
+        // };
+
+        // // Example quiz data
+    
+
+        // // Ensure showAnswerSheet is defined globally
+        // window.showAnswerSheet = () => {
+        //     quizData.forEach((_, index) => {
+        //         currentQuestionIndex = index;
+        //         displayQuestion();
+        //     });
+        //     document.getElementById('next-button').classList.add('hidden');
+        // };
+    
         $(document).ready(function() {
             $('#header-container').load('index.html');
+    
             $('#start-quiz-button').on('click', function() {
-                $('#quiz-window-container').load('quiz_question_proto.html', function() {
-                    $(this).removeClass('hidden');
-                });
+                $('#quiz-window-container').removeClass('hidden');
+                displayQuestion(); // Show the first question
             });
-
+    
             // Check for 'answersheet' parameter in the URL
             const urlParams = new URLSearchParams(window.location.search);
             const isAnswerSheet = urlParams.get('answersheet') === 'true';
-
+    
             if (isAnswerSheet) {
-                $('#quiz-window-container').load('quiz_question_proto.html', function() {
-                    $(this).removeClass('hidden');
-                    // Trigger the answer sheet logic
-                    window.showAnswerSheet();
-                });
+                $('#quiz-window-container').removeClass('hidden');
+                // Trigger the answer sheet logic
+                window.showAnswerSheet();
             }
+
+            // // Example logic for navigation buttons
+            // $('#next-button').on('click', function() {
+            //     if (currentQuestionIndex < totalQuestions - 1) {
+            //         currentQuestionIndex++;
+            //         displayQuestion();
+            //     }
+            // });
+
+            // $('#prev-button').on('click', function() {
+            //     if (currentQuestionIndex > 0) {
+            //         currentQuestionIndex--;
+            //         displayQuestion();
+            //     }
+            // });
         });
-    </script>
+    </script>    
 </body>
 </html>
