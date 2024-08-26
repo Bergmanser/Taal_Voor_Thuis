@@ -10,11 +10,11 @@ export let quizData;
 document.addEventListener("DOMContentLoaded", function () {
     // Array of background image URLs
     const backgroundImages = [
-        '../images/quiz_background_1.png',
-        '../images/quiz_background_2.png',
-        '../images/quiz_background_3.png',
-        '../images/quiz_background_4.png',
-        '../images/quiz_background_5.png'
+        '/public/assets/images/quiz_background_1.png',
+        '/public/assets/images/quiz_background_2.png',
+        '/public/assets/images/quiz_background_3.png',
+        '/public/assets/images/quiz_background_4.png',
+        '/public/assets/images/quiz_background_5.png'
     ];
 
     function setRandomBackground() {
