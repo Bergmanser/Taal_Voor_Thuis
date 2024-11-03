@@ -35,7 +35,7 @@ form.addEventListener('submit', (e) => {
 
                 // Insert redirect after sign-up here!
                 alert("User Created!");
-                window.location.href = "login_employee.html";
+                window.location.href = "login_employee_tvt.html";
             })
             .catch((error) => {
                 const errorCode = error.code;

@@ -1,32 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Student Overview Page Parent Dashboard</title>
-  <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-      />
-  <link rel="stylesheet" href="./assets/css/main_menu.css"/>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard Main Menu</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/employee_dashboard.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-  <header>
-    <div id="header-container"></div>
-  </header>
-  <section>
-      <button id="studentOverview-btn">Student Overview</button>
-      <button id="quizUpdate-btn">Add a new quiz to the DB</button>
-      <button id="quizSearchOverview-btn">Search for quizzes</button>
-  </section>
-  <script type="module" src="./assets/js/main_menu.js"></script>
-  <script>
-    $(document).ready(function() {
-        $('#header-container').load('index.html');
-    });
-  </script>
+    <header>
+        <div id="header-container"></div>
+    </header>
+    <div class="dashboard-container">
+        <div class="dashboard-grid" id="dashboardGrid"></div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#header-container').load('global_header.html');
+        });
+    </script>
+    <script type="module" src="../public/assets/js/employee_dashboard.js"></script>
 </body>
 </html>

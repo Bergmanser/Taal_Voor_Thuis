@@ -1,6 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap");
 
 /* Body styling to ensure the background image covers the entire viewport and is centered */
+/* body {
+    font-family: "Poppins", sans-serif; 
+    height: 100vh; 
+    margin: 0;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    background-image: url("../images/login_tvt\(4\).jpeg");
+    background-size: cover; 
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed; 
+} */
+
+/* Body styling with gradient */
 body {
     font-family: "Poppins", sans-serif; 
     height: 100vh; 
@@ -8,11 +23,34 @@ body {
     display: flex; 
     justify-content: center; 
     align-items: center; 
-    background-image: url("../images/temp-background.jpeg");
-    background-size: cover; 
-    background-repeat: no-repeat;
-    background-position: center;
-    background-attachment: fixed; 
+    background: linear-gradient(
+        135deg,
+        #b13058 0%,
+        #a82b51 20%,
+        #ac2c53 35%,
+        #9e2a4c 50%,
+        #962847 65%,
+        #8d2644 80%,
+        #852340 100%
+    );
+    background-attachment: fixed;
+    position: relative;
+}
+
+/* Background overlay */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: -1;
+}
+
+.hidden {
+    display: none;
 }
 
 /* Container for the login form */
@@ -22,9 +60,10 @@ body {
     padding: 20px; 
     position: relative;
     margin-top: 20px;
+    z-index: 1;
 }
 
-/* Form styling for the login form */
+/* Form styling */
 .login-form {
     display: flex; 
     flex-direction: column; 
@@ -32,57 +71,84 @@ body {
     background-color: #191919; 
     color: #a2d63c; 
     border-radius: 1.25rem;
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    padding: 25px;
 }
 
-/* Image styling for the form image */
+/* Image styling */
 .form-image img {
     max-width: 80px; 
-    margin: 0 auto 10px; 
+    margin: 0 auto 10px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
 }
 
 /* Heading text styling */
 .form-heading h1 {
     font-size: 24px; 
     font-weight: 500; 
-    text-align: center; 
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Wrapper for the input fields */
+/* Input styling */
 .input-wrap .input {
     position: relative; 
 }
 
-/* Input field styling */
 .input-wrap .input input {
     width: 100%; 
     padding: 12px; 
     margin-bottom: 15px; 
     border-radius: 8px; 
     border: 1px solid #333; 
-    background-color: #f9f9f9; 
+    background-color: rgba(249, 249, 249, 0.95);
     color: #000; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.1),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
-/* Styling for focused input fields */
 input:focus {
     outline: none; 
     border-color: #a2d63c; 
-    box-shadow: 0 0 5px rgba(162, 214, 60, 0.5); 
+    box-shadow: 
+        0 0 0 2px rgba(162, 214, 60, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
 }
 
-/* Disabled button styling */
+/* Button styling */
+button {
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 4px 12px rgba(162, 214, 60, 0.2),
+        0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+button:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 6px 15px rgba(162, 214, 60, 0.25),
+        0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
 button:disabled {
     cursor: not-allowed; 
-    background-color: #ccc; 
+    background-color: #ccc;
+    box-shadow: none;
 }
 
-/* Hover effect for disabled buttons */
 button:hover:disabled {
-    background-color: #ccc; 
+    background-color: #ccc;
+    transform: none;
 }
 
-/* Toast notification styling */
+/* Toast notifications */
 .toast-container {
     position: fixed;
     bottom: 20px;
@@ -93,6 +159,9 @@ button:hover:disabled {
 .toast {
     min-width: 250px;
     color: white;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .toast.bg-success {
@@ -101,4 +170,269 @@ button:hover:disabled {
 
 .toast.bg-danger {
     background-color: #dc3545;
+}
+
+/* Background effects */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.025) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.025) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Language switcher */
+.language-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.language-switcher select {
+    background-color: rgba(25, 25, 25, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 8px 30px 8px 15px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: 
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 2px 4px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(10px);
+}
+
+.language-switcher::after {
+    content: '▼';
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.language-switcher select:hover {
+    background-color: rgba(35, 35, 35, 0.95);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 
+        0 6px 8px rgba(0, 0, 0, 0.12),
+        0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.language-switcher select:focus {
+    outline: none;
+    border-color: rgba(162, 214, 60, 0.4);
+    box-shadow: 
+        0 0 0 2px rgba(162, 214, 60, 0.1),
+        0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.language-switcher select option {
+    background-color: #191919;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+}
+
+/* Responsive Media Queries */
+
+/* Tablet Portrait */
+@media (min-width: 768px) and (orientation: portrait) {
+    .container {
+        margin-top: 0;
+        transform: translateY(-5%);
+    }
+
+    .container::before {
+        content: 'Taal voor Thuis';
+        position: absolute;
+        top: -60px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: rgb(255, 255, 255);
+        font-size: 1.7rem;
+        font-weight: 300;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .container::after {
+        content: '© 2024 Taal voor Thuis | Meer Dan Bijles';
+        position: absolute;
+        bottom: -60px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+        font-weight: 300;
+    }
+}
+
+/* Tablet Landscape */
+@media (min-width: 768px) and (orientation: landscape) and (max-width: 1199px) {
+    .container {
+        margin: 0 auto;
+        transform: translateY(0);
+    }
+
+    .container::before {
+        content: 'Taal voor Thuis';
+        position: absolute;
+        top: -45px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: rgb(255, 255, 255);
+        font-size: 1.3rem;
+        font-weight: 300;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .container::after {
+        content: '© 2024 Taal voor Thuis | Meer Dan Bijles';
+        position: absolute;
+        bottom: -40px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85rem;
+        font-weight: 300;
+    }
+
+    .login-form {
+        padding: 25px;
+    }
+}
+
+/* Desktop and Large Screens */
+@media (min-width: 1200px) {
+    .container {
+        margin: 0 auto;
+        transform: translateY(-3%);
+    }
+
+    .container::before {
+        content: 'Taal voor Thuis';
+        position: absolute;
+        top: -70px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: rgb(255, 255, 255);
+        font-size: 1.8rem;
+        font-weight: 300;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .container::after {
+        content: '© 2024 Taal voor Thuis | Meer Dan Bijles';
+        position: absolute;
+        bottom: -65px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1rem;
+        font-weight: 300;
+        transition: all 0.3s ease;
+    }
+}
+
+/* Very Large Screens */
+@media (min-width: 1600px) {
+    .container::before {
+        top: -80px;
+        font-size: 2rem;
+    }
+
+    .container::after {
+        bottom: -75px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Small Screens and Phones Landscape */
+@media (max-height: 500px) {
+    .container {
+        transform: translateY(0);
+    }
+
+    .container::before {
+        top: -30px;
+        font-size: 1.1rem;
+    }
+
+    .container::after {
+        bottom: -25px;
+        font-size: 0.8rem;
+    }
+
+    .login-form {
+        padding: 20px;
+    }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .language-switcher {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .language-switcher select {
+        padding: 6px 25px 6px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Background Shapes for Larger Screens */
+@media (min-width: 768px) {
+    .background-shapes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .background-shapes::before {
+        content: '';
+        position: absolute;
+        top: 15%;
+        left: 10%;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .background-shapes::after {
+        content: '';
+        position: absolute;
+        bottom: 15%;
+        right: 10%;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+        border-radius: 50%;
+    }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taal Voor Thuis Account Login For The Student Role</title>
+    <title>Taal Voor Thuis - Student Login</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="../public/assets/css/login_tvt.css">
@@ -13,14 +13,21 @@
 </head>
 <body>
     <div class="container">
-        <div class="login-form card p-4 mt-5 bg-dark text-light">
+        <div class="language-switcher hidden">
+            <select id="language-switcher" class="custom-select">
+                <option value="nl">Nederlands</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+
+        <div class="login-form card p-4 mt-3 bg-dark text-light">
             <form class="form-content">
                 <div class="form-image text-center mb-3">
                     <img src="./assets/images/puzzlePiece.png" alt="Icon" class="img-fluid" />
                 </div>
                 <div class="form-heading text-center mb-3">
-                    <h1 class="h3">Login</h1>
-                    <p>Please fill out all the required fields to login into your Student account</p>
+                    <h1 id="form-heading" class="h3">Login</h1>
+                    <p id="form-subheading">Please fill out all the required fields to log in to your Student account</p>
                 </div>
                 <div class="input-wrap mb-3">
                     <div class="input mb-3">
@@ -39,6 +46,8 @@
         </div>
     </div>
 
+    <!-- Localization and Main Script Files -->
+    <script type="module" src="../public/assets/js/localization.js"></script>
     <script type="module" src="../public/assets/js/login_student.js"></script>
 </body>
 </html>

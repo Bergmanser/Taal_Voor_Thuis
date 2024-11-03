@@ -1,9 +1,19 @@
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, updateDoc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { auth, db } from "./firebase_config.js"
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { collection, doc, getDocs, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { auth, db } from "./firebase_config.js";
+import { setLanguage, t, updateUIText } from './localization.js';
 
-// Function to show toast feedback
-function showToast(message, isSuccess = true) {
+// Set initial language and update UI texts
+setLanguage('nl');  // Set to Dutch ('nl') if preferred
+
+// Listen for language changes
+document.getElementById('language-switcher').addEventListener('change', (event) => {
+    setLanguage(event.target.value);
+});
+
+// Function to show toast feedback with localized messages
+function showToast(key, isSuccess = true) {
+    const message = t(key);
     const notificationArea = document.getElementById('notification-area');
     const toast = document.createElement('div');
     toast.className = `toast ${isSuccess ? 'bg-success' : 'bg-danger'} show`;
@@ -16,7 +26,7 @@ function showToast(message, isSuccess = true) {
 
     const toastTitle = document.createElement('strong');
     toastTitle.className = 'mr-auto';
-    toastTitle.textContent = 'Notification';
+    toastTitle.textContent = t('notificationTitle');
 
     const toastTime = document.createElement('small');
     toastTime.className = 'text-muted';
@@ -54,12 +64,11 @@ document.getElementById('login-button').addEventListener('click', async () => {
     const password = document.getElementById('password-user-login').value;
 
     if (!username || !password) {
-        showToast('Please fill in both username and password fields.', false);
+        showToast('fillFields', false);
         return;
     }
 
     try {
-        // Retrieve the user document from Firestore using the username
         const usersRef = collection(db, "users");
         const userQuery = query(usersRef, where("username", "==", username));
         const userSnapshot = await getDocs(userQuery);
@@ -70,29 +79,24 @@ document.getElementById('login-button').addEventListener('click', async () => {
             const userRoleId = userDoc.data().userRoleId;
 
             if (userRoleId === 0) {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                await updateDoc(doc(db, "users", user.uid), {
-                    last_login: new Date()
-                });
-
-                await updateDoc(doc(db, "studentdb", user.uid), {
-                    last_login: new Date()
-                });
-
-                showToast("User logged in!");
-                setTimeout(() => {
-                    window.location.href = "student_dashboard.html";
-                }, 2000);
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    await updateDoc(doc(db, "users", userCredential.user.uid), { last_login: new Date() });
+                    showToast('loginSuccess');
+                    setTimeout(() => {
+                        window.location.href = "student_dashboard.html";
+                    }, 2000);
+                } catch {
+                    showToast('loginError', false);
+                }
             } else {
-                showToast("Invalid user role.", false);
+                showToast('invalidRole', false);
             }
         } else {
-            showToast("User not found.", false);
+            showToast('loginError', false);
         }
-    } catch (error) {
-        showToast(error.message, false);
+    } catch {
+        showToast('generalError', false);
     }
 });
 
@@ -105,3 +109,6 @@ loginFormInputs.forEach(input => {
         }
     });
 });
+
+// Update initial UI text
+updateUIText();

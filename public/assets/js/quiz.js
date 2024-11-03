@@ -1,8 +1,9 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { initScreenReader } from '../js/screenreader_quiztext.js';
+// import { initScreenReader } from '../js/screenreader_quiztext.js';
 import { app, auth, db } from "./firebase_config.js";
 import { redirectUserBasedOnRole } from "./roleRedirect.js";
+
 
 export let quizData;
 

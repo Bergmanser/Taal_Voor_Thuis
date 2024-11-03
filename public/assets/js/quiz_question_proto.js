@@ -4,13 +4,13 @@ import { app, auth, db } from "./firebase_config.js";
 import { uploadQuizSummary } from "./quiz.js";
 
 // State Management
-let quizData = [];
 export let currentQuestionIndex = 0;
-let userResponses = {};
-let attempts = {};
-let feedback = {};
+export let userResponses = {};
+export let attempts = {};
+export let feedback = {};
+export let startTime = new Date();
+let quizData = [];
 let selectedOptionIndex = null;
-let startTime;
 let questionStartTime;
 let quizSummary = {};
 let correctQuestions = 0;
@@ -23,7 +23,7 @@ const feedbackMessages = {
 };
 
 // Save state to localStorage
-const saveState = () => {
+export const saveState = (quizId) => {
     const state = {
         currentQuestionIndex,
         userResponses,
@@ -31,15 +31,42 @@ const saveState = () => {
         feedback,
         selectedOptionIndex,
         startTime: startTime.getTime(),
+        questionStartTime: questionStartTime.getTime(),  // Track time spent on question
         correctQuestions
     };
-    localStorage.setItem('quizState', JSON.stringify(state));
-    console.log("State saved to localStorage:", state);
+    localStorage.setItem(`quizState_${quizId}`, JSON.stringify(state));
+    console.log("State saved to localStorage for quiz:", quizId, state);
 };
 
-// Load state from local storage
-const loadState = () => {
-    const state = JSON.parse(localStorage.getItem('quizState'));
+// Selectively save state only when necessary
+// const selectiveSaveState = (quizId) => {
+//     // Save state when necessary, like moving to the next question or answering one
+//     saveState(quizId);
+// };
+
+// Load state from (local)storage
+const loadState = async (quizId) => {
+    // Attempt to load from local storage first
+    let state = JSON.parse(localStorage.getItem(`quizState_${quizId}`));
+
+    if (!state) {
+        console.log("No local storage data found, attempting to load from Firestore");
+        try {
+            const userDocRef = doc(db, "studentdb", auth.currentUser.uid);
+            const userDoc = await getDoc(userDocRef);
+            const quizData = userDoc.data().quizzes[quizId];
+
+            if (quizData && quizData.state === 'paused') {
+                console.log("Paused state found in Firestore, loading quiz state...");
+                state = quizData;
+            } else {
+                console.log("No paused state found in Firestore");
+            }
+        } catch (error) {
+            console.error("Error fetching paused state from Firestore: ", error);
+        }
+    }
+
     if (state) {
         currentQuestionIndex = state.currentQuestionIndex;
         userResponses = state.userResponses;
@@ -47,19 +74,29 @@ const loadState = () => {
         feedback = state.feedback;
         selectedOptionIndex = state.selectedOptionIndex;
         startTime = new Date(state.startTime);
+        questionStartTime = new Date(state.questionStartTime);
         correctQuestions = state.correctQuestions || 0;
-        console.log("State loaded from localStorage:", state);
+        console.log("State loaded from storage for quiz:", quizId, state);
+
+        // Automatically click the start quiz button if state is available
+        const startButton = document.getElementById('start-quiz-button');
+        if (startButton) {
+            startButton.click();
+        } else {
+            console.error("'start-quiz-button' not found");
+        }
     } else {
+        console.log("No previous state found for quiz:", quizId);
         startTime = new Date();
+        questionStartTime = new Date();
         correctQuestions = 0;
-        console.log("No previous state found, starting new quiz.");
     }
 };
 
 // Clear state from localStorage
-export const clearState = () => {
-    localStorage.removeItem('quizState');
-    console.log("State cleared from localStorage.");
+export const clearState = (quizId) => {
+    localStorage.removeItem(`quizState_${quizId}`);
+    console.log(`State cleared from localStorage for quiz: ${quizId}`);
     currentQuestionIndex = 0;
     attempts = {};
     feedback = {};
@@ -92,10 +129,10 @@ const fetchQuizData = async (quizId) => {
     }
 };
 
-const displayQuestion = () => {
+export const displayQuestion = () => {
     const question = quizData[currentQuestionIndex];
-    document.getElementById('question-text').innerText = question.Text;
-    document.getElementById('question-tracker').innerText = `Question ${currentQuestionIndex + 1} out of ${quizData.length}`;
+    document.getElementById('question-text').innerText = currentQuestionIndex + 1 + ". " + question.Text
+    document.getElementById('question-tracker').innerText = `${currentQuestionIndex + 1} / ${quizData.length}`;
     const optionsContainer = document.getElementById('options-container');
     optionsContainer.innerHTML = '';
 
@@ -128,8 +165,8 @@ const displayQuestion = () => {
     document.getElementById('prev-button').disabled = currentQuestionIndex === 0;
     document.getElementById('next-button').disabled = selectedOptionIndex === null && userResponses[currentQuestionIndex] === undefined;
 
-    document.getElementById('dialogue-hint').classList.add('proto-hidden');
-    document.getElementById('dialogue-answer').classList.add('proto-hidden');
+    document.getElementById('dialogue-hint').classList.add('hidden');
+    document.getElementById('dialogue-answer').classList.add('hidden');
 
     if (userResponses[currentQuestionIndex] !== undefined && attempts[currentQuestionIndex]) {
         showHint();
@@ -144,7 +181,8 @@ const displayQuestion = () => {
 
     document.getElementById('next-button').onclick = handleNextButtonClick;
 
-    questionStartTime = new Date();
+    questionStartTime = new Date()
+    console.log("Question start time recorded:", questionStartTime);
 };
 
 const selectOption = (index) => {
@@ -287,25 +325,21 @@ const moveToNextQuestion = () => {
 const showHint = () => {
     console.log(`Showing hint for question ${currentQuestionIndex + 1}`);
     document.getElementById('dialogue-hint').innerText = quizData[currentQuestionIndex].Hint;
-    document.getElementById('dialogue-hint').classList.remove('proto-hidden');
+    document.getElementById('dialogue-hint').classList.remove('hidden');
 };
 
 const showAnswer = () => {
     console.log(`Showing answer for question ${currentQuestionIndex + 1}`);
     document.getElementById('dialogue-answer').innerText = quizData[currentQuestionIndex].CorrectOptionDescription;
-    document.getElementById('dialogue-answer').classList.remove('proto-hidden');
+    document.getElementById('dialogue-answer').classList.remove('hidden');
     document.getElementById('next-button').disabled = false;
 };
 
-const endQuiz = () => {
+const endQuiz = async () => {
     const endTime = new Date();
     const totalTime = endTime - startTime;
     const scoreWithHints = calculateScoreWithHints();
     const scoreWithoutHints = calculateScoreWithoutHints();
-
-    console.log(`Score with hints: ${scoreWithHints}`);
-    console.log(`Score without hints: ${scoreWithoutHints}`);
-    console.log(`Total time: ${formatTime(totalTime)}`);
 
     quizSummary = {
         title: quizData.Title,
@@ -313,23 +347,34 @@ const endQuiz = () => {
         type: quizData.QuizType,
         state: 'finished',
         time: formatTime(totalTime),
-        scoreWithoutHints: scoreWithoutHints,
-        scoreWithHints: scoreWithHints,
+        scoreWithoutHints,
+        scoreWithHints,
         correctQuestions,
         totalQuestions: quizData.length,
         dateTime: new Date().toISOString()
     };
 
-    console.log('Quiz Summary:', quizSummary);
+    await uploadQuizSummary(quizSummary);
+    clearPausedState(quizId);  // Clear paused state for this quiz
+    showQuizModal(scoreWithHints, scoreWithoutHints, quizSummary.time, correctQuestions, quizData.length);
+};
 
-    window.parent.postMessage({
-        type: 'quizSummary',
-        quizSummary
-    }, '*');
-
-    logEvent('Quiz Completed');
-    uploadQuizSummary(quizSummary);
-    showQuizModal(quizSummary.scoreWithHints, quizSummary.scoreWithoutHints, quizSummary.time, quizSummary.correctQuestions, quizSummary.totalQuestions);
+// Clear paused state in Firestore and local storage
+const clearPausedState = async (quizId) => {
+    try {
+        // Clear paused state from Firestore
+        const userDocRef = doc(db, "studentdb", auth.currentUser.uid);
+        await updateDoc(userDocRef, {
+            [`quizzes.${quizId}`]: {
+                state: "finished"
+            }
+        });
+        // Clear local storage
+        localStorage.removeItem(`quizState_${quizId}`);
+        console.log(`Paused state cleared for quiz: ${quizId}`);
+    } catch (error) {
+        console.error("Error clearing paused state: ", error);
+    }
 };
 
 const calculateScoreWithHints = () => {
@@ -386,7 +431,7 @@ if (quizId) {
     fetchQuizData(quizId);
 }
 startTime = new Date();
-document.getElementById('quiz-overlay').classList.add('proto-hidden');
+document.getElementById('quiz-overlay').classList.add('hidden');
 document.getElementById('quiz-overlay').style.display = 'none';
 
 window.onload = () => {
@@ -449,4 +494,4 @@ function setSummaryColor(correctQuestions, totalQuestions) {
     } else {
         summary.css('color', 'crimson');
     }
-}
+};
