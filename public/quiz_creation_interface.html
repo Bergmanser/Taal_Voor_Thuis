@@ -15,12 +15,18 @@
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.1/dist/pickr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
 </head>
 <body>
 <div id="header-container"></div>
 <div class="container mt-5">
     <h1 class="text-center mb-4">Maak op deze pagina een nieuwe toets aan</h1>
     <form id="quiz-form">
+        <div class="form-group">
+            <label for="pdf-file">Upload een "print-ready tekst" PDF bestand om de inhoud van deze pagina gemakkelijk te genereren(De styling en foto's zullen handmatig aangepast worden)</label>
+            <input type="file" id="pdf-file" class="form-control-file" accept="application/pdf" />
+        </div>
+        <button type="button" id="clear-storage-button" class="btn btn-danger">Clear Form Data</button>
         <div class="form-group">
             <label for="title">Vul hier de titel van de toets in</label>
             <input type="text" id="title" name="title" class="form-control" placeholder="Title" required />
@@ -94,7 +100,7 @@
 </div>
 <script type="module" src="../public/assets/js/quiz_creation.js"></script>
 <script type="module" src="../public/assets/js/embedded_text_creation.js"></script>
-<script>
+<script type="text/javascript">
     $(document).ready(function() {
         $('#header-container').load('index.html', function() {
             $.getScript('app.js');

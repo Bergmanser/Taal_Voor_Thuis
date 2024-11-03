@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="./assets/images/MeerDanBijles-Logo.png">
     <link rel="stylesheet" href="./assets/css/student_dashboard.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
     <title>Quiz Student Dashboard</title>
 </head>
 <body>
@@ -12,11 +21,88 @@
         <div id="header-container"></div>
     </header>
     <main>
-        <section class="hero">
-            <h2>Welcome to the Quiz Site!</h2>
-            <p>Select a quiz to start:</p>
+        <div class="parallax-container">
+            <div class="parallax-background">
+                <div class="parallax-image active" style="background-image: url('../public/assets/images/4k-Mysterious-Black-Hole-AI-Generated-4K-Desktop-Wallpaper.jpg');"></div>
+                <div class="parallax-image" style="background-image: url('../public/assets/images/archeron_shiro.jpeg');"></div>
+                <div class="parallax-image" style="background-image: url('../public/assets/images/void葬礼荧4 4k.jpeg');"></div>
+                <div class="parallax-image" style="background-image: url('../public/assets/images/chiori.jpeg');"></div>
+            </div>
+            <div class="hero-content">
+                <h1>Welcome to Taal Voor Thuis!</h1>
+                <p>Select one of the available quizzes to start your learning endeavour!</p>
+            </div>
+        </div>
+        <section id="stat-tracker" class="stat-tracker-container">
+            <div class="stat-tracker-box">
+                <div class="stat-tracker-header">
+                    <ul class="stat-tracker-titles">
+                        <li>Overall account score:</li>
+                        <li>Best and worst subject scores:</li>
+                        <li>The most recently finished exercises:</li>
+                    </ul>
+                </div>
+                <div class="no-data-message d-none" id="no-data-message">
+                    Come back later after having finished one of the exercises, Good Luck!
+                </div>
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div id="donut-chart" class="chart-container">
+                                <canvas id="averageScoreChart"></canvas>
+                                <div id="average-score-title"></div>
+                                <div id="average-score-text"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="dynamic-best-worst-scores">
+                            <!-- Best and Worst Scores will be dynamically inserted here -->
+                        </div>
+                        <div class="col-md-4" id="dynamic-recent-exercises">
+                            <!-- Recent exercises will be dynamically inserted here -->
+                        </div>
+                    </div>
+                    <div id="subject-details" class="subject-details d-none">
+                        <h4 id="subject-name"></h4>
+                        <p id="average-with-hints"></p>
+                        <p id="average-without-hints"></p>
+                    </div>
+                </div>
+            </div>
         </section>
-        <section id="quizzes" class="quiz-container"></section>
+        
+        <div class="parallax-quiz-container">
+            <div class="parallax-quiz-background"></div>
+            <section id="filter-toolbar" class="filter-toolbar">
+                <select id="quizTypeFilter">
+                    <option value="">All Types</option>
+                    <option value="woordenschat">Woordenschat</option>
+                    <option value="samenvatten">Samenvatten</option>
+                    <option value="verwijswoorden&signaalwoorden">Verwijswoorden & Signaalwoorden</option>
+                    <option value="grammatica">Grammatica</option>
+                    <option value="anders">Anders</option>
+                </select>
+                <select id="sortOrderFilter">
+                    <option value="newFirst">New First</option>
+                    <option value="oldFirst">Old First</option>
+                    <option value="random">Random</option>
+                </select>
+                <select id="quizGroupFilter">
+                    <option value="">All Groups</option>
+                    <option value="3000">3000</option>
+                    <option value="4000">4000</option>
+                    <option value="5000">5000</option>
+                    <option value="6000">6000</option>
+                    <option value="7000">7000</option>
+                    <option value="8000">8000</option>
+                </select>
+                <select id="questionTypeFilter">
+                    <option value="">All Question Types</option>
+                    <option value="Multiple Choice">Multiple Choice</option>
+                    <!-- Future options can be added here -->
+                </select>
+            </section>
+            <section id="quizzes" class="quiz-container"></section>
+        </div>
         <div class="pagination">
             <button id="prev-page" class="page-btn">Vorige</button>
             <span id="page-numbers"></span>
@@ -26,9 +112,7 @@
     <script type="module" src="../public/assets/js/student_dashboard.js"></script>
     <script>
         $(document).ready(function() {
-            $('#header-container').load('index.html', function() {
-                $.getScript('app.js');
-            });
+            $('#header-container').load('index.html', function() { });
         });
     </script>
 </body>

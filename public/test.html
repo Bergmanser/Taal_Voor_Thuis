@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draggable Screenreader Menu</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #screenreader-menu {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: move;
+    user-select: none;
+    z-index: 1000; /* Ensures it stays on top of other elements */
+}
+
+#screenreader-menu .menu-background {
+    background-color: #1a202c;
+    border-radius: 9999px;
+    padding: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+#screenreader-menu .menu-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#screenreader-menu.dark {
+    color: #ffffff;
+}
+
+#screenreader-menu.light {
+    color: #1a202c;
+}
+
+#screenreader-menu.light .menu-background {
+    background-color: #ffffff;
+}
+
+#screenreader-menu button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#screenreader-menu button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#screenreader-menu.light button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+#screenreader-menu #sr-play-pause {
+    background-color: #3182ce;
+    padding: 0.5rem;
+    color: #ffffff;
+}
+
+#screenreader-menu #sr-play-pause:hover {
+    background-color: #2c5282;
+}
+
+#screenreader-menu select {
+    background-color: transparent;
+    border: none;
+    color: inherit;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+}
+
+#screenreader-menu.light select {
+    background-color: #f7fafc;
+}
+
+#screenreader-menu.dark select {
+    background-color: #2d3748;
+}
+
+#screenreader-menu select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3182ce;
+}
+
+#screenreader-menu .feather {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+    </style>
+</head>
+<body>
+    <div id="screenreader-menu" class="dark">
+        <div class="menu-background">
+            <div class="menu-content">
+                <button id="skip-back"><i data-feather="skip-back"></i></button>
+                <button id="rewind"><i data-feather="rewind"></i></button>
+                <button id="play-pause"><i data-feather="play-circle"></i></button>
+                <button id="fast-forward"><i data-feather="fast-forward"></i></button>
+                <button id="skip-forward"><i data-feather="skip-forward"></i></button>
+                <select id="voice-select">
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                </select>
+                <button id="tts-toggle"><i data-feather="volume-2"></i></button>
+                <button id="settings"><i data-feather="settings"></i></button>
+                <button id="theme-toggle"><i data-feather="sun"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            feather.replace();
+
+            let isPlaying = false;
+            let isTTSEnabled = true;
+            let isDarkMode = true;
+
+            function updateIconColors() {
+                if (isDarkMode) {
+                    $('#screenreader-menu button:not(#play-pause)').css('color', '#ffffff');
+                } else {
+                    $('#screenreader-menu button:not(#play-pause)').css('color', '#1a202c');
+                }
+            }
+
+            $('#screenreader-menu').draggable({
+                cursor: 'move',
+                start: function(event, ui) {
+                    $(this).find('.menu-background').css('transition', 'none');
+                },
+                stop: function(event, ui) {
+                    $(this).find('.menu-background').css('transition', 'background-color 0.3s');
+                }
+            });
+
+            $('#play-pause').click(function() {
+                isPlaying = !isPlaying;
+                $(this).find('i').attr('data-feather', isPlaying ? 'pause-circle' : 'play-circle');
+                feather.replace();
+            });
+
+            $('#tts-toggle').click(function() {
+                isTTSEnabled = !isTTSEnabled;
+                $(this).find('i').attr('data-feather', isTTSEnabled ? 'volume-2' : 'volume-x');
+                $(this).css('color', isTTSEnabled ? '#68d391' : '');
+                feather.replace();
+            });
+
+            $('#theme-toggle').click(function() {
+                isDarkMode = !isDarkMode;
+                $('#screenreader-menu').toggleClass('dark light');
+                $(this).find('i').attr('data-feather', isDarkMode ? 'sun' : 'moon');
+                updateIconColors();
+                feather.replace();
+            });
+
+            // Placeholder functions for other buttons
+            $('#skip-back, #rewind, #fast-forward, #skip-forward, #settings').click(function() {
+                console.log($(this).attr('id') + ' clicked');
+            });
+
+            $('#voice-select').change(function() {
+                console.log('Voice changed to: ' + $(this).val());
+            });
+
+            // Initial color update
+            updateIconColors();
+        });
+    </script>
+</body>
+</html>

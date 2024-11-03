@@ -1,34 +1,23 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 import { initializeEmbeddedTextCreation, getEmbeddedText } from './embedded_text_creation.js';
 import { availableFonts } from './fonts.js';
-import { redirectUserBasedOnRole } from './roleRedirect.js';
-
-// Main Config for Project Plato
-const firebaseConfig = {
-    apiKey: "AIzaSyCHFj9oABXSxiWm7u1yPOvyhXQw_FRp5Lw",
-    authDomain: "project-plato-eb365.firebaseapp.com",
-    databaseURL: "https://project-plato-eb365-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "project-plato-eb365",
-    storageBucket: "project-plato-eb365.appspot.com",
-    messagingSenderId: "753582080609",
-    appId: "1:753582080609:web:98b2db93e63a500a56e020",
-    measurementId: "G-KHJXGLJM4Y"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth();
-const db = getFirestore(app);
-const storage = getStorage(app);
+import { auth, db, storage } from "./firebase_config.js";
+import { redirectUserBasedOnRole } from "./roleRedirect.js";
 
 const quizForm = document.getElementById('quiz-form');
 const questionsContainer = document.getElementById('questions');
 let questionId = 1;
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log('Current User Email:', user.email);
+        redirectUserBasedOnRole([3, 4]);
+    } else {
+        window.location.href = "login_employee_tvt.html";
+    }
+});
 
 function compressData(data) {
     return LZString.compress(JSON.stringify(data));
@@ -65,59 +54,218 @@ function saveFormData() {
                 type: 'multiple-choice'
             };
         }),
-        embeddedText: document.getElementById('preview').innerHTML || ''
+        embeddedText: document.getElementById('preview').innerHTML || '',
+        timestamp: new Date().getTime()
     };
     localStorage.setItem('quizFormData', compressData(formData));
 }
 
-function loadFormData() {
+function clearFormData() {
+    localStorage.removeItem('quizFormData');
+    localStorage.removeItem('sectionOrder');
+    localStorage.removeItem('sectionContent');
+    alert("Form data successfully cleared from local storage.");
+    location.reload();
+}
+
+function checkClearFormData() {
     const formData = decompressData(localStorage.getItem('quizFormData'));
     if (formData) {
-        document.getElementById('title').value = formData.title;
-        document.getElementById('title').style.color = formData.titleColor;
-        document.getElementById('title').style.fontFamily = formData.titleFont;
-        document.getElementById('description').value = formData.description;
-        document.getElementById('group-id-subject').value = formData.groupId;
-        if (formData.banner) {
-            const bannerPreview = document.createElement('img');
-            bannerPreview.src = formData.banner;
-            bannerPreview.alt = "Banner Image";
-            bannerPreview.id = 'loaded-banner-img';  // Ensure this ID is unique
-            const existingBanner = document.getElementById('loaded-banner-img');
-            if (existingBanner) {
-                existingBanner.src = formData.banner;
-            } else {
-                document.getElementById('quiz-card-preview').innerHTML = '';
-                const quizCard = createQuizCard(formData.banner);
-                document.getElementById('quiz-card-preview').appendChild(quizCard);
-            }
-        }
-        document.getElementById('quiz-type').value = formData.quizType;
-        formData.questions.forEach((question, index) => {
-            addQuestion(question.type, true);
-            document.getElementById(`question-title-${index + 1}`).value = question.title;
-            question.options.forEach(option => addOption(index + 1, option));
-            document.getElementById(`question-hint-${index + 1}`).value = question.hint;
-            document.getElementById(`correct-option-description-${index + 1}`).value = question.correctOptionDescription;
-            document.getElementById(`correct-option-dropdown-${index + 1}`).value = question.correctOption;
-        });
-        if (document.getElementById('preview')) {
-            document.getElementById('preview').innerHTML = formData.embeddedText || '';
+        const currentTime = new Date().getTime();
+        const twelveHours = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+        if (currentTime - formData.timestamp > twelveHours) {
+            clearFormData();
         }
     }
 }
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log('Current User Email:', user.email);
-        // Call the function with the expected role for the parent dashboard (e.g., 1 and 2 for parents and organization users)
-        redirectUserBasedOnRole([3, 4]);
-    } else {
-        window.location.href = "login_employee.html";
+document.getElementById('clear-storage-button').addEventListener('click', clearFormData);
+
+function addSection(type, sectionData) {
+    let sectionHtml = `
+        <div class="section-container">
+            <div class="section ${type}-section text-section">
+                <div class="section-toolbar">
+                    <button class="btn btn-sm btn-secondary bold-btn" title="Bold the selected text">Bold</button>
+                    <button class="btn btn-sm btn-secondary color-picker" title="Change the border color">Border Color</button>
+                    <button class="btn btn-sm btn-secondary text-color-picker" title="Change the text color">Text Color</button>
+                    <button class="btn btn-sm btn-danger remove-section" title="Remove this section">Remove</button>
+                    <select class="position-dropdown btn btn-sm btn-secondary" title="Change the section position">
+                        <option value="left">Left</option>
+                        <option value="middle">Middle</option>
+                        <option value="right">Right</option>
+                    </select>
+                </div>
+                <div class="section-content" contenteditable="true" style="border-color: ${sectionData.border_color}; color: ${sectionData.text_color}; font-family: ${sectionData.font};">
+                    ${sectionData.text}
+                </div>
+            </div>
+        </div>`;
+    $('#preview').append(sectionHtml);
+}
+
+function addQuestionFromData(questionData) {
+    const question = document.createElement('div');
+    question.className = 'question';
+    question.id = `question-${questionId}`;
+    question.innerHTML = `
+        <h2>Question ${questionId}</h2>
+        <label for="question-title-${questionId}">Question title</label>
+        <input type="text" id="question-title-${questionId}" class="form-control mb-2" placeholder="Question ${questionId} text" value="${questionData.text}" required />
+        <label for="question-options-container">Question options:</label>
+        <div class="question-options-container">
+            <div id="question-options-${questionId}"></div>
+            ${questionData.options.map((option, index) => `
+                <div class="option-section mb-2">
+                    <input type="text" class="form-control mb-2" placeholder="Option text" value="${option}" required />
+                    <button type="button" class="btn btn-danger remove-option-button">Remove Option</button>
+                </div>
+            `).join('')}
+            <button type="button" id="add-option-button-${questionId}" class="btn btn-secondary">Add Option</button>
+            <select id="correct-option-dropdown-${questionId}" class="form-control mt-2">
+                <option value="" disabled selected>Select correct option</option>
+                ${questionData.options.map((option, index) => `<option value="${index}">${option}</option>`).join('')}
+            </select>
+        </div>
+        <label for="question-hint-${questionId}">Question hint:</label>
+        <input type="text" id="question-hint-${questionId}" class="form-control mb-2" placeholder="This will be the hint for question ${questionId}" required />
+        <label for="correct-option-description-${questionId}">Explain the answer:</label>
+        <input type="text" id="correct-option-description-${questionId}" class="form-control mb-2" placeholder="Add the explanation for this questions answer here" required />
+        <button type="button" id="remove-question-button-${questionId}" class="btn btn-danger">Remove Question</button>
+        `;
+    questionsContainer.appendChild(question);
+    initializeQuestion(questionId, 'multiple-choice', true);
+    questionId++;
+}
+
+$('#pdf-file').change(function () {
+    let file = this.files[0];
+    if (file) {
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            let typedArray = new Uint8Array(e.target.result);
+            pdfjsLib.getDocument(typedArray).promise.then(function (pdf) {
+                let totalPages = pdf.numPages;
+                let content = [];
+                for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+                    pdf.getPage(pageNum).then(function (page) {
+                        page.getTextContent().then(function (textContent) {
+                            content.push(textContent);
+                            if (content.length === totalPages) {
+                                processPdfContent(content);
+                            }
+                        });
+                    });
+                }
+            });
+        };
+        reader.readAsArrayBuffer(file);
     }
 });
 
+function processPdfContent(content) {
+    let processedData = {
+        title: "",
+        quiz_group_id: "",
+        sections: [],
+        questions: []
+    };
+
+    let sectionIndex = 1;
+    let isEmbeddedText = true;
+
+    content.forEach((page, pageIndex) => {
+        let section = {
+            "type": "",
+            "text": "",
+            "font": "",
+            "text_color": "",
+            "border_color": "#000000",
+            "bold_words": [],
+            "section_number": ""
+        };
+
+        page.items.forEach((item) => {
+            let text = item.str.trim();
+            let font = item.fontName;
+            let textColor = item.color;
+
+            if (pageIndex === 0 && processedData.title === "") {
+                if (text.includes("HOE LEEFDEN DE EERSTE MENSEN OP AARDE")) {
+                    processedData.title = text;
+                }
+                if (text.includes(" - ")) {
+                    const parts = text.split(" - ");
+                    processedData.quiz_group_id = parts[1].substring(0, 1) + "000";
+                }
+            } else {
+                if (text.match(/^\d+\./)) {
+                    isEmbeddedText = false;
+                }
+
+                if (isEmbeddedText) {
+                    text = text.replace(/HOE LEEFDEN DE EERSTE MENSEN OP AARDE\? - 8013/g, '');
+                    text = text.replace(/\d+\/\s?\d+/g, ''); // Remove page numbers with optional space
+                    section.text += text + " ";
+                    section.font = font;
+                    section.text_color = `#${(textColor || [0, 0, 0]).map(c => c.toString(16).padStart(2, '0')).join('')}`;
+
+                    const boldTextMatches = text.match(/<b>(.*?)<\/b>/g);
+                    if (boldTextMatches) {
+                        boldTextMatches.forEach(match => {
+                            section.bold_words.push(match.replace(/<\/?b>/g, ''));
+                        });
+                    }
+                } else {
+                    processedData.questions.push(text);
+                }
+            }
+        });
+
+        if (isEmbeddedText && section.text.trim().length > 0) {
+            section.type = getSectionType(sectionIndex);
+            section.section_number = `section-${sectionIndex}`;
+            processedData.sections.push(section);
+            sectionIndex++;
+        }
+    });
+
+    console.log(processedData);
+    localStorage.setItem('processedData', JSON.stringify(processedData));
+    loadJsonDataFromLocalStorage();
+}
+
+function getSectionType(index) {
+    if (index % 3 === 1) return 'left';
+    if (index % 3 === 2) return 'right';
+    return 'middle';
+}
+
+function loadJsonDataFromLocalStorage() {
+    let data = JSON.parse(localStorage.getItem('processedData'));
+    if (data) {
+        $('#title').val(data.title);
+        $('#group-id-subject').val(data.quiz_group_id);
+        $('#description').val("Deze tekst gaat over het volgende onderwerp...");
+
+        data.sections.forEach((section) => {
+            addSection(section.type, section);
+        });
+
+        data.questions.forEach((question, index) => {
+            addQuestionFromData({
+                text: question,
+                options: [], // Add logic to parse options if available
+                hint: "", // Add logic to parse hints if available
+                correctOptionDescription: "", // Add logic to parse correct option description if available
+                correctOption: "" // Add logic to parse correct option if available
+            });
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    checkClearFormData(); // Add this line
     loadFormData();
     initializeEmbeddedTextCreation(uploadImage);
 
@@ -155,6 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Form is not valid');
         }
     });
+
+    initializeTitleCustomization(); // Initialize title customization when the page loads
 
     const titleColorPickerElement = document.getElementById('title-color-picker-container');
     if (titleColorPickerElement) {
@@ -623,4 +773,122 @@ document.addEventListener('embeddedTextChange', () => {
 });
 
 setInterval(saveFormData, 5000);  // Autosave every 5 seconds
+
+function initializeTitleCustomization() {
+    const titleColorPickerElement = document.getElementById('title-color-picker-container');
+    if (titleColorPickerElement && !titleColorPickerElement.classList.contains('initialized')) {
+        const titleColorPicker = Pickr.create({
+            el: '#title-color-picker-container',
+            theme: 'nano',
+            default: '#000000',
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                    cmyk: true,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
+
+        titleColorPicker.on('save', (color) => {
+            const colorStr = color.toHEXA().toString();
+            document.getElementById('title').style.color = colorStr;
+            titleColorPicker.hide();
+            saveFormData();
+        });
+
+        titleColorPickerElement.classList.add('initialized');
+    }
+
+    const titleStyleOptionsElement = document.getElementById('title-style-options');
+    if (titleStyleOptionsElement) {
+        const existingFontSearchBar = titleStyleOptionsElement.querySelector('input');
+        if (existingFontSearchBar) {
+            existingFontSearchBar.remove();
+        }
+
+        const fontSearchBar = document.createElement('input');
+        fontSearchBar.setAttribute('list', 'fonts');
+        fontSearchBar.setAttribute('placeholder', 'Search for fonts...');
+        fontSearchBar.className = 'form-control mb-2';
+
+        const fontDataList = document.createElement('datalist');
+        fontDataList.id = 'fonts';
+
+        titleStyleOptionsElement.appendChild(fontSearchBar);
+        titleStyleOptionsElement.appendChild(fontDataList);
+
+        availableFonts.forEach(font => {
+            const option = document.createElement('option');
+            option.value = font;
+            fontDataList.appendChild(option);
+        });
+
+        fontSearchBar.addEventListener('input', (event) => {
+            const selectedFont = event.target.value;
+            if (availableFonts.includes(selectedFont)) {
+                document.getElementById('title').style.fontFamily = selectedFont;
+                const link = document.createElement('link');
+                link.href = `https://fonts.googleapis.com/css?family=${selectedFont}&display=swap`;
+                link.rel = 'stylesheet';
+                document.head.appendChild(link);
+                saveFormData();
+            }
+        });
+    }
+}
+
+// Add the following function to clear font pickers before re-initializing them
+function clearFontPickers() {
+    const existingFontPickers = document.querySelectorAll('.pcr-app');
+    existingFontPickers.forEach(picker => picker.remove());
+}
+
+// Update loadFormData function to call clearFontPickers before initializeTitleCustomization
+function loadFormData() {
+    const formData = decompressData(localStorage.getItem('quizFormData'));
+    if (formData) {
+        document.getElementById('title').value = formData.title;
+        document.getElementById('title').style.color = formData.titleColor;
+        document.getElementById('title').style.fontFamily = formData.titleFont;
+        document.getElementById('description').value = formData.description;
+        document.getElementById('group-id-subject').value = formData.groupId;
+        if (formData.banner) {
+            const bannerPreview = document.createElement('img');
+            bannerPreview.src = formData.banner;
+            bannerPreview.alt = "Banner Image";
+            bannerPreview.id = 'loaded-banner-img';  // Ensure this ID is unique
+            const existingBanner = document.getElementById('loaded-banner-img');
+            if (existingBanner) {
+                existingBanner.src = formData.banner;
+            } else {
+                document.getElementById('quiz-card-preview').innerHTML = '';
+                const quizCard = createQuizCard(formData.banner);
+                document.getElementById('quiz-card-preview').appendChild(quizCard);
+            }
+        }
+        document.getElementById('quiz-type').value = formData.quizType;
+        formData.questions.forEach((question, index) => {
+            addQuestion(question.type, true);
+            document.getElementById(`question-title-${index + 1}`).value = question.title;
+            question.options.forEach(option => addOption(index + 1, option));
+            document.getElementById(`question-hint-${index + 1}`).value = question.hint;
+            document.getElementById(`correct-option-description-${index + 1}`).value = question.correctOptionDescription;
+            document.getElementById(`correct-option-dropdown-${index + 1}`).value = question.correctOption;
+        });
+        if (document.getElementById('preview')) {
+            document.getElementById('preview').innerHTML = formData.embeddedText || '';
+        }
+    }
+    clearFontPickers(); // Clear existing font pickers
+    initializeTitleCustomization(); // Initialize title customization after loading form data
+}
 

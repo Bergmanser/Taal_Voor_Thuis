@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
     <title>Singular Quiz Page</title>
@@ -15,34 +16,69 @@
     <header>
         <div id="header-container"></div>
     </header>
-    <div class="content-wrapper">
-        <div class="loading-indicator">
-            <span class="si-icon si-icon-hourglass" data-icon-name="hourglass">
-                <svg height="64" version="1.1" width="64" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-                    <desc>Created with Snap</desc>
-                    <defs></defs>
-                    <g>
-                        <path fill="none" stroke="#fff" stroke-width="5" d="m 15.177521,13.308356 33.644958,0 -11.214986,18.691643 11.214986,18.691645 -33.644958,0 11.214986,-18.691645 z" transform="matrix(-1,0,0,-1,64,64)"></path>
-                        <path fill="#fff" stroke="none" d="M22,17C22,17,42,17,42,17C42,17,33,32,33,32C33,32,31,32,31,32C31,32,31,32,31,32C31,32,22,17,22,17" transform="matrix(-1,0,0,-1,64,64)"></path>
-                    </g>
-                </svg>
-            </span>
+
+    <!-- Consent Modal -->
+    <!-- <div id="consent-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Tracking Consent</h2>
+            <p>We use tracking to improve your learning experience. Please select which features you consent to:</p>
+            <label>
+                <input type="checkbox" id="consent-basic" checked> Basic tracking (required)
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="consent-advanced"> Advanced tracking (optional)
+            </label>
+            <br><br>
+            <button id="save-consent" class="btn btn-primary">Save Preferences</button>
         </div>
+    </div>
+     -->
+
+     <!-- Consent Button -->
+     <!-- <button id="open-consent-modal" class="btn btn-secondary">Manage Consent Preferences</button> -->
+
+<!-- pause confirmation popup- -->
+<div id="pause-popup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Pause Quiz</h2>
+      <p id="pause-message"></p>
+      <button id="confirm-pause" class="btn btn-primary">Yes, Pause</button>
+      <button id="cancel-pause" class="btn btn-secondary">Cancel</button>
+    </div>
+  </div>
+  
+    <!-- Pauses the quiz and redirects user to student dashboard -->
+    <button id="pause-quiz-button" class="btn btn-warning hidden">
+        <svg data-slot="icon" class="pause-icon" fill="none" stroke-width="3.0" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5"></path>
+          </svg>
+    </button>
+
+    <!-- Word List overview popup- -->
+    <div id="word-list-popup" class="popup hidden">
+        <div class="popup-content">
+        </div>
+      </div>
+
+    <!-- Initiates and closes the word list popup- -->
+    <button id="word-list-button" class="btn btn-warning hidden">Begrippen Lijst</button>
+     
+    <div class="hero">
+        <div class="title" id="quiz-title"></div>
+    </div>
+    <div class="content-wrapper">
         <main id="quiz-main">
-            <div class="quiz-container"> 
-                <div id="slider-container">
-                    <div id="range-slider" class="custom-range-slider"></div>
-                </div>
+            <div class="quiz-container">
                 <div class="container-embedded-text-hero">
-                    <div class="hero" style="background-image: url(banner-image-url);">
-                        <div class="title" id="quiz-title"></div>
-                    </div>
                     <div class="text-section-container" id="text-section-container"></div>
                     <div class="screenreader-text" style="display:none;"></div>
-                    <div class="google-search-box">
+
+                    <!-- <div class="google-search-box">
                         <div class="gcse-search"></div>
-                    </div>
-                    <div class="screenreader-toolbar-container">
+                    </div> -->
+
+                    <!-- <div class="screenreader-toolbar-container hidden">
                         <button id="screenreader-button">Screenreader</button>
                         <div id="toolbar" class="hidden">
                             <div class="toolbar-inner">
@@ -63,43 +99,150 @@
                                 <button id="close-toolbar-button">Close</button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
+
+                    <div id="screen-reader-menu-container"></div>
                     <div class="embedded-text-section">
                         <div class="embedded-text" id="embedded-text"></div>
                     </div>
                     <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
                 </div>
-                <div class="quiz-window-container hidden">
-                    <div class="quiz-window" id="quiz-window">
-                        <div class="quiz-window-header" id="quiz-window-header">
-                            <div class="question-number" id="question-number"></div>
-                            <button class="quiz-window-close btn btn-primary" id="quiz-window-close">X</button>
-                        </div>
-                        <div class="quiz-window-content">
-                            <div class="question-window-title" id="question-window-title"></div>
-                            <div class="question-container" id="question-container"></div>
-                            <div class="question-text"></div>
-                            <div class="answer-container"></div>
-                            <div class="hint-container"></div>
-                            <div class="correct-answer-container"></div>
-                            <div class="quiz-window-controls">
-                                <button class="prev-question-btn" disabled="">Previous</button>
-                                <button class="next-question-btn">Next</button>
+                <div class="quiz-controls">
+                    <!-- <button id="pause-quiz-button" class="custom-button hidden"></button>    
+                    <button id="resume-quiz-button" class="custom-button hidden"></button>     -->
+                    <button id="swap-layers-button" class="custom-button hidden">
+                        <span class="icon">arrow_forward_ios</span>
+                    </button>                    
+                    <div class="quiz-window-container hidden" id="quiz-window-container">
+                        <div class="proto-quiz-container">
+                            <div class="proto-quiz-header">
+                                <button id="clear-button" class="proto-clear-button hidden">Clear Local Storage</button>
                             </div>
-                            <button class="submit-quiz-btn hidden" disabled>Submit Quiz</button>
+                            <div class="proto-question-container">
+                                <div id="question-tracker"></div>
+                                <div id="question-text"></div>
+                                <div id="options-container"></div>
+                                <div class="proto-character-container">
+                                    <div id="character" class="proto-character"></div>
+                                    <div id="dialogue-hint" class="proto-dialogue hidden"></div>
+                                    <div id="dialogue-answer" class="proto-dialogue hidden"></div>
+                                </div>
+                            </div>
+                            <div class="proto-navigation-container">
+                                <button id="prev-button" class="btn btn-secondary" disabled>Previous</button>
+                                <button id="next-button" class="btn btn-primary" disabled>Next</button>
+                            </div>
+                        </div>
+                        <div id="quizOverlay" class="proto-quiz-overlay">
+                            <div class="proto-quiz-modal">
+                                <div class="proto-score-container">
+                                    <div id="scoreWithHintsCircle" class="proto-score-circle">
+                                        <div class="proto-score-title">Score with Hints</div>
+                                        <div class="proto-black-ring"></div>
+                                        <div class="proto-colored-ring"></div>
+                                        <span id="scoreWithHints">8</span>
+                                    </div>
+                                    <div class="proto-divider-vertical"></div>
+                                    <div id="scoreWithoutHintsCircle" class="proto-score-circle">
+                                        <div class="proto-score-title">Score without Hints</div>
+                                        <div class="proto-black-ring"></div>
+                                        <div class="proto-colored-ring"></div>
+                                        <span id="scoreWithoutHints">10</span>
+                                    </div>
+                                </div>
+                                <div id="scoreSummary" class="proto-score-summary">
+                                    <span id="correctQuestions" class="proto-correct-questions">X</span> out of <span id="totalQuestions">Y</span> questions were correctly answered.
+                                </div>
+                                <div class="proto-timer">
+                                    <span id="totalTime">3:41</span>
+                                </div>
+                                <button id="close-button" class="proto-quiz-close btn btn-primary">Close</button>
+                            </div>
                         </div>
                     </div>
-                </div> 
+                </div>
             </div>
         </main>
     </div>
     <script src="https://cse.google.com/cse.js?cx=111c176d9efa64756"></script>
+
+    <script type="module" src="../public/assets/js/quiz_question_proto.js"></script>
     <script type="module" src="../public/assets/js/quiz.js"></script>
-    <script type="module" src="../public/assets/js/screenreader_quiztext.js"></script>
+
+<!-- 
+    <script type="module" src="../public/assets/js/quiz_page_manager/quizManager.js"></script>
+    <script type="module" src="../public/assets/js/quiz_page_manager/services.js"></script>
+    <script type="module" src="../public/assets/js/quiz_page_manager/uiRenderer.js"></script> -->
+
     <script>
         $(document).ready(function() {
-            $('#header-container').load('index.html');
+            // $('#header-container').load('index.html');
+            $('#header-container').load('global_header.html');
+    
+            $('#start-quiz-button').on('click', function() {
+                $('#quiz-window-container').removeClass('hidden');
+                // displayQuestion(); // Show the first question
+            });
+    
+            // // Check for 'answersheet' parameter in the URL
+            // const urlParams = new URLSearchParams(window.location.search);
+            // const isAnswerSheet = urlParams.get('answersheet') === 'true';
+    
+            // if (isAnswerSheet) {
+            //     $('#quiz-window-container').removeClass('hidden');
+            //     // Trigger the answer sheet logic
+            //     window.showAnswerSheet();
+            // }
         });
     </script>
+    <script>
+        // const CONSENT_KEY = 'userConsent';
+        // const CONSENT_DATE_KEY = 'userConsentDate';
+        // const CONSENT_EXPIRY_MONTHS = 2;
+
+        // function showConsentModal() {
+        //     document.getElementById('consent-modal').style.display = 'block';
+        // }
+
+        // function hideConsentModal() {
+        //     document.getElementById('consent-modal').style.display = 'none';
+        // }
+
+        // function saveConsentPreferences() {
+        //     const basicConsent = document.getElementById('consent-basic').checked;
+        //     const advancedConsent = document.getElementById('consent-advanced').checked;
+
+        //     const userConsent = {
+        //         basic: basicConsent,
+        //         advanced: advancedConsent
+        //     };
+
+        //     localStorage.setItem(CONSENT_KEY, JSON.stringify(userConsent));
+        //     localStorage.setItem(CONSENT_DATE_KEY, new Date().toISOString());
+        //     hideConsentModal();
+        // }
+
+        // function hasConsentExpired() {
+        //     const consentDateStr = localStorage.getItem(CONSENT_DATE_KEY);
+        //     if (!consentDateStr) return true;
+
+        //     const consentDate = new Date(consentDateStr);
+        //     const now = new Date();
+        //     const monthsDifference = (now.getFullYear() - consentDate.getFullYear()) * 12 + (now.getMonth() - consentDate.getMonth());
+
+        //     return monthsDifference >= CONSENT_EXPIRY_MONTHS;
+        // }
+
+        // function initializeConsent() {
+        //     if (hasConsentExpired()) {
+        //         showConsentModal();
+        //     }
+        // }
+
+        // document.getElementById('save-consent').addEventListener('click', saveConsentPreferences);
+        // document.getElementById('open-consent-modal').addEventListener('click', showConsentModal);
+
+        // window.addEventListener('load', initializeConsent);
+    </script>      
 </body>
 </html>

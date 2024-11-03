@@ -3,6 +3,7 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { retrieveStudentsWithSameParentEmail } from "../js/parent_overview.js";
+import { showMessage } from "../js/parent_overview.js";
 // import { app, auth, db, secondaryApp, secondaryAuth } from "./firebase_config.js";
 
 // Main Config for Project Plato
@@ -125,60 +126,71 @@ async function getStudent(email) {
 }
 
 
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        const uid = user.uid;
-        const parentEmail = user.email;
+// Ensure the DOM is fully loaded before executing
+document.addEventListener('DOMContentLoaded', () => {
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const uid = user.uid;
+            const parentEmail = user.email;
 
-        const counter = getStudentCounter();
+            const counter = getStudentCounter();
 
-        const form = document.querySelector('.form-content');
+            // Ensure the form exists before accessing it
+            const form = document.querySelector('#addStudentForm');
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            var uniqueEmail = await generateUniqueEmail(parentEmail, counter);
-            var username = document.getElementById("username-student-signup").value;
-            var password = document.getElementById("password-student-signup").value;
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    var uniqueEmail = await generateUniqueEmail(parentEmail, counter);
+                    var username = document.getElementById("username-student-signup").value;
+                    var password = document.getElementById("password-student-signup").value;
 
-            console.log(uniqueEmail);
+                    console.log(uniqueEmail);
 
-            try {
-                const userCredential = await createUserWithEmailAndPassword(secondaryAuth, uniqueEmail, password);
-                const user = userCredential.user;
+                    try {
+                        const userCredential = await createUserWithEmailAndPassword(secondaryAuth, uniqueEmail, password);
+                        const user = userCredential.user;
 
-                // Send users info to Firestore
-                const userRef = doc(db, `users/${user.uid}`);
-                await setDoc(userRef, {
-                    email: uniqueEmail,
-                    username: username,
-                    parentEmail: parentEmail, // Adds the parents email to user document
-                    username: username,
-                    userRoleId: 0 // Set userRoleId to 0 for students
-                }, { merge: true });
+                        // Send user info to Firestore
+                        const userRef = doc(db, `users/${user.uid}`);
+                        await setDoc(userRef, {
+                            email: uniqueEmail,
+                            username: username,
+                            parentEmail: parentEmail,
+                            userRoleId: 0 // Set userRoleId to 0 for students
+                        }, { merge: true });
 
-                const studentRef = doc(db, `studentdb/${user.uid}`);
-                await setDoc(studentRef, {
-                    email: uniqueEmail,
-                    username: username,
-                    parentEmail: parentEmail, // Adds the parents email to user document
-                    userRoleId: 0 // Set userRoleId to 0 for students
-                }, { merge: true });
+                        const studentRef = doc(db, `studentdb/${user.uid}`);
+                        await setDoc(studentRef, {
+                            email: uniqueEmail,
+                            username: username,
+                            parentEmail: parentEmail,
+                            userRoleId: 0 // Set userRoleId to 0 for students
+                        }, { merge: true });
 
-                // Insert redirect after sign-up here!
-                alert("Student Added!");
-                // Close the modal
-                $('#addStudentModal').modal('hide');
+                        // Show success message
+                        showMessage(`Student "${username}" has been added.`, 'success');
 
-                // Refresh the student list
-                retrieveStudentsWithSameParentEmail(auth.currentUser.email);
-            } catch (error) {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                alert(errorMessage);
+                        // Close the popup
+                        document.getElementById('addStudentPopup').style.display = 'none';
+
+                        // Clear the form
+                        form.reset();
+
+                        // Refresh the student list
+                        retrieveStudentsWithSameParentEmail(auth.currentUser.email);
+                    } catch (error) {
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        showMessage(`Failed to add student: ${errorMessage}`, 'error');
+                    }
+                });
+            } else {
+                console.error("Form element '.addStudentForm' not found in the DOM.");
             }
-        });
-    } else {
-        // User is signed out
-        window.location.href = "login_parent_tvt.html";
-    }
+        } else {
+            // User is signed out
+            window.location.href = "login_parent_tvt.html";
+        }
+    });
 });

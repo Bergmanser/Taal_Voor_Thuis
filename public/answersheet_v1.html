@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Quiz Answer Sheet</title>
+    <link rel="stylesheet" href="./assets/css/answersheet_v1.css">
+    <style>
+.highlighted-sentence {
+    background-color: yellow !important;  /* Highlight the sentence with a yellow background */
+    color: black;  /* Ensure text is readable */
+    padding: 2px;
+    border-radius: 3px;
+    z-index: 1005;
+}
+        
+.screen-reader-toolbar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.sr-button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.sr-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.sr-speed-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sr-info {
+    font-size: 14px;
+    color: #666;
+}
+
+.sr-highlight {
+    background-color: #ffffd0;
+    transition: background-color 0.3s;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id="quiz-title">Quiz Answer Sheet</h1>
+    </header>
+
+
+  <!-- Tab buttons to switch between sections -->
+    <div class="tab-buttons">
+        <button id="show-answer-sheet-button" class="tab-button active">Show Answer Sheet</button>
+        <button id="show-text-section-button" class="tab-button">Show Embedded Text</button>
+        <div class="tab-indicator"></div>
+    </div>
+
+    <!-- Embedded Text Section (Initially Hidden) -->
+    <div class="text-section-container hidden" id="text-section-container">
+        <!-- Embedded text will be injected here -->
+    </div>
+
+    <!-- Answer Sheet Section -->
+    <main class="answer-sheet-container" id="answer-sheet-container">
+        <!-- Questions with answers will be injected here -->
+    </main>
+
+    <!-- Slide-out Pagination Section -->
+    <div class="pagination-window" id="pagination-window">
+        <div id="toggle-pagination-button">&#9650;</div> <!-- Toggle Button for Slide Out -->
+        <div class="pagination-content hidden" id="pagination-content">
+            <span class="pagination-prev" id="pagination-prev">&#9664;</span>
+            <div class="pagination" id="pagination"></div>
+            <span class="pagination-next" id="pagination-next">&#9654;</span>
+        </div>
+    </div>
+
+    <script type="module" src="./assets/js/answersheet_v1.js"></script> <!-- Separate JS for answer sheet logic -->
+    <script>
+
+    </script>
+</body>
+</html>

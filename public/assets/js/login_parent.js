@@ -1,9 +1,19 @@
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { collection, doc, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { app, auth, db } from "./firebase_config.js"
+import { auth, db } from "./firebase_config.js";
+import { setLanguage, t, updateUIText } from './localization.js';
 
-// Function to show toast feedback
-function showToast(message, isSuccess = true, isModal = false) {
+// Set initial language to Dutch ('nl')
+setLanguage('nl');
+
+// Listen for language changes
+document.getElementById('language-switcher').addEventListener('change', (event) => {
+  setLanguage(event.target.value);
+});
+
+// Show toast feedback with localized messages
+function showToast(key, isSuccess = true, isModal = false) {
+  const message = t(key);
   const notificationArea = isModal ? document.getElementById('modal-notification-area') : document.getElementById('notification-area');
   const toast = document.createElement('div');
   toast.className = `toast ${isSuccess ? 'bg-success' : 'bg-danger'} show`;
@@ -16,7 +26,7 @@ function showToast(message, isSuccess = true, isModal = false) {
 
   const toastTitle = document.createElement('strong');
   toastTitle.className = 'mr-auto';
-  toastTitle.textContent = 'Notification';
+  toastTitle.textContent = t('notificationTitle');
 
   const toastTime = document.createElement('small');
   toastTime.className = 'text-muted';
@@ -48,117 +58,118 @@ function showToast(message, isSuccess = true, isModal = false) {
   $(toast).toast('show');
 }
 
-// Email validation function
+// Retrieve and display stored email if "Remember Me" was previously checked
+const rememberMeCheckbox = document.getElementById('remember-me-user');
+const emailInput = document.getElementById('email-user-login');
+const storedEmail = localStorage.getItem('rememberedEmail');
+
+if (storedEmail) {
+  emailInput.value = storedEmail;
+  rememberMeCheckbox.checked = true;
+}
+
+// Login button event listener
+document.getElementById('login-button').addEventListener('click', async () => {
+  const email = emailInput.value;
+  const password = document.getElementById('password-user-login').value;
+
+  if (!email || !password) {
+    showToast('fillFields', false);
+    return;
+  }
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userDoc = await getUserByEmail(email);
+    const userRoleId = userDoc.data().userRoleId;
+
+    if (userRoleId === 1 || userRoleId === 2) {
+      await updateDoc(doc(db, "users", userCredential.user.uid), { last_login: new Date() });
+
+      if (rememberMeCheckbox.checked) {
+        localStorage.setItem('rememberedEmail', email);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+      }
+
+      showToast('loginSuccess');
+      setTimeout(() => window.location.href = "parent_overview.html", 2000);
+    } else {
+      showToast('invalidRole', false);
+    }
+  } catch {
+    showToast('loginError', false);
+  }
+});
+
+// Enable/disable reset button based on email input
+document.getElementById('reset-email').addEventListener('input', () => {
+  const email = document.getElementById('reset-email').value;
+  document.getElementById('reset-button').disabled = !validateEmail(email);
+});
+
+// Password reset with countdown timer
+document.getElementById('reset-button').addEventListener('click', async () => {
+  const email = document.getElementById('reset-email').value;
+
+  if (!validateEmail(email)) {
+    showToast('enterValidEmail', false, true);
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showToast('passwordResetSent', true, true);
+  } catch {
+    showToast('passwordResetSent', true, true);
+  }
+
+  let timeLeft = 30;
+  const resetButton = document.getElementById('reset-button');
+  resetButton.disabled = true;
+  resetButton.textContent = `Wait ${timeLeft}s`;
+
+  const countdown = setInterval(() => {
+    timeLeft -= 1;
+    resetButton.textContent = `Wait ${timeLeft}s`;
+
+    if (timeLeft <= 0) {
+      clearInterval(countdown);
+      resetButton.disabled = false;
+      resetButton.textContent = t('sendResetLink');
+    }
+  }, 1000);
+
+  $('#resetPasswordModal').modal('hide');
+});
+
+// Validate email structure
 function validateEmail(email) {
   const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   return re.test(String(email).toLowerCase());
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Check if elements exist
-  const loginButton = document.getElementById('login-button');
-  const resetEmailInput = document.getElementById('reset-email');
-  const resetButton = document.getElementById('reset-button');
+// Fetch user document from Firestore by email
+async function getUserByEmail(email) {
+  const usersRef = collection(db, "users");
+  const userQuery = query(usersRef, where("email", "==", email));
+  const userSnapshot = await getDocs(userQuery);
 
-  if (!loginButton || !resetEmailInput || !resetButton) {
-    console.error('One or more elements not found in the DOM');
-    return;
+  if (userSnapshot.size === 1) {
+    return userSnapshot.docs[0];
+  } else {
+    throw new Error("User not found.");
   }
+}
 
-  console.log('Elements found, attaching event listeners');
+// Update initial UI text
+updateUIText();
 
-  // Login button event listener
-  loginButton.addEventListener('click', async () => {
-    console.log('Login button clicked');
-    const email = document.getElementById('email-user-login').value;
-    const password = document.getElementById('password-user-login').value;
-
-    if (!email || !password) {
-      showToast('Please fill in both email and password fields.', false);
-      return;
-    }
-
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      const userDoc = await getUserByEmail(email);
-      const userRoleId = userDoc.data().userRoleId;
-
-      if (userRoleId === 1 || userRoleId === 2) {
-        await updateDoc(doc(db, "users", user.uid), {
-          last_login: new Date()
-        });
-
-        showToast("User logged in!");
-        setTimeout(() => {
-          window.location.href = "parent_overview.html";
-        }, 2000);
-      } else {
-        showToast("Invalid user or user role.", false);
-      }
-    } catch (error) {
-      showToast(error.message, false);
+// Add keypress event listener for Enter key
+document.querySelectorAll('.form-content input').forEach(input => {
+  input.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      document.getElementById('login-button').click();
     }
   });
-
-  // Event listener for enabling/disabling the reset button based on email input
-  resetEmailInput.addEventListener('input', () => {
-    console.log('Reset email input changed');
-    const email = resetEmailInput.value;
-    resetButton.disabled = !validateEmail(email);
-  });
-
-  // Event listener for sending password reset email with countdown timer
-  resetButton.addEventListener('click', async () => {
-    console.log('Reset button clicked');
-    const email = resetEmailInput.value;
-
-    // Validate email structure
-    if (!validateEmail(email)) {
-      showToast('Please enter a valid email address.', false, true);
-      return;
-    }
-
-    try {
-      await sendPasswordResetEmail(auth, email);
-      console.log('Password reset email sent to:', email);
-      showToast('If an account with that email exists, a password reset email has been sent.', true, true);
-    } catch (error) {
-      console.error('Error sending password reset email:', error);
-      // Uniform response for both valid and invalid emails
-      showToast('If an account with that email exists, a password reset email has been sent.', true, true);
-    }
-
-    let timeLeft = 30;
-    resetButton.disabled = true;
-    resetButton.textContent = `Wait ${timeLeft}s`;
-
-    const countdown = setInterval(() => {
-      timeLeft -= 1;
-      resetButton.textContent = `Wait ${timeLeft}s`;
-
-      if (timeLeft <= 0) {
-        clearInterval(countdown);
-        resetButton.disabled = false;
-        resetButton.textContent = 'Send Reset Link';
-      }
-    }, 1000);
-
-    // Close the modal only if the email structure is valid and email has been sent
-    $('#resetPasswordModal').modal('hide');
-  });
-
-  // Function to get user document from Firestore by email
-  async function getUserByEmail(email) {
-    const usersRef = collection(db, "users");
-    const userQuery = query(usersRef, where("email", "==", email));
-    const userSnapshot = await getDocs(userQuery);
-
-    if (userSnapshot.size === 1) {
-      return userSnapshot.docs[0];
-    } else {
-      throw new Error("User not found.");
-    }
-  }
 });

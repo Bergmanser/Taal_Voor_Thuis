@@ -69,7 +69,7 @@ $(document).ready(function () {
                 break;
             case 1: // private
             case 2: // business
-                window.location.href = 'parent_dashboard.html';
+                window.location.href = 'parent_overview.html';
                 break;
             case 3: // admin
             case 4: // editor
@@ -93,7 +93,7 @@ $(document).ready(function () {
                 break;
             case 3: // admin
             case 4: // editor
-                window.location.href = 'login_employee.html';
+                window.location.href = 'login_employee_tvt.html';
                 break;
             default:
                 window.location.href = 'https://www.taalvoorthuis.nl';
@@ -186,7 +186,6 @@ $(document).ready(function () {
                     console.log('User document data:', doc.data());
                 });
                 const userData = userSnapshot.docs[0].data();
-                console.log('User data:', userData);
                 return userData.userRoleId;
             } else {
                 console.log('No user document found');
@@ -213,4 +212,24 @@ $(document).ready(function () {
             console.log("No user is logged in.");
         }
     });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const header = document.querySelector(".header");
+
+    const setStickyHeader = () => {
+        const sticky = header.offsetTop;
+        if (window.pageYOffset > sticky) {
+            header.classList.add("sticky");
+        } else {
+            header.classList.remove("sticky");
+        }
+    };
+
+    window.onscroll = function () {
+        setStickyHeader();
+    };
+
+    // Initial check
+    setStickyHeader();
 });

@@ -1,98 +1,540 @@
-/* CSS sources:
-https://personal-portfolio.freecodecamp.rocks */
-
-/* Custom properties/variables  */
 :root {
-  --main-white: #f0f0f0;
-  --main-red: #be3144;
-  --main-blue: #45567d;
-  --main-gray: #303841;
+    --main-white: #f5f5f5;
+    --main-red: #C23A2B;
+    --main-blue: #1A3A5F;
+    --main-gray: #303841;
+    --muted-blue: #5C7E9C;
+    --gold: #D6A664;
+    --purple: #b75ad6;
 }
 
-/* Base reset */
 * {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
-/* box-sizing and font sizing */
 *,
 *::before,
 *::after {
-  box-sizing: inherit;
+    box-sizing: inherit;
 }
 
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    color: #333;
+    color: #3C3C3C;
     margin: 0;
     padding: 0;
-  }
-  
-  
-  main {
-    padding: 2rem;
-  }
-  
+    background-color: var(--main-white);
+}
+
+main {
+    padding-top: 60px;
+}
+
 a {
-  text-decoration: none;
-  color: #333;
+    text-decoration: none;
+    color: var(--main-blue);
 }
 
 ul {
-  list-style: none;
+    list-style: none;
 }
 
-/* nav */
 .nav {
-  display: flex;
-  justify-content: flex-end;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: var(--main-red);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
-  z-index: 10;
+    display: flex;
+    justify-content: flex-end;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--main-blue);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+    z-index: 10;
 }
 
 .nav-list {
-  display: flex;
-  margin-right: 2rem;
+    display: flex;
+    margin-right: 2rem;
 }
 
 @media (max-width: 28.75em) {
-  .nav {
-    justify-content: center;
-  }
+    .nav {
+        justify-content: center;
+    }
 
-  .nav-list {
-    margin: 0 1rem;
-  }
+    .nav-list {
+        margin: 0 1rem;
+    }
 }
 
 .nav-list a {
-  display: block;
-  font-size: 1.2rem;
-  padding: 2rem;
-  color: var(--main-white);
+    display: block;
+    font-size: 1.2rem;
+    padding: 2rem;
+    color: var (--main-white);
 }
 
 .nav-list a:hover {
-  background: var(--main-blue);
+    background: var(--main-red);
 }
 
-
-.hero {
-  margin-top: 2rem;
-  background-color: #4CAF50;
-  color: white;    padding: 2rem;
-  text-align: center;
-  margin-bottom: 2rem;
+.parallax-container {
+    position: relative;
+    height: 35vh;
+    overflow: hidden;
 }
-  
-  .card {
+
+.parallax-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-attachment: fixed;
+    z-index: -1;
+}
+
+.parallax-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    background-size: cover;
+    background-position: center;
+}
+
+.parallax-image.active {
+    opacity: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.parallax-quiz-container {
+    position: relative;
+    height: auto;
+    overflow: hidden;
+}
+
+.parallax-quiz-background {
+    background-image: url('../images/MDB-Background.png');
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transform: translateY(-25%);
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: hue-rotate(80deg) saturate(0.9) brightness(0.5); 
+}
+
+/* .quiz-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+} */
+
+.stat-tracker-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin: 20px;
+    min-height: 400px; /* Set a minimum height to keep the size consistent */
+    display: flex;
+    flex-direction: column; /* Ensure children are stacked vertically */
+    align-items: center;
+}
+
+.stat-tracker-header {
+
+    background-color: #193a5f;
+    height: 5em;
+    width: 100%;
+    margin-bottom: 20px; /* Add some space below the header */
+    /* Ensure it does not flex-grow or shrink */
+    flex: 0 0 auto;
+    border-radius: 0.25rem
+}
+
+.stat-tracker-titles {
+    padding-top: 10px;
+    justify-content: center;
+    position: center;
+    align-items: center;
+    display: flex;
+    gap: 80px;
+    color: #ffffff;
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-left: 3em;
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex: 1;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+}
+
+#averageScoreChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#average-score-title {
+    position: absolute;
+    top: 33%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8em;
+    font-weight: bold;
+    color: var(--main-blue);
+    text-shadow: -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, -2px 0px 0 #fff, 2px 0px 0 #fff, 0px -2px 0 #fff, 0px 2px 0 #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+#average-score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.5em;
+    font-weight: bold;
+    color: var(--main-blue);
+    text-shadow: 
+        -2px -2px 0 #fff,  
+         2px -2px 0 #fff,
+        -2px  2px 0 #fff,
+         2px  2px 0 #fff,
+        -2px  0px 0 #fff,
+         2px   0px 0 #fff,
+         0px -2px 0 #fff,
+         0px   2px 0 #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+#average-score-text span {
+    display: block;
+    text-align: center;
+    width: 50%;
+    position: relative;
+}
+
+#average-score-text .divider {
+    width: 2px;
+    height: 100%;
+    background-color: var(--main-blue);
+}
+
+.no-data-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 1.5em;
+    color: rgb(105, 104, 104);
+    text-align: center;
+    min-height: 400px; /* Ensure minimum height for the stat tracker box */
+    position: float;
+}
+
+.recent-scores-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#best-worst-scores {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.score-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.score-card .score-title {
+    font-weight: bold;
+    padding: 0.5rem;
+    margin-bottom: 0;
+    text-align: center;
+    border-radius: 0.25rem 0.25rem 0 0;
+    color: white;
+}
+
+.score-card .score-values {
+    font-size: 1.25em;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 0 0 0.25rem 0.25rem;
+    padding-bottom: 1.2em;
+}
+
+.score-card .score-values .score {
+    width: 50%;
+    text-align: center;
+    position: relative;
+}
+
+.score-card .score-values .score.with-hints {
+    background-color: var(--main-gray);
+    color: white;
+    border-radius: 0.25rem;
+}
+
+.score-card .score-values .score.without-hints {
+    background-color: var(--main-blue);
+    color: white;
+    border-radius: 0.25rem;
+}
+
+#average-score-text span::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: var(--main-blue);
+    white-space: nowrap;
+}
+
+.average-score-text span::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: var(--main-blue);
+    white-space: nowrap;
+}
+
+/* Tooltip style for score cards */
+.score-card .score-values .score::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: var(--main-blue);
+    white-space: nowrap;
+}
+
+[data-subject="woordenschat"] .score-title {
+    background-color: var(--main-blue);
+}
+
+[data-subject="woordenschat"] .score-values {
+    background-color: var(--main-white);
+}
+
+[data-subject="samenvatten"] .score-title {
+    background-color: var(--main-red);
+}
+
+[data-subject="samenvatten"] .score-values {
+    background-color: var(--main-white);
+}
+
+[data-subject="verwijs-signaalwoorden"] .score-title {
+    background-color: var(--gold);
+}
+
+[data-subject="verwijs-signaalwoorden"] .score-values {
+    background-color: var(--main-white);
+}
+
+[data-subject="grammatica"] .score-title {
+    background-color: #b75ad6;
+}
+
+[data-subject="grammatica"] .score-values {
+    background-color: #f4d4ff;
+}
+
+[data-subject="anders"] .score-title {
+    background-color: var(--main-red);
+}
+
+[data-subject="anders"] .score-values {
+    background-color: var(--main-white);
+}
+
+.quiz-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* Align items to the start */
+    padding: 20px;
+    gap: 20px;
+}
+
+.card {
+    position: relative;
+    width: 30%;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s;
+    background-color: var(--main-white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+}
+
+.card-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px;
+    box-sizing: border-box;
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.card-description {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    max-height: 60px; /* Limit height */
+    overflow-y: auto; /* Allow scrolling */
+    z-index: 2;
+}
+
+.card-footer {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+}
+
+.card:hover .overlay {
+    opacity: 1;
+}
+
+.card-btn {
+    position: center;
+    color: #ffffff;
+    background-color: #AC2C53;
+    margin-left: 30%;
+    padding: 5px 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 0.25rem;
+}
+
+.overlay button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.overlay button:hover {
+    background-color: #555;
+}
+
+.subject-color-woordenschat .card-footer { background-color: #1A3A5F; } /* Blue */
+.subject-color-samenvatten .card-footer { background-color: #5C7E9C; } /* Muted Blue */
+.subject-color-verwijs-signaalwoorden .card-footer { background-color: #D6A664; } /* Gold */
+.subject-color-grammatica .card-footer { background-color: #b75ad6; } /* Purple */
+.subject-color-anders .card-footer { background-color: #C23A2b; } /* Red */
+
+@media (max-width: 992px) {
+    .card {
+        width: 45%;
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        width: 100%;
+    }
+}
+
+/* .card {
     width: 100%;
     max-width: 300px;
     margin: 1rem;
@@ -100,35 +542,28 @@ ul {
     border-radius: 4px;
     overflow: hidden;
     background-color: #cdcdcd;
-  }
-  
-  .card-img-top {
+}
+
+.card-img-top {
     width: 100%;
     height: 200px;
     object-fit: cover;
-  }
-  
-  .card-body {
+}
+
+.card-body {
     padding: 1.25rem;
-  }
-  
-  .card-title {
-    margin-bottom:0.5rem;
+}
+
+.card-title {
+    margin-bottom: 0.5rem;
     font-size: 1.2rem;
     font-weight: 600;
-  }
-  
-  .card-text {
+}
+
+.card-text {
     margin-bottom: 1rem;
     font-size: 1.1rem;
     color: #666;
-  }
-
-  .quiz-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
 }
 
 .card {
@@ -148,7 +583,7 @@ ul {
         flex: 1 1 calc(100% - 2rem);
         max-width: calc(100% - 2rem);
     }
-}
+} */
 
 .pagination {
     display: flex;
@@ -160,7 +595,7 @@ ul {
 .page-btn {
     margin: 0 0.5rem;
     padding: 0.5rem 1rem;
-    background-color: #FF9800;
+    background-color: var(--gold);
     color: white;
     border: none;
     cursor: pointer;
@@ -171,21 +606,41 @@ ul {
     cursor: not-allowed;
 }
 
-  
-  /* @media (min-width: 768px) {
-    .card {
-      width: calc(50% - 2rem);
-    }
-  }
-  
-  @media (min-width: 992px) {
-    .card {
-      width: calc(33.333% - 2rem);
-    }
-  }
-  
-  @media (min-width: 1200px) {
-    .card {
-      width: calc(25% - 2rem);
-    }
-  } */
+/* Css related to filtering the quizcards */
+
+.filter-toolbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--main-gray);
+    color: white;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.filter-toolbar select {
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid var(--main-blue);
+}
+
+
+/* .filter-toolbar select,
+.filter-toolbar button {
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid var(--main-blue);
+} */
+
+.filter-toolbar button {
+    background-color: var(--main-blue);
+    color: white;
+    cursor: pointer;
+}
+
+.filter-toolbar button:hover {
+    background-color: var(--main-red);
+}
