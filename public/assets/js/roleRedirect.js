@@ -55,3 +55,26 @@ import { redirectUserBasedOnRole } from './path/to/roleRedirect.js';
 // Call the function with the expected role for the parent dashboard (e.g., 1 and 2 for parents and organization users)
 redirectUserBasedOnRole([1, 2]);
 </script> */}
+
+
+// // roleRedirect.js
+// export async function redirectUserBasedOnRole(allowedRoles, targetPage) {
+//     onAuthStateChanged(auth, async (user) => {
+//         if (user) {
+//             const userDocRef = doc(db, "users", user.uid);
+//             const userDoc = await getDoc(userDocRef);
+
+//             if (userDoc.exists()) {
+//                 const userRoleId = userDoc.data().userRoleId;
+
+//                 if (!allowedRoles.includes(userRoleId)) {
+//                     window.location.href = `role_check.html?target=${encodeURIComponent(targetPage)}&roles=${allowedRoles.join(",")}`;
+//                 }
+//             } else {
+//                 console.error("User document does not exist.");
+//             }
+//         } else {
+//             window.location.href = "https://www.taalvoorthuis.nl"; // Redirect non-logged in users
+//         }
+//     });
+// }

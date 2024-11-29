@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Check</title>
+    <script type="module">
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { auth, db } from "./firebase_config.js";
+
+        async function checkUserRole() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const target = urlParams.get('target');
+            const roles = urlParams.get('roles').split(',').map(Number);
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDoc = await getDoc(userDocRef);
+
+                    if (userDoc.exists()) {
+                        const userRoleId = userDoc.data().userRoleId;
+
+                        if (roles.includes(userRoleId)) {
+                            window.location.href = target; // Proceed to target page
+                        } else {
+                            // Redirect to a default or allowed page based on role
+                            switch (userRoleId) {
+                                case 0:
+                                    window.location.href = "student_dashboard.html";
+                                    break;
+                                case 1:
+                                    window.location.href = "parent_overview.html";
+                                    break;
+                                case 3:
+                                    window.location.href = "employee_dashboard.html";
+                                    break;
+                                default:
+                                    console.error("Unknown or unauthorized role.");
+                            }
+                        }
+                    } else {
+                        console.error("User document does not exist.");
+                    }
+                } else {
+                    window.location.href = "https://www.taalvoorthuis.nl";
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', checkUserRole);
+    </script>
+</head>
+<body>
+    <h1>Checking Permissions...</h1>
+</body>
+</html>

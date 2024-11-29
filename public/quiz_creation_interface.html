@@ -94,6 +94,45 @@
                 <button type="button" id="add-question-button" class="btn btn-secondary mb-3 ml-0">Add question</button>
             </div>
         </div>
+
+        <div class="form-group">
+            <label>Begrippenlijst</label>
+            <div id="begrippen-container">
+                <!-- Container for begrippen entries -->
+            </div>
+            <div class="form-group d-flex align-items-end">
+                <div class="flex-grow-1">
+                    <button type="button" id="add-begrip-button" class="btn btn-secondary mb-3">
+                        Add Begrip
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Template for new begrip entries (hidden by default) -->
+        <template id="begrip-template">
+            <div class="begrip-entry card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Term:</label>
+                                <input type="text" class="form-control begrip-term" placeholder="Enter term" required/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Definition:</label>
+                                <textarea class="form-control begrip-definition" rows="2" placeholder="Enter definition" required></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger remove-begrip-btn mt-4">×</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
         
         <button type="submit" class="btn btn-primary">Submit quiz</button>
     </form>
@@ -102,7 +141,7 @@
 <script type="module" src="../public/assets/js/embedded_text_creation.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#header-container').load('index.html', function() {
+        $('#header-container').load('global_header.html', function() {
             $.getScript('app.js');
         });
     });

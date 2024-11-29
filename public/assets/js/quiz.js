@@ -4,9 +4,7 @@ import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/f
 import { app, auth, db } from "./firebase_config.js";
 import { redirectUserBasedOnRole } from "./roleRedirect.js";
 
-
 export let quizData;
-
 
 document.addEventListener("DOMContentLoaded", function () {
     // Array of background image URLs
@@ -116,6 +114,12 @@ onAuthStateChanged(auth, (user) => {
                 if (docSnap.exists()) {
                     quizData = docSnap.data();
                     document.getElementById('quiz-title').innerText = quizData.quizTitle;
+
+                    // Show/hide word list button based on begrippen availability
+                    const wordListButton = document.getElementById('word-list-button');
+                    if (wordListButton) {
+                        wordListButton.classList.toggle('hidden', !quizData?.Begrippen?.length);
+                    }
 
                     if (quizData.embedTextHTML) {
                         const htmlDoc = new DOMParser().parseFromString(quizData.embedTextHTML, 'text/html');
@@ -522,3 +526,132 @@ document.getElementById('swap-layers-button').addEventListener('click', function
     }
 });
 
+document.addEventListener('scroll', () => {
+    const container = document.querySelector('.proto-quiz-container');
+    const scrollY = window.scrollY;
+
+    // Adjust margin-top dynamically
+    const maxMargin = 13; // 15%
+    const minMargin = 2;  // 5%
+    const newMargin = Math.max(minMargin, maxMargin - (scrollY / 100));
+
+    container.style.marginTop = `${newMargin}%`;
+});
+
+if (typeof quizData === 'undefined') {
+    quizData = {
+        Begrippen: [
+            { term: "Beperkt", definition: "Iets dat niet veel ruimte of mogelijkheden heeft." },
+            { term: "Ceremoniële", definition: "Te maken met officiële gebeurtenissen." }
+        ]
+    };
+}
+
+function initBegrippenLogic() {
+    const popup = document.getElementById('begrippen-popup');
+    const content = document.querySelector('.begrippen-content');
+    const container = document.getElementById('begrippen-container');
+    const searchInput = document.getElementById('begrippen-search');
+    const gridViewBtn = document.querySelector('.grid-view');
+    const listViewBtn = document.querySelector('.list-view');
+    const closeBtn = document.querySelector('.close-btn');
+    const wordListButton = document.getElementById('word-list-button');
+
+    // Define soft colors for the cards
+    const cardColors = ["#f8f9fa", "#e8eaf6", "#ffe4b5", "#e0f7fa", "#ffebee"];
+
+    // Helper: Update button visibility based on Begrippen content
+    function updateButtonVisibility() {
+        const hasCards = container.querySelector('.begrip-card') !== null; // Check for Begrippen cards
+        const hasNoBegrippen = container.querySelector('.no-begrippen') !== null; // Check for empty placeholder
+
+        // Show the button if Begrippen cards exist; hide otherwise
+        wordListButton.classList.toggle('hidden', !hasCards && hasNoBegrippen);
+    }
+
+    // Render Begrippen
+    function renderBegrippen(begrippen = [], searchTerm = '') {
+        container.innerHTML = '';
+
+        // No Begrippen available at all
+        if (!begrippen.length) {
+            container.innerHTML = `
+                <div class="no-begrippen">
+                    <p>Voor deze tekst zijn er geen begrippen</p>
+                </div>`;
+            updateButtonVisibility();
+            return;
+        }
+
+        // Filter Begrippen based on the search term
+        const filteredBegrippen = begrippen.filter(item =>
+            item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.definition.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        // If no Begrippen match the search term, show the placeholder
+        if (filteredBegrippen.length === 0) {
+            container.innerHTML = `
+                <div class="no-begrippen">
+                    <p>Er zijn geen begrippen beschikbaar voor deze zoek opdracht</p>
+                </div>`;
+            updateButtonVisibility();
+            return;
+        }
+
+        // Render Begrippen cards if matches are found
+        filteredBegrippen.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'begrip-card';
+            // Assign one of the five colors cyclically
+            card.style.backgroundColor = cardColors[index % cardColors.length];
+            card.style.animationDelay = `${index * 50}ms`; // Staggered animation
+            card.innerHTML = `<h3>${item.term}</h3><p>${item.definition}</p>`;
+            container.appendChild(card);
+        });
+
+        updateButtonVisibility();
+    }
+
+    // Event handlers
+    gridViewBtn?.addEventListener('click', () => {
+        container.classList.remove('list-view');
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+    });
+
+    listViewBtn?.addEventListener('click', () => {
+        container.classList.add('list-view');
+        listViewBtn.classList.add('active');
+        gridViewBtn.classList.remove('active');
+    });
+
+    searchInput?.addEventListener('input', (e) => {
+        renderBegrippen(quizData.Begrippen, e.target.value);
+    });
+
+    closeBtn?.addEventListener('click', () => {
+        popup.classList.remove('show');
+        setTimeout(() => popup.classList.add('hidden'), 300);
+    });
+
+    // Allow closing popup by clicking outside
+    popup?.addEventListener('click', (e) => {
+        if (!content.contains(e.target)) {
+            popup.classList.remove('show');
+            setTimeout(() => popup.classList.add('hidden'), 300);
+        }
+    });
+
+    wordListButton?.addEventListener('click', () => {
+        popup.classList.remove('hidden');
+        setTimeout(() => popup.classList.add('show'), 10);
+        renderBegrippen(quizData.Begrippen);
+    });
+
+    // Initial rendering of Begrippen
+    renderBegrippen(quizData.Begrippen);
+}
+
+// Initialize Begrippen logic
+initBegrippenLogic();

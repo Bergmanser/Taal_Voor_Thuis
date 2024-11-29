@@ -72,47 +72,74 @@
         
         <div class="parallax-quiz-container">
             <div class="parallax-quiz-background"></div>
-            <section id="filter-toolbar" class="filter-toolbar">
-                <select id="quizTypeFilter">
-                    <option value="">All Types</option>
-                    <option value="woordenschat">Woordenschat</option>
-                    <option value="samenvatten">Samenvatten</option>
-                    <option value="verwijswoorden&signaalwoorden">Verwijswoorden & Signaalwoorden</option>
-                    <option value="grammatica">Grammatica</option>
-                    <option value="anders">Anders</option>
-                </select>
-                <select id="sortOrderFilter">
-                    <option value="newFirst">New First</option>
-                    <option value="oldFirst">Old First</option>
-                    <option value="random">Random</option>
-                </select>
-                <select id="quizGroupFilter">
-                    <option value="">All Groups</option>
-                    <option value="3000">3000</option>
-                    <option value="4000">4000</option>
-                    <option value="5000">5000</option>
-                    <option value="6000">6000</option>
-                    <option value="7000">7000</option>
-                    <option value="8000">8000</option>
-                </select>
-                <select id="questionTypeFilter">
-                    <option value="">All Question Types</option>
-                    <option value="Multiple Choice">Multiple Choice</option>
-                    <!-- Future options can be added here -->
-                </select>
-            </section>
-            <section id="quizzes" class="quiz-container"></section>
-        </div>
-        <div class="pagination">
-            <button id="prev-page" class="page-btn">Vorige</button>
-            <span id="page-numbers"></span>
-            <button id="next-page" class="page-btn">Volgende</button>
+            <!-- Replace current filter-toolbar section with: -->
+            <div class="unified-controls">
+                <div class="filter-toolbar">
+                    <div class="filter-group">
+                        <label>Type</label>
+                        <select id="quizTypeFilter">
+                            <option value="">All Types</option>
+                            <option value="woordenschat">Woordenschat</option>
+                            <option value="samenvatten">Samenvatten</option>
+                            <option value="verwijswoorden&signaalwoorden">Verwijswoorden & Signaalwoorden</option>
+                            <option value="grammatica">Grammatica</option>
+                            <option value="anders">Anders</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sortOrderFilter">
+                            <option value="newFirst">Newest First</option>
+                            <option value="oldFirst">Oldest First</option>
+                            <option value="random">Random</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Group</label>
+                        <select id="quizGroupFilter">
+                            <option value="">All Groups</option>
+                            <option value="3000">3000</option>
+                            <option value="4000">4000</option>
+                            <option value="5000">5000</option>
+                            <option value="6000">6000</option>
+                            <option value="7000">7000</option>
+                            <option value="8000">8000</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Question Type</label>
+                        <select id="questionTypeFilter">
+                            <option value="">All Types</option>
+                            <option value="Multiple Choice">Multiple Choice</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="quiz-sections-container">
+                <section class="quiz-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Available Quizzes</h2>
+                        <!-- Kept your existing filter toolbar -->
+                        <div class="filter-toolbar">
+                            <!-- Your existing filters remained unchanged -->
+                        </div>
+                    </div>
+                    <div class="quiz-grid" id="uncompleted-quizzes"></div>
+                </section>
+            
+                <section class="quiz-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Completed Quizzes</h2>
+                    </div>
+                    <div class="quiz-grid" id="completed-quizzes"></div>
+                </section>
+            </div>
         </div>
     </main>
     <script type="module" src="../public/assets/js/student_dashboard.js"></script>
     <script>
         $(document).ready(function() {
-            $('#header-container').load('index.html', function() { });
+            $('#header-container').load('global_header.html', function() { });
         });
     </script>
 </body>

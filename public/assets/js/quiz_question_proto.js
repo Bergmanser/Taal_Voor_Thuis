@@ -197,10 +197,12 @@ const selectOption = (index) => {
             option.classList.remove('proto-selected');
         }
         if (idx === index) {
-            option.classList.add('proto-selected');
+            // Ensure proto-selected is not added if the option has proto-incorrect
+            if (!option.classList.contains('proto-incorrect')) {
+                option.classList.add('proto-selected');
+            }
         }
     });
-
     document.getElementById('next-button').disabled = false;
     saveState();
 };
@@ -453,6 +455,7 @@ function showQuizModal(scoreWithHints, scoreWithoutHints, totalTime, correctQues
     setSummaryColor(correctQuestions, totalQuestions);
 
     $('#quizOverlay').show();
+    clearState();
 
     const closeButton = document.getElementById('close-button');
     if (closeButton) {

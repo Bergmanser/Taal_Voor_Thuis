@@ -55,6 +55,10 @@ function saveFormData() {
             };
         }),
         embeddedText: document.getElementById('preview').innerHTML || '',
+        begrippen: Array.from(document.querySelectorAll('.begrip-entry')).map(entry => ({
+            term: entry.querySelector('.begrip-term').value,
+            definition: entry.querySelector('.begrip-definition').value
+        })),
         timestamp: new Date().getTime()
     };
     localStorage.setItem('quizFormData', compressData(formData));
@@ -166,101 +170,246 @@ $('#pdf-file').change(function () {
 function processPdfContent(content) {
     let processedData = {
         title: "",
+        titleColor: "",
+        titleFont: "",
         quiz_group_id: "",
         sections: [],
-        questions: []
+        questions: [],
+        terms: []
     };
 
-    let sectionIndex = 1;
-    let isEmbeddedText = true;
+    let currentSection = null;
+    let currentQuestion = null;
+    let currentTerm = null;
+    let currentOptionText = '';
+    let parsingMode = "none";
 
-    content.forEach((page, pageIndex) => {
-        let section = {
-            "type": "",
-            "text": "",
-            "font": "",
-            "text_color": "",
-            "border_color": "#000000",
-            "bold_words": [],
-            "section_number": ""
-        };
+    // Combine all text content from pages
+    const textLines = content.flatMap(page =>
+        page.items.map(item => item.str.trim()).filter(str => str.length > 0)
+    );
 
-        page.items.forEach((item) => {
-            let text = item.str.trim();
-            let font = item.fontName;
-            let textColor = item.color;
+    // Process each line
+    textLines.forEach(line => {
+        // Title Section
+        if (line.startsWith("Title:")) {
+            parsingMode = "title";
+            processedData.title = line.replace("Title:", "").trim();
+        } else if (line.startsWith("Title Color:")) {
+            processedData.titleColor = line.replace("Title Color:", "").trim();
+        } else if (line.startsWith("Font Style Title:")) {
+            processedData.titleFont = line.replace("Font Style Title:", "").trim();
+        }
 
-            if (pageIndex === 0 && processedData.title === "") {
-                if (text.includes("HOE LEEFDEN DE EERSTE MENSEN OP AARDE")) {
-                    processedData.title = text;
-                }
-                if (text.includes(" - ")) {
-                    const parts = text.split(" - ");
-                    processedData.quiz_group_id = parts[1].substring(0, 1) + "000";
-                }
-            } else {
-                if (text.match(/^\d+\./)) {
-                    isEmbeddedText = false;
-                }
-
-                if (isEmbeddedText) {
-                    text = text.replace(/HOE LEEFDEN DE EERSTE MENSEN OP AARDE\? - 8013/g, '');
-                    text = text.replace(/\d+\/\s?\d+/g, ''); // Remove page numbers with optional space
-                    section.text += text + " ";
-                    section.font = font;
-                    section.text_color = `#${(textColor || [0, 0, 0]).map(c => c.toString(16).padStart(2, '0')).join('')}`;
-
-                    const boldTextMatches = text.match(/<b>(.*?)<\/b>/g);
-                    if (boldTextMatches) {
-                        boldTextMatches.forEach(match => {
-                            section.bold_words.push(match.replace(/<\/?b>/g, ''));
-                        });
-                    }
-                } else {
-                    processedData.questions.push(text);
-                }
+        // Section Processing
+        else if (line.startsWith("Section Number:")) {
+            if (currentSection) {
+                processedData.sections.push(currentSection);
             }
-        });
+            parsingMode = "section";
+            currentSection = {
+                type: "",
+                text: "",
+                font: "",
+                text_color: "",
+                border_color: "#000000",
+                bold_words: [],
+                section_number: line.replace("Section Number:", "").trim()
+            };
+        }
+        else if (line.startsWith("Section Position:") && currentSection) {
+            const position = line.replace("Section Position:", "").trim().toLowerCase();
+            currentSection.type = position;
+        }
+        else if (line.startsWith("Bold Words:") && currentSection) {
+            const boldWords = line.replace("Bold Words:", "").trim();
+            if (boldWords.startsWith("[") && boldWords.endsWith("]")) {
+                currentSection.bold_words = boldWords
+                    .slice(1, -1)
+                    .split(",")
+                    .map(word => word.trim())
+                    .filter(word => word.length > 0);
+            }
+        }
+        else if (line.startsWith("Section Border Color:") && currentSection) {
+            currentSection.border_color = line.replace("Section Border Color:", "").trim();
+        }
+        else if (line.startsWith("Text Color:") && currentSection) {
+            currentSection.text_color = line.replace("Text Color:", "").trim();
+        }
+        else if (line.startsWith("Text:") && currentSection) {
+            currentSection.text = line.replace("Text:", "")
+                .trim()
+                .replace(/\s+/g, ' ')
+                .replace(/\\n/g, ' ');
+        }
 
-        if (isEmbeddedText && section.text.trim().length > 0) {
-            section.type = getSectionType(sectionIndex);
-            section.section_number = `section-${sectionIndex}`;
-            processedData.sections.push(section);
-            sectionIndex++;
+        // Question Processing
+        else if (line.match(/^Question \d+$/)) {
+            if (currentQuestion) {
+                if (currentOptionText) {
+                    currentQuestion.options.push(currentOptionText.trim());
+                    currentOptionText = '';
+                }
+                processedData.questions.push(currentQuestion);
+            }
+            parsingMode = "question";
+            currentQuestion = {
+                text: "",
+                title: "",
+                options: [],
+                correctOption: "",
+                correctOptionDescription: "",
+                hint: "",
+                type: "multiple-choice"
+            };
+        }
+        else if (line.startsWith("Question Text:") && currentQuestion) {
+            const questionText = line.replace("Question Text:", "").trim();
+            currentQuestion.text = questionText;
+            currentQuestion.title = questionText;
+        }
+        else if (line.match(/^[a-d]\./) && currentQuestion) {
+            if (currentOptionText) {
+                currentQuestion.options.push(currentOptionText.trim());
+            }
+            currentOptionText = line.substring(2).trim();
+        }
+        else if (currentOptionText && currentQuestion &&
+            !line.startsWith('Correct Option:') &&
+            !line.startsWith('Hint:') &&
+            !line.startsWith('Correct Option Description:')) {
+            currentOptionText += ' ' + line.trim();
+        }
+        else if (line.startsWith("Correct Option:") && currentQuestion) {
+            if (currentOptionText) {
+                currentQuestion.options.push(currentOptionText.trim());
+                currentOptionText = '';
+            }
+            const correctOption = line.replace("Correct Option:", "").trim();
+            const match = correctOption.match(/^([a-d])/i);
+            if (match) {
+                currentQuestion.correctOption = match[1].toLowerCase().charCodeAt(0) - 97;
+            }
+        }
+        else if (line.startsWith("Hint:") && currentQuestion) {
+            if (currentOptionText) {
+                currentQuestion.options.push(currentOptionText.trim());
+                currentOptionText = '';
+            }
+            currentQuestion.hint = line.replace("Hint:", "").trim();
+        }
+        else if (line.startsWith("Correct Option Description:") && currentQuestion) {
+            if (currentOptionText) {
+                currentQuestion.options.push(currentOptionText.trim());
+                currentOptionText = '';
+            }
+            currentQuestion.correctOptionDescription = line.replace("Correct Option Description:", "").trim();
+        }
+
+        // Terms Processing
+
+        else if (line.startsWith("Term:")) {
+            if (currentTerm) {
+                processedData.terms.push(currentTerm);
+            }
+            parsingMode = "term";
+            currentTerm = {
+                term: line.replace("Term:", "").trim(),
+                definition: ""
+            };
+        }
+        else if (line.startsWith("Explanation:") && currentTerm) {
+            currentTerm.definition = line.replace("Explanation:", "").trim();
+            processedData.terms.push(currentTerm);
+            currentTerm = null;
+        }
+
+        // Handle continuous text
+        else if (parsingMode === "section" && currentSection && line.length > 0) {
+            currentSection.text += " " + line;
         }
     });
 
-    console.log(processedData);
+    // Add final items
+    if (currentSection) processedData.sections.push(currentSection);
+    if (currentQuestion) {
+        if (currentOptionText) {
+            currentQuestion.options.push(currentOptionText.trim());
+        }
+        processedData.questions.push(currentQuestion);
+    }
+    if (currentTerm) processedData.terms.push(currentTerm);
+
+    // Clean up data
+    processedData.sections.forEach(section => {
+        section.text = section.text.trim();
+    });
+
+    console.log("Processed Data:", processedData);
     localStorage.setItem('processedData', JSON.stringify(processedData));
     loadJsonDataFromLocalStorage();
 }
 
-function getSectionType(index) {
-    if (index % 3 === 1) return 'left';
-    if (index % 3 === 2) return 'right';
-    return 'middle';
-}
-
+// Update the loadJsonDataFromLocalStorage function to handle the new format
 function loadJsonDataFromLocalStorage() {
     let data = JSON.parse(localStorage.getItem('processedData'));
     if (data) {
-        $('#title').val(data.title);
-        $('#group-id-subject').val(data.quiz_group_id);
-        $('#description').val("Deze tekst gaat over het volgende onderwerp...");
+        // Load title and metadata
+        if (data.title) {
+            $('#title').val(data.title);
+            if (data.titleColor) $('#title').css('color', data.titleColor);
+            if (data.titleFont) $('#title').css('font-family', data.titleFont);
+        }
 
-        data.sections.forEach((section) => {
-            addSection(section.type, section);
-        });
+        // Set quiz group ID if available
+        if (data.quiz_group_id) {
+            $('#group-id-subject').val(data.quiz_group_id);
+        }
 
-        data.questions.forEach((question, index) => {
-            addQuestionFromData({
-                text: question,
-                options: [], // Add logic to parse options if available
-                hint: "", // Add logic to parse hints if available
-                correctOptionDescription: "", // Add logic to parse correct option description if available
-                correctOption: "" // Add logic to parse correct option if available
+        // Set default description if empty
+        if (!$('#description').val()) {
+            $('#description').val("Deze tekst gaat over het volgende onderwerp...");
+        }
+
+        // Clear existing sections before adding new ones
+        $('#preview').empty();
+
+        // Add sections
+        if (data.sections && data.sections.length > 0) {
+            data.sections.forEach((section) => {
+                addSection(section.type || 'left', {
+                    text: section.text || '',
+                    border_color: section.border_color || '#000000',
+                    text_color: section.text_color || '#000000',
+                    font: section.font || 'inherit'
+                });
             });
-        });
+        }
+
+        // Add questions
+        if (data.questions && data.questions.length > 0) {
+            data.questions.forEach((question) => {
+                addQuestionFromData({
+                    text: question.text || '',
+                    options: question.options || [],
+                    hint: question.hint || '',
+                    correctOptionDescription: question.correctOptionDescription || '',
+                    correctOption: question.correctOption !== undefined ? question.correctOption.toString() : ''
+                });
+            });
+        }
+
+        // Load begrippen from PDF data
+        if (data.terms && data.terms.length > 0) {
+            document.getElementById('begrippen-container').innerHTML = '';
+            data.terms.forEach(term => {
+                addBegripEntry({
+                    term: term.term || '',
+                    definition: term.explanation || term.definition || ''
+                });
+            });
+        }
     }
 }
 
@@ -706,6 +855,10 @@ async function createQuizFromForm() {
             QuestionType: 'multiple-choice'
         };
     });
+    const begrippen = Array.from(document.querySelectorAll('.begrip-entry')).map(entry => ({
+        term: entry.querySelector('.begrip-term').value.trim(),
+        definition: entry.querySelector('.begrip-definition').value.trim()
+    }));
 
     const userEmail = auth.currentUser ? auth.currentUser.email : 'anonymous';
     const quiz = {
@@ -717,6 +870,7 @@ async function createQuizFromForm() {
         Difficulty: 'easy',
         QuizType: quizType,
         Questions: questions,
+        Begrippen: begrippen,
         Created_at: new Date(),
         Modified_at: new Date(),
         Uploaded_by: userEmail
@@ -887,8 +1041,78 @@ function loadFormData() {
         if (document.getElementById('preview')) {
             document.getElementById('preview').innerHTML = formData.embeddedText || '';
         }
+        if (formData.begrippen) {
+            document.getElementById('begrippen-container').innerHTML = ''; // Clear existing
+            formData.begrippen.forEach(begrip => {
+                addBegripEntry(begrip);
+            });
+        }
     }
     clearFontPickers(); // Clear existing font pickers
     initializeTitleCustomization(); // Initialize title customization after loading form data
 }
 
+
+// Begrippenlijst section
+let begripId = 1;
+
+document.getElementById('add-begrip-button').addEventListener('click', () => {
+    addBegripEntry();
+    saveFormData();
+});
+
+function addBegripEntry(termData = { term: '', definition: '' }) {
+    const template = document.getElementById('begrip-template');
+    const begripContainer = document.getElementById('begrippen-container');
+
+    // Check if elements exist
+    if (!template || !begripContainer) {
+        console.error('Required elements not found');
+        return;
+    }
+
+    const clone = document.importNode(template.content, true);
+    const begripEntry = clone.querySelector('.begrip-entry');
+
+    if (!begripEntry) {
+        console.error('begrip-entry not found in template');
+        return;
+    }
+
+    begripEntry.id = `begrip-${begripId}`;
+
+    // Set values if provided
+    const termInput = begripEntry.querySelector('.begrip-term');
+    const definitionInput = begripEntry.querySelector('.begrip-definition');
+
+    if (!termInput || !definitionInput) {
+        console.error('Input elements not found');
+        return;
+    }
+
+    termInput.value = termData.term || '';
+    definitionInput.value = termData.definition || '';
+
+    // Add event listeners
+    const removeButton = begripEntry.querySelector('.remove-begrip-btn');
+    if (removeButton) {
+        removeButton.addEventListener('click', () => {
+            begripEntry.remove();
+            saveFormData();
+        });
+    }
+
+    termInput.addEventListener('input', saveFormData);
+    definitionInput.addEventListener('input', saveFormData);
+
+    // Append only once
+    begripContainer.appendChild(begripEntry);
+
+    // Scroll to the newly added begrip with smooth animation
+    begripEntry.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+
+    begripId++;
+}

@@ -227,17 +227,185 @@ function updateBestWorstScores(scores) {
         `;
     }
 };
+class QuizManager {
+    constructor() {
+        this.completedPage = 1;
+        this.uncompletedPage = 1;
+        this.itemsPerPage = 6;
+        this.filters = {
+            type: '',
+            sort: 'newFirst',
+            group: '',
+            questionType: ''
+        };
 
+        this.setupFilterListeners();
+    }
 
-async function fetchQuizzes() {
-    const querySnapshot = await getDocs(quizzesCollection);
-    querySnapshot.forEach((doc) => {
-        quizzes.push({ id: doc.id, ...doc.data() });
-    });
-    displayQuizzes();
-    setupPagination();
+    setupFilterListeners() {
+        const filterIds = ['quizTypeFilter', 'sortOrderFilter', 'quizGroupFilter', 'questionTypeFilter'];
+        filterIds.forEach(id => {
+            document.getElementById(id)?.addEventListener('change', (e) => {
+                this.updateFilters(id, e.target.value);
+                this.refreshDisplay();
+            });
+        });
+    }
+
+    updateFilters(filterId, value) {
+        const filterMap = {
+            'quizTypeFilter': 'type',
+            'sortOrderFilter': 'sort',
+            'quizGroupFilter': 'group',
+            'questionTypeFilter': 'questionType'
+        };
+        this.filters[filterMap[filterId]] = value;
+        // Reset pages when filters change
+        this.completedPage = 1;
+        this.uncompletedPage = 1;
+    }
+
+    applyFilters(quizzes) {
+        let filtered = [...quizzes];
+
+        if (this.filters.type) {
+            filtered = filtered.filter(quiz => quiz.QuizType === this.filters.type);
+        }
+
+        if (this.filters.group) {
+            filtered = filtered.filter(quiz => quiz.QuizGroupId === this.filters.group);
+        }
+
+        if (this.filters.questionType) {
+            filtered = filtered.filter(quiz =>
+                quiz.Questions.some(q => q.QuestionType === this.filters.questionType)
+            );
+        }
+
+        // Apply sorting
+        switch (this.filters.sort) {
+            case 'newFirst':
+                filtered.sort((a, b) => new Date(b.completedAt || b.Created_at) - new Date(a.completedAt || a.Created_at));
+                break;
+            case 'oldFirst':
+                filtered.sort((a, b) => new Date(a.completedAt || a.Created_at) - new Date(b.completedAt || b.Created_at));
+                break;
+            case 'random':
+                filtered.sort(() => Math.random() - 0.5);
+                break;
+        }
+
+        return filtered;
+    }
+
+    getPaginatedQuizzes(quizzes, page) {
+        const start = (page - 1) * this.itemsPerPage;
+        return quizzes.slice(start, start + this.itemsPerPage);
+    }
+
+    setupPagination(section, quizzes, currentPage, updateCallback) {
+        const pageCount = Math.ceil(quizzes.length / this.itemsPerPage);
+        const paginationContainer = document.createElement('div');
+        paginationContainer.className = 'section-pagination';
+
+        paginationContainer.innerHTML = `
+            <button class="page-btn prev-page" ${currentPage === 1 ? 'disabled' : ''}>
+                Previous
+            </button>
+            <span class="page-numbers">${currentPage} / ${pageCount}</span>
+            <button class="page-btn next-page" ${currentPage === pageCount ? 'disabled' : ''}>
+                Next
+            </button>
+        `;
+
+        // Remove existing pagination if any
+        const existingPagination = section.querySelector('.section-pagination');
+        if (existingPagination) {
+            existingPagination.remove();
+        }
+
+        section.appendChild(paginationContainer);
+
+        // Add event listeners
+        paginationContainer.querySelector('.prev-page').addEventListener('click', () => {
+            if (currentPage > 1) {
+                updateCallback(currentPage - 1);
+            }
+        });
+
+        paginationContainer.querySelector('.next-page').addEventListener('click', () => {
+            if (currentPage < pageCount) {
+                updateCallback(currentPage + 1);
+            }
+        });
+    }
+
+    refreshDisplay() {
+        // Get and filter all quizzes
+        const filteredCompleted = this.applyFilters(this.completedQuizzes);
+        const filteredUncompleted = this.applyFilters(this.uncompletedQuizzes);
+
+        // Display with pagination
+        const completedToShow = this.getPaginatedQuizzes(filteredCompleted, this.completedPage);
+        const uncompletedToShow = this.getPaginatedQuizzes(filteredUncompleted, this.uncompletedPage);
+
+        // Update displays
+        displayCompletedQuizzes(completedToShow);
+        displayUncompletedQuizzes(uncompletedToShow);
+
+        // Setup pagination for both sections
+        const completedSection = document.querySelector('#completed-quizzes').parentElement;
+        const uncompletedSection = document.querySelector('#uncompleted-quizzes').parentElement;
+
+        this.setupPagination(completedSection, filteredCompleted, this.completedPage,
+            (newPage) => {
+                this.completedPage = newPage;
+                this.refreshDisplay();
+            }
+        );
+
+        this.setupPagination(uncompletedSection, filteredUncompleted, this.uncompletedPage,
+            (newPage) => {
+                this.uncompletedPage = newPage;
+                this.refreshDisplay();
+            }
+        );
+    }
 }
 
+// Initialize the manager
+const quizManager = new QuizManager();
+
+// Modify fetchQuizzes to use the manager
+async function fetchQuizzes() {
+    const querySnapshot = await getDocs(quizzesCollection);
+    const allQuizzes = [];
+    querySnapshot.forEach((doc) => {
+        allQuizzes.push({ id: doc.id, ...doc.data() });
+    });
+
+    const studentDoc = await getDoc(doc(db, "studentdb", auth.currentUser.uid));
+    const completedQuizzes = studentDoc.data()?.quizzes || {};
+
+    quizManager.completedQuizzes = [];
+    quizManager.uncompletedQuizzes = [];
+
+    allQuizzes.forEach(quiz => {
+        if (completedQuizzes[quiz.Title]) {
+            const quizData = completedQuizzes[quiz.Title];
+            quizManager.completedQuizzes.push({
+                ...quiz,
+                scoreWithHints: parseFloat(quizData.scoreWithHints || 0).toFixed(1),
+                scoreWithoutHints: parseFloat(quizData.scoreWithoutHints || 0).toFixed(1),
+                completedAt: quizData.dateTime
+            });
+        } else {
+            quizManager.uncompletedQuizzes.push(quiz);
+        }
+    });
+
+    quizManager.refreshDisplay();
+}
 function displayQuizzes() {
     const startIndex = (currentPage - 1) * quizzesPerPage;
     const endIndex = startIndex + quizzesPerPage;
@@ -270,41 +438,233 @@ function displayQuizzes() {
     setupQuizButtons();
 }
 
+// function displaySeparatedQuizzes(allQuizzes, completedQuizzes) {
+//     const completed = [];
+//     const uncompleted = [];
+
+//     console.log('All Quizzes:', allQuizzes);
+//     console.log('Completed Quizzes Data:', completedQuizzes);
+
+//     allQuizzes.forEach(quiz => {
+//         if (completedQuizzes[quiz.Title]) {
+//             const quizData = completedQuizzes[quiz.Title];
+//             console.log(`Quiz "${quiz.Title}" completion data:`, quizData);
+
+//             completed.push({
+//                 ...quiz,
+//                 scoreWithHints: parseFloat(quizData.scoreWithHints || 0).toFixed(1),
+//                 scoreWithoutHints: parseFloat(quizData.scoreWithoutHints || 0).toFixed(1),
+//                 completedAt: quizData.dateTime
+//             });
+//         } else {
+//             uncompleted.push(quiz);
+//         }
+//     });
+
+//     console.log('Processed Completed Quizzes:', completed);
+//     console.log('Uncompleted Quizzes:', uncompleted);
+
+//     // Sort completed quizzes by completion date (newest first)
+//     completed.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+
+//     // Randomize uncompleted quizzes
+//     const shuffledUncompleted = [...uncompleted].sort(() => Math.random() - 0.5);
+
+//     displayUncompletedQuizzes(shuffledUncompleted);
+//     displayCompletedQuizzes(completed);
+// }
+
+function displayUncompletedQuizzes(quizzes) {
+    const filteredQuizzes = applyFilters(quizzes);
+
+
+    // Then randomize the filtered uncompleted quizzes
+    const shuffledQuizzes = [...filteredQuizzes].sort(() => Math.random() - 0.5);
+
+    const container = document.getElementById('uncompleted-quizzes');
+    container.innerHTML = shuffledQuizzes.length ? shuffledQuizzes.map(quiz => `
+        <div class="quiz-card" data-quiz-id="${quiz.id}">
+            <img class="quiz-image" src="${quiz.Banner}" alt="Quiz banner">
+            <div class="quiz-content">
+                <h3 class="quiz-title">${quiz.Title}</h3>
+                <p class="quiz-description">${quiz.Description}</p>
+                <div class="quiz-footer">
+                    <div class="quiz-meta">
+                        <span class="quiz-type">${quiz.QuizType}</span>
+                        <span class="quiz-questions">${quiz.Questions.length} Questions</span>
+                    </div>
+                    <button class="start-quiz-btn" data-quiz-id="${quiz.id}">
+                        Start Quiz
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('') : '<div class="no-quizzes-message">No available quizzes</div>';
+
+    setupQuizButtons();
+}
+
+function getScoreColor(score) {
+    // Convert score to number if it's a string
+    score = parseFloat(score);
+
+    // Color ranges for different score levels
+    if (score >= 8.5) {
+        return {
+            background: '#4CAF50',  // Green
+            text: '#E8F5E9'         // Light green text
+        };
+    } else if (score >= 7.0) {
+        return {
+            background: '#8BC34A',  // Light green
+            text: '#F1F8E9'         // Very light green text
+        };
+    } else if (score >= 5.5) {
+        return {
+            background: '#FFC107',  // Amber/Yellow
+            text: '#FFFFFF'         // White text
+        };
+    } else if (score >= 4.0) {
+        return {
+            background: '#FF9800',  // Orange
+            text: '#FFF3E0'         // Light orange text
+        };
+    } else {
+        return {
+            background: '#FF7043',  // Deep Orange - encouraging rather than red
+            text: '#FBE9E7'         // Light orange text
+        };
+    }
+}
+
+function formatCompletionDate(completedAt) {
+    const now = new Date();
+    const completedDate = new Date(completedAt);
+    const timeDiff = now - completedDate; // Difference in milliseconds
+    const minutesDiff = Math.floor(timeDiff / (1000 * 60));
+    const hoursDiff = Math.floor(timeDiff / (1000 * 60 * 60));
+    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+    if (daysDiff >= 1) {
+        if (daysDiff === 1) {
+            return 'Yesterday';
+        } else {
+            return completedDate.toLocaleDateString(); // Default date format
+        }
+    } else if (hoursDiff >= 1) {
+        return `${hoursDiff} hours ago`;
+    } else if (minutesDiff >= 1) {
+        return `${minutesDiff} minutes ago`;
+    } else {
+        return 'Just now';
+    }
+}
+
+function displayCompletedQuizzes(quizzes) {
+    const container = document.getElementById('completed-quizzes');
+    container.innerHTML = quizzes.length ? quizzes.map(quiz => {
+        // Calculate score color based on each score
+        const hintsScoreColor = getScoreColor(quiz.scoreWithHints);
+        const withoutHintsScoreColor = getScoreColor(quiz.scoreWithoutHints);
+
+        return `
+        <div class="quiz-card quiz-card-completed" data-quiz-id="${quiz.id}">
+            <div class="score-badge-stacked">
+                <div class="score-card-mini with-hints" 
+                     style="background-color: ${hintsScoreColor.background}">
+                    <span class="score-value">${quiz.scoreWithHints}</span>
+                    <span class="score-label">WITH HINTS</span>
+                </div>
+                <div class="score-card-mini without-hints"
+                     style="background-color: ${withoutHintsScoreColor.background}">
+                    <span class="score-value">${quiz.scoreWithoutHints}</span>
+                    <span class="score-label">WITHOUT HINTS</span>
+                </div>
+            </div>
+            <img class="quiz-image" src="${quiz.Banner}" alt="Quiz banner">
+            <div class="quiz-content">
+                <h3 class="quiz-title">${quiz.Title}</h3>
+                <p class="quiz-description">${quiz.Description}</p>
+                <div class="quiz-footer">
+                    <div class="quiz-meta">
+                        <span class="completion-date">Completed: ${formatCompletionDate(quiz.completedAt)}</span>
+                        <span class="quiz-type">${quiz.QuizType}</span>
+                    </div>
+                    <button class="start-quiz-btn" data-quiz-id="${quiz.id}">
+                        Retry Quiz
+                    </button>
+                </div>
+            </div>
+        </div>
+    `}).join('') : '<div class="no-quizzes-message">No completed quizzes yet</div>';
+
+    setupQuizButtons();
+}
+
+// Modified setupQuizButtons to handle both sections
 function setupQuizButtons() {
-    const quizButtons = document.querySelectorAll(".card-btn");
-    quizButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const quizId = button.dataset.quizId;
-            redirectToQuiz(quizId);
+    document.querySelectorAll(".start-quiz-btn").forEach(button => {
+        button.addEventListener("click", function (e) {
+            e.preventDefault();
+            const quizId = this.dataset.quizId; // Using data attribute directly from button
+            if (quizId) {
+                redirectToQuiz(quizId);
+            }
         });
     });
 }
+
 
 function redirectToQuiz(quizId) {
     window.location.href = `quiz.html?id=${quizId}`;
 }
 
-function setupPagination() {
-    const pageCount = Math.ceil(quizzes.length / quizzesPerPage);
-    document.getElementById("page-numbers").innerText = `${currentPage} / ${pageCount}`;
-    document.getElementById("prev-page").disabled = currentPage === 1;
-    document.getElementById("next-page").disabled = currentPage === pageCount;
+// Add this to handle pagination for both sections if needed
+function setupPagination(section, quizzes) {
+    const itemsPerPage = 6; // Your existing quizzesPerPage value
+    const pageCount = Math.ceil(quizzes.length / itemsPerPage);
+    const paginationContainer = section.querySelector('.pagination');
 
-    document.getElementById("prev-page").addEventListener("click", () => {
-        if (currentPage > 1) {
-            currentPage--;
-            displayQuizzes();
-            setupPagination();
-        }
-    });
+    if (paginationContainer) {
+        paginationContainer.innerHTML = `
+            <button class="page-btn prev-page" ${currentPage === 1 ? 'disabled' : ''}>Vorige</button>
+            <span class="page-numbers">${currentPage} / ${pageCount}</span>
+            <button class="page-btn next-page" ${currentPage === pageCount ? 'disabled' : ''}>Volgende</button>
+        `;
 
-    document.getElementById("next-page").addEventListener("click", () => {
-        if (currentPage < pageCount) {
-            currentPage++;
-            displayQuizzes();
-            setupPagination();
-        }
-    });
+        // Add your existing pagination event listeners
+        const prevBtn = paginationContainer.querySelector('.prev-page');
+        const nextBtn = paginationContainer.querySelector('.next-page');
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayQuizzesBySection(section, quizzes);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < pageCount) {
+                currentPage++;
+                displayQuizzesBySection(section, quizzes);
+            }
+        });
+    }
+}
+
+// Helper function to display quizzes for a specific section with pagination
+function displayQuizzesBySection(section, quizzes) {
+    const startIndex = (currentPage - 1) * quizzesPerPage;
+    const endIndex = startIndex + quizzesPerPage;
+    const quizzesToDisplay = quizzes.slice(startIndex, endIndex);
+
+    if (section.id === 'uncompleted-quizzes') {
+        displayUncompletedQuizzes(quizzesToDisplay);
+    } else {
+        displayCompletedQuizzes(quizzesToDisplay);
+    }
+
+    setupPagination(section, quizzes);
 }
 
 // Apply Filters immediately when any filter changes
