@@ -13,6 +13,8 @@
 </head>
 <body>
     <div class="container">
+        <div class="header-content">Taal voor Thuis</div>
+
         <!-- Language Switcher Dropdown -->
         <div class="language-switcher hidden">
             <select id="language-switcher" class="custom-select">
@@ -52,7 +54,13 @@
             <!-- Notification area -->
             <div id="notification-area" class="w-100 mt-3"></div>
         </div>
+
+        <div class="footer-content">
+            <span id="footer-text"></span>
+        </div>
     </div>
+
+
 
     <!-- Password Reset Modal -->
     <div class="modal fade" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
@@ -77,5 +85,10 @@
 
     <script type="module" src="../public/assets/js/localization.js"></script>
     <script type="module" src="../public/assets/js/login_parent.js"></script>
+    <script>
+        // Set footer text dynamically with the current year
+        const year = new Date().getFullYear();
+        document.getElementById('footer-text').innerText = `© ${year} Taal voor Thuis | Meer Dan Bijles`;
+    </script>
 </body>
 </html>

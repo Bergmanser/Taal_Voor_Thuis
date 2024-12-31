@@ -256,30 +256,14 @@ body::after {
         margin-top: 0;
         transform: translateY(-5%);
     }
-
-    .container::before {
-        content: 'Taal voor Thuis';
-        position: absolute;
+    
+    .header-content {
         top: -60px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        color: rgb(255, 255, 255);
         font-size: 1.7rem;
-        font-weight: 300;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
-
-    .container::after {
-        content: '© 2024 Taal voor Thuis | Meer Dan Bijles';
-        position: absolute;
+    .footer-content {
         bottom: -60px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.6);
         font-size: 0.9rem;
-        font-weight: 300;
     }
 }
 
@@ -289,32 +273,17 @@ body::after {
         margin: 0 auto;
         transform: translateY(0);
     }
-
-    .container::before {
-        content: 'Taal voor Thuis';
-        position: absolute;
+    
+    .header-content {
         top: -45px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        color: rgb(255, 255, 255);
         font-size: 1.3rem;
-        font-weight: 300;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
-
-    .container::after {
-        content: '© 2024 Taal voor Thuis | Meer Dan Bijles';
-        position: absolute;
+    
+    .footer-content {
         bottom: -40px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.6);
         font-size: 0.85rem;
-        font-weight: 300;
     }
-
+    
     .login-form {
         padding: 25px;
     }
@@ -326,33 +295,30 @@ body::after {
         margin: 0 auto;
         transform: translateY(-3%);
     }
-
-    .container::before {
-        content: 'Taal voor Thuis';
-        position: absolute;
+    
+    .header-content {
         top: -70px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        color: rgb(255, 255, 255);
         font-size: 1.8rem;
-        font-weight: 300;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
     }
-
-    .container::after {
-        content: '© 2024 Taal voor Thuis | Meer Dan Bijles';
-        position: absolute;
+    
+    .footer-content {
         bottom: -65px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.6);
         font-size: 1rem;
-        font-weight: 300;
         transition: all 0.3s ease;
     }
+}
+
+.header-content, .footer-content {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    font-weight: 300;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.footer-content {
+    color: rgba(255, 255, 255, 0.6);
 }
 
 /* Very Large Screens */

@@ -13,6 +13,8 @@
 </head>
 <body>
     <div class="container">
+        <div class="header-content">Taal voor Thuis</div>
+
         <div class="language-switcher hidden">
             <select id="language-switcher" class="custom-select">
                 <option value="nl">Nederlands</option>
@@ -44,10 +46,19 @@
             <!-- Notification area -->
             <div id="notification-area" class="w-100 mt-3"></div>
         </div>
+
+        <div class="footer-content">
+            <span id="footer-text"></span>
+        </div>
     </div>
 
     <!-- Localization and Main Script Files -->
     <script type="module" src="../public/assets/js/localization.js"></script>
     <script type="module" src="../public/assets/js/login_student.js"></script>
+    <script>
+        // Set footer text dynamically with the current year
+        const year = new Date().getFullYear();
+        document.getElementById('footer-text').innerText = `© ${year} Taal voor Thuis | Meer Dan Bijles`;
+    </script>
 </body>
 </html>

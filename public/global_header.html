@@ -22,21 +22,39 @@
         </div>
     </header>
 
+    <!-- User menu -->
     <div class="user-menu" id="userMenu">
         <ul>
-            <li id="accountInfo">Account Info</li>
-            <li id="logoutButton">Logout</li>
+            <li id="accountInfo">
+                <i class="fas fa-user"></i>
+                Profiel Instellingen
+            </li>
+            <li id="logoutButton">
+                <i class="fas fa-sign-out-alt"></i>
+                Log Uit
+            </li>
         </ul>
     </div>
 
-    <!-- Existing Logout Modal -->
-    <div id="logoutModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h5>Confirm Logout</h5>
-            <p>Are you sure you want to logout?</p>
-            <div class="modal-footer">
-                <button class="btn btn-primary btn-logout" id="confirmLogout">Logout</button>
+    <!-- Logout Modal -->
+    <div id="logoutPopup" class="logout-popup popup">
+        <div class="popup-content">
+            <div class="popup-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <div class="popup-text">
+                <h3>Tot de volgende keer!</h3>
+                <p class="logout-popup-text">Log straks opnieuw in</p>
+            </div>
+            <div class="popup-buttons">
+                <button class="btn-cancel" id="cancelLogout">
+                    <i class="fas fa-times"></i>
+                    Annuleer
+                </button>
+                <button class="btn-confirm" id="confirmLogout">
+                    <i class="fas fa-check"></i>
+                    Log Uit
+                </button>
             </div>
         </div>
     </div>

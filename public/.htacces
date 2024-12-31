@@ -1,0 +1,30 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Redirect secondary domains to the primary domain (.nl)
+RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.com [NC,OR]
+RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.online [NC,OR]
+RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.be [NC,OR]
+RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.eu [NC]
+RewriteRule ^(.*)$ https://www.taalvoorthuis.nl/$1 [R=301,L]
+
+# Force HTTPS (always recommended for production)
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Rewrite friendly URLs to specific file paths
+RewriteRule ^loginpagina$ /public/login_student_tvt.html [L]
+RewriteRule ^quiz$ /public/quiz.html [L]
+RewriteRule ^user-info-student$ /public/user_info_student.html [L]
+RewriteRule ^student-dashboard$ /public/student_dashboard.html [L]
+RewriteRule ^login-parent$ /public/login_parent_tvt.html [L]
+RewriteRule ^login-employee$ /public/login_employee_tvt.html [L]
+RewriteRule ^login-student$ /public/login_student_tvt.html [L]
+
+# Rewrite for global_header.html
+RewriteRule ^global-header$ /public/global_header.html [L]
+
+# Graceful handling for non-existing files or directories (SPA fallback)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]

@@ -2,20 +2,30 @@ import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { auth, db } from "./firebase_config.js";
 
-$(document).ready(function () {
-    const $homeLogo = $("#homeLogo");
-    const $userInfo = $("#userInfo");
-    const $userMenu = $("#userMenu");
-    const $logoutButton = $("#logoutButton");
-    const $logoutModal = $("#logoutModal");
-    const $closeModal = $("#closeModal");
-    const $confirmLogout = $("#confirmLogout");
-    const $accountInfo = $("#accountInfo");
-    const $username = $("#username");
-    const $avatar = $("#avatar");
+const avatarPaths = {
+    1: '../public/assets/images/background_2.png',
+    2: '../public/assets/images/background_2.png',
+    3: '../public/assets/images/background_2.png',
+    4: '../public/assets/images/background_2.png',
+    5: '../public/assets/images/background_2.png',
+    6: '../public/assets/images/background_2.png',
+    // Expected format:
+    // 1: '../public/assets/images/avatars/avatar1.png'
+};
 
-    // Redirect to home page based on user role when logo is clicked
-    $homeLogo.click(async function () {
+
+$(document).ready(function () {
+    const elements = {
+        homeLogo: $("#homeLogo"),
+        userInfo: $("#userInfo"),
+        userMenu: $("#userMenu"),
+        accountInfo: $("#accountInfo"),
+        username: $("#username"),
+        avatar: $("#avatar")
+    };
+
+    // Event Handlers
+    elements.homeLogo.click(async () => {
         try {
             const userRole = await getUserRole();
             redirectToDashboard(userRole);
@@ -24,178 +34,204 @@ $(document).ready(function () {
         }
     });
 
-    $userInfo.click(function () {
-        $userMenu.toggle();
-    });
+    elements.userInfo.click(() => elements.userMenu.toggle());
+    elements.accountInfo.click(() => window.location.href = 'user_info_student.html');
 
-    $logoutButton.click(function () {
-        $logoutModal.show();
-        $userMenu.hide();
-    });
-
-    $closeModal.click(function () {
-        $logoutModal.hide();
-    });
-
-    $confirmLogout.click(async function () {
-        try {
-            const userRole = await getUserRole();
-            await signOut(auth);
-            console.log('User logged out');
-            redirectToLogin(userRole);
-        } catch (error) {
-            console.error('Error logging out:', error);
+    // Close menu on outside click
+    $(window).click(event => {
+        if (!elements.userInfo[0].contains(event.target) && !elements.userMenu[0].contains(event.target)) {
+            elements.userMenu.hide();
         }
     });
 
-    $accountInfo.click(function () {
-        window.location.href = 'user_info.html';
-    });
-
-    // Close the user menu if clicked outside
-    $(window).click(function (event) {
-        if (!$userInfo[0].contains(event.target) && !$userMenu[0].contains(event.target)) {
-            $userMenu.hide();
-        }
-    });
-
-    // Function to redirect user to the appropriate dashboard based on user role
+    // Role-based Navigation
     function redirectToDashboard(userRole) {
-        switch (userRole) {
-            case 0: // student
-                window.location.href = 'student_dashboard.html';
-                break;
-            case 1: // private
-            case 2: // business
-                window.location.href = 'parent_overview.html';
-                break;
-            case 3: // admin
-            case 4: // editor
-                window.location.href = 'employee_dashboard.html';
-                break;
-            default:
-                console.error("Unknown user role");
-                break;
-        }
+        const dashboards = {
+            0: 'student_dashboard.html',
+            1: 'parent_overview.html',
+            2: 'parent_overview.html',
+            3: 'employee_dashboard.html',
+            4: 'employee_dashboard.html'
+        };
+        window.location.href = dashboards[userRole] || console.error("Unknown user role");
     }
 
-    // Function to redirect user to the appropriate login page based on user role
     function redirectToLogin(userRole) {
-        switch (userRole) {
-            case 0: // student
-                window.location.href = 'login_student_tvt.html';
-                break;
-            case 1: // private
-            case 2: // business
-                window.location.href = 'login_parent_tvt.html';
-                break;
-            case 3: // admin
-            case 4: // editor
-                window.location.href = 'login_employee_tvt.html';
-                break;
-            default:
-                window.location.href = 'https://www.taalvoorthuis.nl';
-        }
+        const loginPages = {
+            0: 'login_student_tvt.html',
+            1: 'login_parent_tvt.html',
+            2: 'login_parent_tvt.html',
+            3: 'login_employee_tvt.html',
+            4: 'login_employee_tvt.html'
+        };
+        window.location.href = loginPages[userRole] || 'https://www.taalvoorthuis.nl';
     }
 
-    // Get user role from Firestore
+    // Firebase User Management
     async function getUserRole() {
         const user = auth.currentUser;
-        if (user) {
-            console.log('User found:', user.uid);
-            const usersRef = collection(db, "users");
-            const userQuery = query(usersRef, where("email", "==", user.email));
-            const userSnapshot = await getDocs(userQuery);
-
-            if (userSnapshot.size > 0) {
-                userSnapshot.forEach(doc => {
-                    console.log('User document data:', doc.data());
-                });
-                const userData = userSnapshot.docs[0].data();
-                return userData.userRoleId;
-            } else {
-                console.log('No user document found');
-                throw new Error("User not found.");
-            }
-        } else {
-            console.log('No user is logged in');
+        if (!user) {
             throw new Error("No user is logged in.");
         }
+
+        const userSnapshot = await getDocs(
+            query(collection(db, "users"), where("email", "==", user.email))
+        );
+
+        if (!userSnapshot.empty) {
+            return userSnapshot.docs[0].data().userRoleId;
+        }
+        throw new Error("User not found.");
     }
 
     async function updateUserInfo() {
+        const user = auth.currentUser;
+        if (!user) return;
+
         try {
-            const user = auth.currentUser;
-            if (user) {
-                const usersRef = collection(db, "users");
-                const userQuery = query(usersRef, where("email", "==", user.email));
-                const userSnapshot = await getDocs(userQuery);
+            const userSnapshot = await getDocs(
+                query(collection(db, "users"), where("email", "==", user.email))
+            );
 
-                if (userSnapshot.size > 0) {
-                    const userData = userSnapshot.docs[0].data();
-                    const userRoleId = userData.userRoleId;
-                    let username;
+            if (!userSnapshot.empty) {
+                const userData = userSnapshot.docs[0].data();
+                let username = userData.username;
 
-                    if (userRoleId === 0) {
-                        // For students, look in the studentdb collection, this will allow us to use a users real name in the future
-                        const studentdbRef = collection(db, "studentdb");
-                        const studentQuery = query(studentdbRef, where("email", "==", user.email));
-                        const studentSnapshot = await getDocs(studentQuery);
+                if (userData.userRoleId === 0) {
+                    const studentSnapshot = await getDocs(
+                        query(collection(db, "studentdb"), where("email", "==", user.email))
+                    );
+                    if (!studentSnapshot.empty) {
+                        const studentData = studentSnapshot.docs[0].data();
+                        username = studentData.username;
 
-                        if (studentSnapshot.size > 0) {
-                            const studentData = studentSnapshot.docs[0].data();
-                            username = studentData.username;
+                        elements.username.text(username);
+                        if (studentData.studentAvatar) {
+                            elements.avatar
+                                .html(`<img src="${avatarPaths[studentData.studentAvatar]}" 
+                                      alt="User avatar" style="width: 100%; height: 100%; object-fit: cover; 
+                                      border-radius: 8px; border: 2px solid #ad2852;">`)
+                                .css({
+                                    'border-radius': '8px',
+                                    'background-color': 'transparent'
+                                });
+                        } else {
+                            elements.avatar
+                                .text(username.charAt(0).toUpperCase())
+                                .css({
+                                    'border-radius': '50%',
+                                    'background-color': '#ad2852'
+                                });
                         }
-                    } else {
-                        // For non-students, use the username from the users collection
-                        username = userData.username;
+                        return;
                     }
-
-                    if (username) {
-                        $username.text(username);
-                        $avatar.text(username.charAt(0).toUpperCase());
-                    } else {
-                        $username.text(user.email);
-                        $avatar.text(user.email.charAt(0).toUpperCase());
-                    }
-                } else {
-                    console.log('No user document found');
-                    $username.text(user.email);
-                    $avatar.text(user.email.charAt(0).toUpperCase());
                 }
+
+                elements.username.text(username || user.email);
+                elements.avatar
+                    .text((username || user.email).charAt(0).toUpperCase())
+                    .css({
+                        'border-radius': '50%',
+                        'background-color': '#ad2852'
+                    });
             }
         } catch (error) {
             console.error("Error getting user data:", error);
-            // In case of error, display email as fallback
-            $username.text(user.email);
-            $avatar.text(user.email.charAt(0).toUpperCase());
+            elements.username.text(user.email);
+            elements.avatar
+                .text(user.email.charAt(0).toUpperCase())
+                .css({
+                    'border-radius': '50%',
+                    'background-color': '#ad2852'
+                });
         }
     }
 
-    // Initialize header based on user role
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            try {
-                console.log('User state changed:', user.uid);
-                await updateUserInfo();
-            } catch (error) {
-                console.error("Error getting user role:", error);
+    // Logout Popup Management
+    function initializeLogoutPopup() {
+        if (window.popupState?.initialized) return;
+
+        const elements = {
+            popup: document.getElementById('logoutPopup'),
+            cancelBtn: document.getElementById('cancelLogout'),
+            confirmBtn: document.getElementById('confirmLogout'),
+            logoutBtn: document.getElementById('logoutButton')
+        };
+
+        if (!Object.values(elements).every(Boolean)) {
+            console.error('Required logout popup elements not found');
+            return;
+        }
+
+        elements.popup.removeAttribute('style');
+
+        const handlers = {
+            showPopup: () => {
+                document.querySelectorAll('.popup').forEach(p => {
+                    if (p !== elements.popup) p.classList.remove('show');
+                });
+                elements.popup.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            },
+            hidePopup: () => {
+                elements.popup.classList.remove('show');
+                document.body.style.overflow = '';
+            },
+            logout: async () => {
+                try {
+                    const userRole = await getUserRole();
+                    await signOut(auth);
+                    handlers.hidePopup();
+                    redirectToLogin(userRole);
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                }
             }
-        } else {
-            console.log("No user is logged in.");
-            // window.location.href = 'login.html'; // Redirect to login page if no user is logged in
+        };
+
+        elements.logoutBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            handlers.showPopup();
+            document.getElementById('userMenu')?.style.setProperty('display', 'none');
+        });
+
+        elements.popup.addEventListener('click', e => {
+            if (e.target === elements.popup) handlers.hidePopup();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && elements.popup.classList.contains('show')) {
+                handlers.hidePopup();
+            }
+        });
+
+        elements.cancelBtn.addEventListener('click', handlers.hidePopup);
+        elements.confirmBtn.addEventListener('click', handlers.logout);
+
+        window.popupState = { initialized: true };
+    }
+
+    // Initialize header and auth state
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            await updateUserInfo();
         }
     });
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeLogoutPopup);
+    } else {
+        initializeLogoutPopup();
+    }
+
+    $(document).ready(initializeLogoutPopup);
 });
 
-// Sticky header logic
+// Sticky header behavior
 let prevScrollpos = window.pageYOffset;
 window.onscroll = function () {
     const currentScrollPos = window.pageYOffset;
-    if (prevScrollpos > currentScrollPos) {
-        document.querySelector(".header").style.top = "0";
-    } else {
-        document.querySelector(".header").style.top = "-88px";
-    }
+    const header = document.querySelector(".header");
+    header.style.top = prevScrollpos > currentScrollPos ? "0" : "-88px";
     prevScrollpos = currentScrollPos;
 }

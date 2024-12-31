@@ -10,29 +10,132 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
-    <title>Singular Quiz Page</title>
+    <title>Singular Quiz Page | Taal Voor Thuis</title>
+    <style>
+        /* screenreader.css */
+#screenreader-toolbar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(to right, #8B4513, #A0522D);
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+}
+
+#screenreader-toolbar.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sr-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sr-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sr-button:active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sr-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.sr-speed {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.sr-speed option {
+    background: #8B4513;
+    color: white;
+}
+
+.highlighted-text {
+    background-color: rgba(255, 220, 0, 0.3);
+    transition: background-color 0.3s ease;
+}
+
+    </style>
 </head>
 <body>
+    <div class="nav-buttons-container">
+        <a href="student_dashboard.html" class="nav-button">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <!-- <button class="nav-button" id="screenreader-toggle">
+            <span class="material-symbols-outlined">volume_up</span>
+            <span class="button-text">Lees voor</span>
+        </button> -->
+    </div>
+
     <header>
         <div id="header-container"></div>
     </header>
 
-    <!-- pause confirmation popup- -->
-    <div id="pause-popup" class="popup hidden">
-        <div class="popup-content">
-        <h2>Pause Quiz</h2>
-        <p id="pause-message"></p>
-        <button id="confirm-pause" class="btn btn-primary">Yes, Pause</button>
-        <button id="cancel-pause" class="btn btn-secondary">Cancel</button>
-        </div>
-    </div>
-  
-    <!-- Pauses the quiz and redirects user to student dashboard -->
-    <button id="pause-quiz-button" class="btn btn-warning hidden">
+    <!-- Pause Button -->
+    <button id="pause-quiz-button" class="btn btn-warning">
         <svg data-slot="icon" class="pause-icon" fill="none" stroke-width="3.0" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5"></path>
-          </svg>
+        </svg>
+        <div class="pause-counter hidden">
+            <span id="pause-count">3</span>
+        </div>
     </button>
+
+    <!-- Pause Popup (matching glossary style) -->
+    <div id="pause-popup" class="pause-popup hidden">
+        <div class="pause-content">
+            <div class="pause-header">
+                <h2>Pauzeer Quiz</h2>
+                <div class="view-controls">
+                    <button class="close-btn">×</button>
+                </div>
+            </div>
+            <div class="pause-body">
+                <div id="pause-counter-display" class="pause-counter-display">
+                    <span>Beschikbare pauzeer mogelijkheden: </span>
+                    <span id="pauses-remaining" class="pauses-remaining">3</span>
+                </div>
+                <p id="pause-message" class="pause-message"></p>
+                <div id="oldest-quiz-warning" class="warning-box hidden">
+                    <div class="warning-icon">⚠️</div>
+                    <p id="oldest-quiz-message"></p>
+                </div>
+                <div class="pause-actions">
+                    <button id="confirm-pause" class="btn btn-primary">Ja, Pauzeer Quiz</button>
+                    <button id="cancel-pause" class="btn btn-secondary">Ga Verder Met Quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Glossary related logic -->
     <div id="begrippen-popup" class="begrippen-popup hidden">
@@ -86,28 +189,9 @@
                         <div class="gcse-search"></div>
                     </div> -->
 
-                    <!-- <div class="screenreader-toolbar-container hidden">
-                        <button id="screenreader-button">Screenreader</button>
-                        <div id="toolbar" class="hidden">
-                            <div class="toolbar-inner">
-                                <button id="play-button">Play</button>
-                                <button id="pause-button">Pause</button>
-                                <button id="reset-button">Reset</button>
-                                <input id="start-from-input" type="number" value="1" />
-                                <button id="start-from-button">Start from</button>
-                                <div class="auto-scroll-options">
-                                    <button id="auto-scroll-dropdown-button" aria-haspopup="true" aria-expanded="false">
-                                        Screenreader auto scroll: <span id="auto-scroll-button-text"></span>
-                                    </button>
-                                    <ul id="auto-scroll-dropdown" class="hidden">
-                                        <li><button class="auto-scroll-option" data-value="on"><span class="green">On</span></button></li>
-                                        <li><button class="auto-scroll-option" data-value="off"><span class="red">Off</span></button></li>
-                                    </ul>
-                                </div>
-                                <button id="close-toolbar-button">Close</button>
-                            </div>
-                        </div>
-                    </div> -->
+                    <div class="sigma-screenreader-toolbar hidden">
+                        <!-- Screenreader controls -->
+                    </div>                    
 
                     <div id="screen-reader-menu-container"></div>
                     <div class="embedded-text-section">
@@ -116,8 +200,6 @@
                     <div class="start-quiz-button btn btn-primary" id="start-quiz-button">Start quiz</div>
                 </div>
                 <div class="quiz-controls">
-                    <!-- <button id="pause-quiz-button" class="custom-button hidden"></button>    
-                    <button id="resume-quiz-button" class="custom-button hidden"></button>     -->
                     <button id="swap-layers-button" class="custom-button hidden">
                         <span class="icon">arrow_forward_ios</span>
                     </button>                    
@@ -131,35 +213,36 @@
                                 <div id="question-text"></div>
                                 <div id="options-container"></div>
                                 <div class="proto-character-container">
-                                    <div id="character" class="proto-character"></div>
+                                    <div id="character" class="proto-character hidden"></div>
                                     <div id="dialogue-hint" class="proto-dialogue hidden"></div>
                                     <div id="dialogue-answer" class="proto-dialogue hidden"></div>
                                 </div>
                             </div>
                             <div class="proto-navigation-container">
-                                <button id="prev-button" class="btn btn-secondary" disabled>Previous</button>
-                                <button id="next-button" class="btn btn-primary" disabled>Next</button>
+                                <button id="prev-button" class="btn btn-secondary" disabled>Vorige</button>
+                                <button id="next-button" class="btn btn-primary" disabled>volgende</button>
                             </div>
+                            <div id="error-message" class="hidden" style="display: none; color: red; margin: 10px;"></div>
                         </div>
                         <div id="quizOverlay" class="proto-quiz-overlay">
                             <div class="proto-quiz-modal">
                                 <div class="proto-score-container">
                                     <div id="scoreWithHintsCircle" class="proto-score-circle">
-                                        <div class="proto-score-title">Score with Hints</div>
+                                        <div class="proto-score-title">Score Met Hints</div>
                                         <div class="proto-black-ring"></div>
                                         <div class="proto-colored-ring"></div>
                                         <span id="scoreWithHints">8</span>
                                     </div>
                                     <div class="proto-divider-vertical"></div>
                                     <div id="scoreWithoutHintsCircle" class="proto-score-circle">
-                                        <div class="proto-score-title">Score without Hints</div>
+                                        <div class="proto-score-title">Score Zonder Hints</div>
                                         <div class="proto-black-ring"></div>
                                         <div class="proto-colored-ring"></div>
                                         <span id="scoreWithoutHints">10</span>
                                     </div>
                                 </div>
                                 <div id="scoreSummary" class="proto-score-summary">
-                                    <span id="correctQuestions" class="proto-correct-questions">X</span> out of <span id="totalQuestions">Y</span> questions were correctly answered.
+                                    <span id="correctQuestions" class="proto-correct-questions">X</span> van de <span id="totalQuestions">Y</span> vragen zijn correct beantwoord.
                                 </div>
                                 <div class="proto-timer">
                                     <span id="totalTime">3:41</span>
@@ -174,14 +257,10 @@
     </div>
     <script src="https://cse.google.com/cse.js?cx=111c176d9efa64756"></script>
 
-    <script type="module" src="../public/assets/js/quiz_question_proto.js"></script>
+    <script type="module" src="../public/assets/js/quiz_state_manager.js"></script>
     <script type="module" src="../public/assets/js/quiz.js"></script>
-
-<!-- 
-    <script type="module" src="../public/assets/js/quiz_page_manager/quizManager.js"></script>
-    <script type="module" src="../public/assets/js/quiz_page_manager/services.js"></script>
-    <script type="module" src="../public/assets/js/quiz_page_manager/uiRenderer.js"></script> -->
-
+    <script type="module" src="../public/assets/js/quiz_question_proto.js"></script>
+    <script type="module" src="../public/assets/js/screenreader_quiztext.js"></script>
     <script>
         $(document).ready(function() {
             // $('#header-container').load('index.html');

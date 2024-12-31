@@ -14,7 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
-    <title>Quiz Student Dashboard</title>
+    <title>Quiz Student Dashboard | Taal voor Thuis</title>
 </head>
 <body>
     <header>
@@ -29,42 +29,70 @@
                 <div class="parallax-image" style="background-image: url('../public/assets/images/chiori.jpeg');"></div>
             </div>
             <div class="hero-content">
-                <h1>Welcome to Taal Voor Thuis!</h1>
-                <p>Select one of the available quizzes to start your learning endeavour!</p>
+                <h1>Welkome bij Taal Voor Thuis!</h1>
+                <p>Kies een van de beschikbare quizzes om je leerpad te beginnen!</p>
             </div>
         </div>
         <section id="stat-tracker" class="stat-tracker-container">
             <div class="stat-tracker-box">
-                <div class="stat-tracker-header">
-                    <ul class="stat-tracker-titles">
-                        <li>Overall account score:</li>
-                        <li>Best and worst subject scores:</li>
-                        <li>The most recently finished exercises:</li>
-                    </ul>
-                </div>
-                <div class="no-data-message d-none" id="no-data-message">
-                    Come back later after having finished one of the exercises, Good Luck!
-                </div>
-                <div class="content-wrapper">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div id="donut-chart" class="chart-container">
-                                <canvas id="averageScoreChart"></canvas>
-                                <div id="average-score-title"></div>
-                                <div id="average-score-text"></div>
+                <div class="stats-grid">
+                    <!-- Left column: Score chart -->
+                    <div class="stats-left">
+                        <div class="stats-card score-overview">
+                            <h3>Score overzicht</h3>
+                            <div class="horizontal-bar-chart">
+                                <canvas id="scoreOverviewChart"></canvas>
                             </div>
                         </div>
-                        <div class="col-md-4" id="dynamic-best-worst-scores">
-                            <!-- Best and Worst Scores will be dynamically inserted here -->
+                    </div>
+                    
+                    <!-- Middle column: Performance cards -->
+                    <div class="stats-middle">
+                        <!-- Best Performance Card -->
+                        <div class="stats-card best-performance">
+                            <h3>Dit vak gaat super goed!:</h3>
+                            <div class="subject-performance">
+                                <div class="subject-name"></div>
+                                <div class="score-comparison">
+                                    <div class="score-block">
+                                        <span class="score-label">ZONDER HINTS</span>
+                                        <span class="score-value"></span>
+                                    </div>
+                                    <div class="score-block">
+                                        <span class="score-label">MET HINTS</span>
+                                        <span class="score-value"></span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-4" id="dynamic-recent-exercises">
-                            <!-- Recent exercises will be dynamically inserted here -->
+                        
+                        <!-- Needs Improvement Card -->
+                        <div class="stats-card needs-improvement">
+                            <h3>Dit vak heeft meer aandacht nodig:</h3>
+                            <div class="subject-performance">
+                                <div class="subject-name"></div>
+                                <div class="score-comparison">
+                                    <div class="score-block">
+                                        <span class="score-label">ZONDER HINTS</span>
+                                        <span class="score-value"></span>
+                                    </div>
+                                    <div class="score-block">
+                                        <span class="score-label">MET HINTS</span>
+                                        <span class="score-value"></span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div id="subject-details" class="subject-details d-none">
-                        <h4 id="subject-name"></h4>
-                        <p id="average-with-hints"></p>
-                        <p id="average-without-hints"></p>
+                    
+                    <!-- Right column: Recent quizzes -->
+                    <div class="stats-right">
+                        <div class="stats-card recent-quizzes">
+                            <h3>Laatst gemaakt:</h3>
+                            <div class="recent-quizzes-list">
+                                <!-- Recent quizzes will be populated here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -78,7 +106,7 @@
                     <div class="filter-group">
                         <label>Type</label>
                         <select id="quizTypeFilter">
-                            <option value="">All Types</option>
+                            <option value="">Alle Soorten</option>
                             <option value="woordenschat">Woordenschat</option>
                             <option value="samenvatten">Samenvatten</option>
                             <option value="verwijswoorden&signaalwoorden">Verwijswoorden & Signaalwoorden</option>
@@ -89,36 +117,47 @@
                     <div class="filter-group">
                         <label>Sort By</label>
                         <select id="sortOrderFilter">
-                            <option value="newFirst">Newest First</option>
-                            <option value="oldFirst">Oldest First</option>
-                            <option value="random">Random</option>
+                            <option value="newFirst">Nieuwste Eerst</option>
+                            <option value="oldFirst">Oudste Eerst</option>
+                            <option value="random">Willekeurig</option>
                         </select>
                     </div>
                     <div class="filter-group">
                         <label>Group</label>
                         <select id="quizGroupFilter">
-                            <option value="">All Groups</option>
-                            <option value="3000">3000</option>
-                            <option value="4000">4000</option>
-                            <option value="5000">5000</option>
-                            <option value="6000">6000</option>
-                            <option value="7000">7000</option>
-                            <option value="8000">8000</option>
+                            <option value="">Alle Groupen</option>
+                            <option value="3000">Groep 3</option>
+                            <option value="4000">Groep 4</option>
+                            <option value="5000">Groep 5</option>
+                            <option value="6000">Groep 6</option>
+                            <option value="7000">Groep 7</option>
+                            <option value="8000">Groep 8</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Question Type</label>
+                        <label>Soorten Vragen</label>
                         <select id="questionTypeFilter">
                             <option value="">All Types</option>
                             <option value="Multiple Choice">Multiple Choice</option>
                         </select>
                     </div>
                 </div>
+                <div class="search-container">
+                    <input type="text" 
+                           id="quizSearchBar" 
+                           class="quiz-search" 
+                           placeholder="Zoek een quiz..."
+                           aria-label="Zoek een quiz">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </div>
             </div>
             <div class="quiz-sections-container">
                 <section class="quiz-section">
                     <div class="section-header">
-                        <h2 class="section-title">Available Quizzes</h2>
+                        <h2 class="section-title">Beschikbare Quizzen Lijst</h2>
                         <!-- Kept your existing filter toolbar -->
                         <div class="filter-toolbar">
                             <!-- Your existing filters remained unchanged -->
@@ -129,7 +168,7 @@
             
                 <section class="quiz-section">
                     <div class="section-header">
-                        <h2 class="section-title">Completed Quizzes</h2>
+                        <h2 class="section-title">Voltooide Quizzen Lijst</h2>
                     </div>
                     <div class="quiz-grid" id="completed-quizzes"></div>
                 </section>

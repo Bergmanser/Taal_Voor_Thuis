@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profiel | Taal Voor Thuis</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="../public/assets/css/user_info.css">
+</head>
+<body>
+  <header>
+    <div id="header-container"></div>
+  </header>
+
+  <button class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+    Terug
+  </button>
+
+  <main class="profile-container">
+    <section class="profile-header">
+      <div class="avatar-preview" id="currentAvatarContainer">
+        <div class="avatar-display" id="currentAvatar">
+          <!-- Avatar or initial will be inserted here -->
+        </div>
+        <div class="avatar-change-hint">Klik om avatar te wijzigen</div>
+      </div>
+      <h2 class="welcome-text">Welkom terug, <span id="username">...</span>!</h2>
+    </section>
+
+    <section class="avatar-section">
+      <button type="button" class="avatar-toggle" id="avatarToggle">
+        <span>Kies een Avatar</span>
+        <i class="fas fa-chevron-down" id="avatarArrow"></i>
+      </button>
+      
+      <div class="avatar-grid hidden" id="avatarGrid">
+        <!-- Avatars will be inserted here -->
+      </div>
+
+      <button class="btn btn-primary" id="saveBtn">
+        <span id="saveBtnText">Wijzigingen Opslaan</span>
+        <i class="fas fa-check"></i>
+      </button>
+      <button class="btn btn-danger" id="removeAvatarBtn">
+        <span>Avatar Verwijderen</span>
+        <i class="fas fa-trash"></i>
+      </button>
+    </section>
+  </main>
+
+  <div class="toast" id="toast">
+    <div class="toast-content">
+      <i class="toast-icon"></i>
+      <span class="toast-message"></span>
+    </div>
+    <div class="toast-progress"></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="module" src="../public/assets/js/user_info.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#header-container').load('global_header.html', function() {});
+    });
+  </script>
+</body>
+</html>
