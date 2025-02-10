@@ -2,6 +2,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/fi
 import { where, getDocs, query, doc, deleteDoc, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { app, auth, db } from "./firebase_config.js";
 import { redirectUserBasedOnRole } from "./roleRedirect.js";
+import { studentManager } from "./add_student.js";
 
 let currentUser;
 let studentList = [];
@@ -16,12 +17,19 @@ const subjectColors = {
     anders: '#C23A2b'         // Red
 };
 
+// Main initialization
 document.addEventListener('DOMContentLoaded', function () {
+    initializeTabSystem();
+    initializeSearchBars();
+    initializePopups();
+    initializeAuthStateHandler();
+    initializeBackButton();
+});
 
-    // Initialize the tab indicator animation
+// Tab System Initialization
+function initializeTabSystem() {
     const $tabIndicator = $('.tab-indicator');
 
-    // Function to update the tab indicator
     function updateTabIndicator() {
         const activeTab = document.querySelector('.tab-button.active');
         if (activeTab) {
@@ -35,27 +43,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Initialize indicator after fonts load
+    window.addEventListener('load', updateTabIndicator);
 
-    // Initialize the indicator position
-    window.addEventListener('load', function () {
-        updateTabIndicator(); // Recalculate after fonts and styles are loaded
-    });
-
-
-    // Toggle Design within Student Collection Info
+    // Toggle Design Button
     $('#toggleDesignButton').on('click', function () {
         $('#tableDesign').toggle();
         $('#cardDesign').toggle();
     });
 
-    // Click events for the tab buttons
+    // Student Info Section Tab
     $('#showStudentInfoSection').on('click', function () {
-        $('#navigateQuizOptions').hide(); // Hide the quiz options section
-        $('.tab-button').removeClass('active'); // Remove active class from all tabs
-        $(this).addClass('active'); // Add active class to the clicked tab
-        updateTabIndicator(); // Update the tab indicator
+        $('#navigateQuizOptions').hide();
+        $('.tab-button').removeClass('active');
+        $(this).addClass('active');
+        updateTabIndicator();
 
-        // Show the last active view when navigating back to the "Student Collection Info" tab
         if (isDetailedViewOpen) {
             $('#studentDetailedView').show();
             $('#studentCollectionInfo').hide();
@@ -65,49 +68,78 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Quiz Options Section Tab
     $('#showQuizOptionsSection').on('click', function () {
-        $('#navigateQuizOptions').show(); // Show the quiz options section
-        $('#studentCollectionInfo').hide(); // Hide the student collection info
-        $('#studentDetailedView').hide(); // Hide the detailed view, but do not reset isDetailedViewOpen
-        $('.tab-button').removeClass('active'); // Remove active class from all tabs
-        $(this).addClass('active'); // Add active class to the clicked tab
-        updateTabIndicator(); // Update the tab indicator
+        $('#navigateQuizOptions').show();
+        $('#studentCollectionInfo').hide();
+        $('#studentDetailedView').hide(); // Don't reset isDetailedViewOpen
+        $('.tab-button').removeClass('active');
+        $(this).addClass('active');
+        updateTabIndicator();
     });
 
-    // Initialize to show the student collection info section first
+    // Set initial view
     $('#showStudentInfoSection').trigger('click');
+}
+
+// Search Systems Initialization
+function initializeSearchBars() {
+    // Main search bar with error handling
     const searchBar = document.getElementById('searchBar');
-    searchBar.addEventListener('input', function () {
-        if (auth.currentUser) {
-            retrieveStudentsWithSameParentEmail(auth.currentUser.email, this.value.trim().toLowerCase());
+    searchBar?.addEventListener('input', function () {
+        try {
+            if (auth.currentUser) {
+                retrieveStudentsWithSameParentEmail(
+                    auth.currentUser.email,
+                    this.value.trim().toLowerCase()
+                );
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            showMessage('Search failed. Please try again.', 'error');
         }
     });
 
-    // Add event listener for the new detailed view search bar
+    // Detailed view search with error handling
     const detailedViewSearchBar = document.getElementById('detailedViewSearchBar');
-    detailedViewSearchBar.addEventListener('input', function () {
-        if (auth.currentUser) {
-            filterDetailedView(this.value.trim().toLowerCase());
+    detailedViewSearchBar?.addEventListener('input', function () {
+        try {
+            if (auth.currentUser) {
+                filterDetailedView(this.value.trim().toLowerCase());
+            }
+        } catch (error) {
+            console.error('Detailed view search error:', error);
+            showMessage('Search failed. Please try again.', 'error');
         }
     });
 
-    // Allows searching for a specifc answersheet
+    // Answer sheet search with error handling
     const answerSheetSearchBar = document.getElementById('answerSheetSearchBar');
-    answerSheetSearchBar.addEventListener('input', function () {
-        if (auth.currentUser) {
-            searchAnswerSheets(this.value.trim().toLowerCase());
+    answerSheetSearchBar?.addEventListener('input', function () {
+        try {
+            if (auth.currentUser) {
+                searchAnswerSheets(this.value.trim().toLowerCase());
+            }
+        } catch (error) {
+            console.error('Answer sheet search error:', error);
+            showMessage('Search failed. Please try again.', 'error');
         }
     });
+}
 
-    // Add Student Popup
+// Popup System Initialization
+function initializePopups() {
     const addStudentPopup = document.getElementById('addStudentPopup');
+    const deleteConfirmationPopup = document.getElementById('deleteConfirmationPopup');
     const openAddStudentPopupBtn = document.getElementById('openAddStudentPopup');
     const closePopupBtns = document.querySelectorAll('.close-popup');
 
-    openAddStudentPopupBtn.addEventListener('click', () => {
+    // Open popup handler
+    openAddStudentPopupBtn?.addEventListener('click', () => {
         addStudentPopup.style.display = 'block';
     });
 
+    // Close button handlers
     closePopupBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             addStudentPopup.style.display = 'none';
@@ -115,30 +147,45 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Close popup when clicking outside
+    // Outside click handler
     window.addEventListener('click', (event) => {
-        if (event.target === addStudentPopup || event.target === deleteConfirmationPopup) {
+        if (event.target === addStudentPopup ||
+            event.target === deleteConfirmationPopup) {
             addStudentPopup.style.display = 'none';
             deleteConfirmationPopup.style.display = 'none';
         }
     });
+}
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("Currently logged in user: " + user.email);
-            currentUser = user;
-            // document.getElementById('welcomeHeader').textContent = `Welcome ${user.email}`;
-            retrieveStudentsWithSameParentEmail(user.email);
-            fetchQuizzes();
-            redirectUserBasedOnRole([1, 2]);
-        } else {
-            console.log("No user logged in");
-            window.location.href = "login_parent_tvt.html";
+// Auth State Handler
+function initializeAuthStateHandler() {
+    onAuthStateChanged(auth, async (user) => {
+        try {
+            if (user) {
+                console.log("Currently logged in user:", user.email);
+                currentUser = user;
+                await retrieveStudentsWithSameParentEmail(user.email);
+                await fetchQuizzes();
+                redirectUserBasedOnRole([1, 2]);
+            } else {
+                console.log("No user logged in");
+                window.location.href = "login_parent_tvt.html";
+            }
+        } catch (error) {
+            console.error('Auth state handler error:', error);
+            showMessage('Failed to initialize user data', 'error');
         }
     });
+}
 
-});
-
+// Back Button Handler
+function initializeBackButton() {
+    $('#backButton').on('click', function () {
+        $('#studentDetailedView').hide();
+        $('#studentCollectionInfo').show();
+        isDetailedViewOpen = false;
+    });
+}
 
 // Function to show the detailed view when a student is selected
 function showDetailedView(student) {
@@ -245,25 +292,113 @@ function showStudentDetails(student) {
 }
 
 // Update these functions to work with the new structure
-function updateDashboard(quizzes) {
-    const scores = Object.values(quizzes).map(quiz => ({
-        title: quiz.title,
-        subject: quiz.type.toLowerCase(),
-        scoreWithHints: parseFloat(quiz.scoreWithHints),
-        scoreWithoutHints: parseFloat(quiz.scoreWithoutHints),
-        date: new Date(quiz.dateTime)
-    }));
-
-    if (scores.length === 0) {
-        document.getElementById('averageScoreChart').classList.add('d-none');
-        document.getElementById('no-data-message').classList.remove('d-none');
-    } else {
-        document.getElementById('averageScoreChart').classList.remove('d-none');
-        document.getElementById('no-data-message').classList.add('d-none');
-        updateChart(scores);
-        updateRecentScores(scores);
-        updateBestWorstScores(scores);
+class ScoreCalculator {
+    constructor(quizzes = {}) {
+        this.quizzes = quizzes;
+        this.scores = this.processQuizzes();
     }
+
+    processQuizzes() {
+        if (!this.quizzes || Object.keys(this.quizzes).length === 0) {
+            return [];
+        }
+
+        return Object.values(this.quizzes).map(quiz => ({
+            title: quiz.title,
+            subject: quiz.type.toLowerCase(),
+            scoreWithHints: parseFloat(quiz.scoreWithHints) || 0,
+            scoreWithoutHints: parseFloat(quiz.scoreWithoutHints) || 0,
+            date: new Date(quiz.dateTime)
+        }));
+    }
+
+    getAveragesBySubject() {
+        const subjects = {};
+
+        this.scores.forEach(score => {
+            if (!subjects[score.subject]) {
+                subjects[score.subject] = {
+                    withHints: [],
+                    withoutHints: []
+                };
+            }
+            subjects[score.subject].withHints.push(score.scoreWithHints);
+            subjects[score.subject].withoutHints.push(score.scoreWithoutHints);
+        });
+
+        const averages = {};
+        for (const [subject, scores] of Object.entries(subjects)) {
+            averages[subject] = {
+                withHints: this.calculateAverage(scores.withHints),
+                withoutHints: this.calculateAverage(scores.withoutHints)
+            };
+        }
+
+        return averages;
+    }
+
+    getOverallAverages() {
+        const withHints = this.scores.map(s => s.scoreWithHints);
+        const withoutHints = this.scores.map(s => s.scoreWithoutHints);
+
+        return {
+            withHints: this.calculateAverage(withHints),
+            withoutHints: this.calculateAverage(withoutHints),
+            attempted: this.scores.length
+        };
+    }
+
+    getBestWorstSubjects() {
+        const averages = this.getAveragesBySubject();
+        let bestSubject = null;
+        let worstSubject = null;
+        let highestAvg = -Infinity;
+        let lowestAvg = Infinity;
+
+        for (const [subject, scores] of Object.entries(averages)) {
+            if (scores.withoutHints > highestAvg) {
+                highestAvg = scores.withoutHints;
+                bestSubject = { subject, scores };
+            }
+            if (scores.withoutHints < lowestAvg) {
+                lowestAvg = scores.withoutHints;
+                worstSubject = { subject, scores };
+            }
+        }
+
+        return { bestSubject, worstSubject };
+    }
+
+    getRecentScores(limit = 3) {
+        return [...this.scores]
+            .sort((a, b) => b.date - a.date)
+            .slice(0, limit);
+    }
+
+    calculateAverage(numbers) {
+        if (!numbers.length) return 0;
+        const sum = numbers.reduce((acc, val) => acc + val, 0);
+        return parseFloat((sum / numbers.length).toFixed(2));
+    }
+}
+
+// Usage in dashboard update functions
+function updateDashboard(quizzes) {
+    const calculator = new ScoreCalculator(quizzes);
+
+    if (calculator.scores.length === 0) {
+        handleEmptyDashboard();
+        return;
+    }
+
+    updateChartDisplay(calculator);
+    updateRecentScoresDisplay(calculator);
+    updateBestWorstDisplay(calculator);
+}
+
+function handleEmptyDashboard() {
+    document.getElementById('averageScoreChart').classList.add('d-none');
+    document.getElementById('no-data-message').classList.remove('d-none');
 }
 
 function displayQuizzes(quizzes, searchText = '') {
@@ -296,17 +431,20 @@ function displayQuizzes(quizzes, searchText = '') {
     });
 }
 
-function updateChart(scores) {
+function updateChartDisplay(calculator) {
     const ctx = document.getElementById('averageScoreChart').getContext('2d');
-    const data = calculateAverageScores(scores);
+    const averages = calculator.getAveragesBySubject();
+
+    document.getElementById('averageScoreChart').classList.remove('d-none');
+    document.getElementById('no-data-message').classList.add('d-none');
 
     const chart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: Object.keys(data.averagesWithoutHints),
+            labels: Object.keys(averages),
             datasets: [{
-                data: Object.values(data.averagesWithoutHints),
-                backgroundColor: Object.keys(data.averagesWithoutHints).map(subject => subjectColors[subject])
+                data: Object.values(averages).map(score => score.withoutHints),
+                backgroundColor: Object.keys(averages).map(subject => subjectColors[subject])
             }]
         },
         options: {
@@ -314,45 +452,36 @@ function updateChart(scores) {
             plugins: {
                 tooltip: {
                     callbacks: {
-                        label: function (context) {
-                            return `${context.label}: ${context.raw.toFixed(1)}`;
-                        }
+                        label: (context) => `${context.label}: ${context.raw.toFixed(1)}`
                     }
-                }
-            },
-            onClick: function (event, elements) {
-                if (elements.length) {
-                    const index = elements[0].index;
-                    const subject = context.chart.data.labels[index];
-                    showSubjectDetails(subject, data);
                 }
             }
         }
     });
 
-    const overallAverageWithHints = calculateOverallAverageWithHints(scores);
-    const overallAverageWithoutHints = calculateOverallAverage(scores);
+    const overallAverages = calculator.getOverallAverages();
+    updateAverageScoreText(overallAverages);
+}
 
+function updateAverageScoreText(averages) {
     document.getElementById('average-score-title').innerText = 'Total account average';
     document.getElementById('average-score-text').innerHTML = `
-        <span data-tooltip="With hints">${overallAverageWithHints.toFixed(1)}</span>
+        <span data-tooltip="With hints">${averages.withHints.toFixed(1)}</span>
         <div class="divider"></div>
-        <span data-tooltip="Without hints">${overallAverageWithoutHints.toFixed(1)}</span>
+        <span data-tooltip="Without hints">${averages.withoutHints.toFixed(1)}</span>
     `;
 }
 
-function updateRecentScores(scores) {
+function updateRecentScoresDisplay(calculator) {
     const container = document.getElementById('dynamic-recent-exercises');
-    if (scores.length === 0) {
+    const recentScores = calculator.getRecentScores();
+
+    if (recentScores.length === 0) {
         container.innerHTML = '';
         return;
     }
 
-    scores.sort((a, b) => b.date - a.date);
-    const recentScores = scores.slice(0, 3);
-
     container.innerHTML = '<h5>The most recently finished exercises:</h5>';
-
     recentScores.forEach(score => {
         container.innerHTML += `
             <div class="score-card" data-subject="${score.subject}">
@@ -366,173 +495,203 @@ function updateRecentScores(scores) {
     });
 }
 
-function updateBestWorstScores(scores) {
-    if (scores.length === 0) return;
-
+function updateBestWorstDisplay(calculator) {
     const container = document.getElementById('dynamic-best-worst-scores');
-    const averageScores = calculateAverageScores(scores);
+    const { bestSubject, worstSubject } = calculator.getBestWorstSubjects();
 
-    let bestSubject = null;
-    let worstSubject = null;
-    let highestAverage = -Infinity;
-    let lowestAverage = Infinity;
+    if (!bestSubject || !worstSubject) return;
 
-    for (const subject in averageScores.averagesWithoutHints) {
-        const average = averageScores.averagesWithoutHints[subject];
-        if (average > highestAverage) {
-            highestAverage = average;
-            bestSubject = subject;
-        }
-        if (average < lowestAverage) {
-            lowestAverage = average;
-            worstSubject = subject;
-        }
-    }
-
-    if (bestSubject !== null || worstSubject !== null) {
-        container.innerHTML = `
-            <div class="score-card" id="best-subject">
-                <div class="score-title" style="background-color: ${subjectColors[bestSubject]}">Best Subject: ${bestSubject}</div>
-                <div class="score-values">
-                    <span class="score with-hints" data-tooltip="Average score with hints">${averageScores.averagesWithHints[bestSubject].toFixed(1)}</span>
-                    <span class="score without-hints" data-tooltip="Average score without hints">${averageScores.averagesWithoutHints[bestSubject].toFixed(1)}</span>
-                </div>
+    container.innerHTML = `
+        <div class="score-card" id="best-subject">
+            <div class="score-title" style="background-color: ${subjectColors[bestSubject.subject]}">
+                Best Subject: ${bestSubject.subject}
             </div>
-            <div class="score-card" id="worst-subject">
-                <div class="score-title" style="background-color: ${subjectColors[worstSubject]}">Subject with Room for Improvement: ${worstSubject}</div>
-                <div class="score-values">
-                    <span class="score with-hints" data-tooltip="Average score with hints">${averageScores.averagesWithHints[worstSubject].toFixed(1)}</span>
-                    <span class="score without-hints" data-tooltip="Average score without hints">${averageScores.averagesWithoutHints[worstSubject].toFixed(1)}</span>
-                </div>
+            <div class="score-values">
+                <span class="score with-hints" data-tooltip="Average score with hints">
+                    ${bestSubject.scores.withHints.toFixed(1)}
+                </span>
+                <span class="score without-hints" data-tooltip="Average score without hints">
+                    ${bestSubject.scores.withoutHints.toFixed(1)}
+                </span>
             </div>
-        `;
-    }
-}
-
-function calculateAverageScores(scores) {
-    const subjectSumsWithHints = {};
-    const subjectSumsWithoutHints = {};
-    const subjectCounts = {};
-
-    scores.forEach(score => {
-        const subject = score.subject;
-        if (!subjectSumsWithHints[subject]) {
-            subjectSumsWithHints[subject] = 0;
-            subjectSumsWithoutHints[subject] = 0;
-            subjectCounts[subject] = 0;
-        }
-        subjectSumsWithHints[subject] += score.scoreWithHints;
-        subjectSumsWithoutHints[subject] += score.scoreWithoutHints;
-        subjectCounts[subject] += 1;
-    });
-
-    const averagesWithHints = {};
-    const averagesWithoutHints = {};
-    for (const subject in subjectSumsWithHints) {
-        averagesWithHints[subject] = subjectSumsWithHints[subject] / subjectCounts[subject];
-        averagesWithoutHints[subject] = subjectSumsWithoutHints[subject] / subjectCounts[subject];
-    }
-
-    return { averagesWithHints, averagesWithoutHints };
+        </div>
+        <div class="score-card" id="worst-subject">
+            <div class="score-title" style="background-color: ${subjectColors[worstSubject.subject]}">
+                Subject with Room for Improvement: ${worstSubject.subject}
+            </div>
+            <div class="score-values">
+                <span class="score with-hints" data-tooltip="Average score with hints">
+                    ${worstSubject.scores.withHints.toFixed(1)}
+                </span>
+                <span class="score without-hints" data-tooltip="Average score without hints">
+                    ${worstSubject.scores.withoutHints.toFixed(1)}
+                </span>
+            </div>
+        </div>
+    `;
 }
 
 export async function retrieveStudentsWithSameParentEmail(parentEmail, searchText = '') {
-    const studentsRef = collection(db, "studentdb");
-    const q = query(studentsRef, where("parentEmail", "==", parentEmail));
-    const querySnapshot = await getDocs(q);
+    try {
+        const studentsRef = collection(db, "studentdb");
+        const q = query(studentsRef, where("parentEmail", "==", parentEmail));
+        const querySnapshot = await getDocs(q);
 
-    studentList = []; // Clear the existing list
-    const studentListTable = $('#childUserList');
-    studentListTable.empty(); // Clear table rows
+        // Clear existing lists and UI
+        studentList = [];
+        const studentListTable = $('#childUserList');
+        const cardListContainer = $('#cardUserList');
+        studentListTable.empty();
+        cardListContainer.empty();
 
-    const cardListContainer = $('#cardUserList');
-    cardListContainer.empty(); // Clear existing cards
-
-    querySnapshot.forEach((doc) => {
-        const student = doc.data();
-        if (!searchText || student.username.toLowerCase().includes(searchText)) {
-            studentList.push(student);
-
-            // Populate the table row
-            const row = studentListTable[0].insertRow();
-            row.onclick = () => showDetailedView(student);
-            row.insertCell(0).textContent = student.username;
-            row.insertCell(1).textContent = student.last_login ? new Date(student.last_login.seconds * 1000).toLocaleString() : "No login data available";
-
-            // Create the delete button and append it to the third cell
-            const deleteButton = createActionButton('Delete', 'delete-btn btn btn-danger', (event) => {
-                event.stopPropagation(); // Prevents the row click event from being triggered
-                handleDeleteButton(doc.id, student.username);
-            });
-            row.insertCell(2).appendChild(deleteButton);
-
-
-            // Create the card for the basic layout with relevant information
-            const basicCard = $('<div>', {
-                class: 'card basic-card clickable-card',
-                css: { backgroundColor: getColorForUsername(student.username) },
-                click: () => showDetailedView(student),
-            });
-
-            // Card Header
-            const cardHeader = $('<div>', { class: 'card-header', text: student.username });
-            basicCard.append(cardHeader);
-
-            // Card Body with available details
-            const cardBody = $('<div>', { class: 'card-body' });
-
-            // Last login
-            const lastLogin = student.last_login ? new Date(student.last_login.seconds * 1000).toLocaleString() : "No login data available";
-            cardBody.append(`<p><strong>Last Login:</strong> ${lastLogin}</p>`);
-
-            // Average Scores
-            const avgScoreWithHints = calculateAverageScore(student.quizzes, 'scoreWithHints');
-            const avgScoreWithoutHints = calculateAverageScore(student.quizzes, 'scoreWithoutHints');
-
-            cardBody.append(`<p><strong>Avg. Score (With Hints):</strong> ${avgScoreWithHints}</p>`);
-            cardBody.append(`<p><strong>Avg. Score (Without Hints):</strong> ${avgScoreWithoutHints}</p>`);
-
-            // Number of quizzes attempted
-            const quizzesAttempted = student.quizzes ? Object.keys(student.quizzes).length : 0;
-            cardBody.append(`<p><strong>Quizzes Attempted:</strong> ${quizzesAttempted}</p>`);
-
-            basicCard.append(cardBody);
-
-            // Card Footer with actions
-            const cardFooter = $('<div>', { class: 'card-footer text-center' });
-            const viewDetailsButton = $('<button>', {
-                class: 'btn btn-info btn-sm',
-                text: 'View Details',
-                click: () => showDetailedView(student),
-            });
-            cardFooter.append(viewDetailsButton);
-            basicCard.append(cardFooter);
-
-            cardListContainer.append(basicCard);
+        if (querySnapshot.empty) {
+            handleEmptyStudentList(studentListTable, cardListContainer);
+            return;
         }
-    });
 
-    // If the detailed view is open, update it with the new student list
-    if (isDetailedViewOpen) {
-        populateDetailedView(studentList);
+        // Process each student document
+        querySnapshot.forEach((doc) => {
+            const student = { ...doc.data(), id: doc.id };
+            if (!searchText || student.username.toLowerCase().includes(searchText)) {
+                studentList.push(student);
+
+                // Create and append table row
+                const tableRow = createTableRow(student);
+                studentListTable.append(tableRow);
+
+                // Create and append card
+                const card = createStudentCard(student);
+                cardListContainer.append(card);
+            }
+        });
+
+        // Update UI based on current view state
+        updateViewState();
+
+    } catch (error) {
+        console.error("Error retrieving students:", error);
+        showMessage("Failed to load students. Please try again.", "error");
     }
 }
 
-function calculateAverageScore(quizzes, scoreType) {
-    if (!quizzes || Object.keys(quizzes).length === 0) return 'N/A';
-    const scores = Object.values(quizzes).map(quiz => parseFloat(quiz[scoreType]) || 0);
-    const sum = scores.reduce((acc, score) => acc + score, 0);
-    return (sum / scores.length).toFixed(2);
+// Helper function for empty student list
+function handleEmptyStudentList(tableContainer, cardContainer) {
+    const emptyMessage = '<tr><td colspan="3" class="text-center">No students found</td></tr>';
+    tableContainer.html(emptyMessage);
+    cardContainer.html('<div class="text-center p-4">No students found</div>');
 }
 
-function calculateOverallAverage(scores) {
-    const totalScore = scores.reduce((sum, score) => sum + score.scoreWithoutHints, 0);
-    return totalScore / scores.length;
+// Helper function to create table row
+function createTableRow(student) {
+    const row = $('<tr>');
+    row.on('click', () => showDetailedView(student));
+
+    // Username cell
+    const usernameCell = $('<td>').text(student.username);
+
+    // Last login cell
+    const lastLogin = formatLastLogin(student.last_login);
+    const lastLoginCell = $('<td>').text(lastLogin);
+
+    // Actions cell
+    const actionsCell = $('<td>');
+    const deleteButton = createActionButton('Delete', 'delete-btn btn btn-danger', (event) => {
+        event.stopPropagation();
+        handleDeleteButton(student.id, student.username);
+    });
+    actionsCell.append(deleteButton);
+
+    return row.append(usernameCell, lastLoginCell, actionsCell);
 }
 
-function calculateOverallAverageWithHints(scores) {
-    const totalScore = scores.reduce((sum, score) => sum + score.scoreWithHints, 0);
-    return totalScore / scores.length;
+// Helper function to create student card
+function createStudentCard(student) {
+    const basicCard = $('<div>', {
+        class: 'card basic-card clickable-card',
+        css: { backgroundColor: getColorForUsername(student.username) }
+    }).on('click', () => showDetailedView(student));
+
+    // Card Header
+    const cardHeader = $('<div>', {
+        class: 'card-header',
+        text: student.username
+    });
+
+    // Card Body
+    const cardBody = createCardBody(student);
+
+    // Card Footer
+    const cardFooter = createCardFooter(student);
+
+    return basicCard.append(cardHeader, cardBody, cardFooter);
+}
+
+// Helper function to create card body
+function createCardBody(student) {
+    const cardBody = $('<div>', { class: 'card-body' });
+    const lastLogin = formatLastLogin(student.last_login);
+    const scores = calculateStudentScores(student.quizzes);
+
+    cardBody.append(`
+        <p><strong>Last Login:</strong> ${lastLogin}</p>
+        <p><strong>Avg. Score (With Hints):</strong> ${scores.withHints}</p>
+        <p><strong>Avg. Score (Without Hints):</strong> ${scores.withoutHints}</p>
+        <p><strong>Quizzes Attempted:</strong> ${scores.attempted}</p>
+    `);
+
+    return cardBody;
+}
+
+// Helper function to create card footer
+function createCardFooter(student) {
+    const cardFooter = $('<div>', { class: 'card-footer text-center' });
+    const viewDetailsButton = $('<button>', {
+        class: 'btn btn-info btn-sm',
+        text: 'View Details',
+        click: (e) => {
+            e.stopPropagation();
+            showDetailedView(student);
+        }
+    });
+
+    return cardFooter.append(viewDetailsButton);
+}
+
+// Helper function to format last login date
+function formatLastLogin(lastLogin) {
+    return lastLogin ?
+        new Date(lastLogin.seconds * 1000).toLocaleString() :
+        "No login data available";
+}
+
+// Helper function to calculate student scores
+function calculateStudentScores(quizzes) {
+    if (!quizzes || Object.keys(quizzes).length === 0) {
+        return {
+            withHints: 'N/A',
+            withoutHints: 'N/A',
+            attempted: 0
+        };
+    }
+
+    const quizArray = Object.values(quizzes);
+    const withHints = quizArray.reduce((sum, quiz) =>
+        sum + (parseFloat(quiz.scoreWithHints) || 0), 0) / quizArray.length;
+    const withoutHints = quizArray.reduce((sum, quiz) =>
+        sum + (parseFloat(quiz.scoreWithoutHints) || 0), 0) / quizArray.length;
+
+    return {
+        withHints: withHints.toFixed(2),
+        withoutHints: withoutHints.toFixed(2),
+        attempted: quizArray.length
+    };
+}
+
+// Helper function to update view state
+function updateViewState() {
+    if (isDetailedViewOpen) {
+        populateDetailedView(studentList);
+    }
 }
 
 function getColorForUsername(username) {
@@ -565,9 +724,13 @@ function handleDeleteButton(userId, username) {
     deleteConfirmationPopup.style.display = 'block';
 
     const confirmButton = document.getElementById('confirmDeleteButton');
-    confirmButton.onclick = () => {
-        deleteUser(userId, username);
-        deleteConfirmationPopup.style.display = 'none';
+    confirmButton.onclick = async () => {
+        const success = await studentManager.deleteStudent(userId, username);
+        if (success) {
+            deleteConfirmationPopup.style.display = 'none';
+            // Refresh the student list
+            await retrieveStudentsWithSameParentEmail(currentUser.email);
+        }
     };
 }
 

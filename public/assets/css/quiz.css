@@ -1607,35 +1607,33 @@
   opacity: 0;
   transition: all 0.3s ease;
   z-index: 10000;
- }
- 
- .toast.show {
+}
+
+.toast.show {
   transform: translateY(0);
   opacity: 1;
- }
- 
- .toast-content {
+}
+
+.toast-content {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
- }
- 
- .toast-icon {
+}
+
+.toast-icon {
   font-size: 1.25rem;
- }
- 
- .toast-progress {
+}
+
+.toast-progress {
   height: 3px;
   background: var(--primary);
   transform-origin: left;
   animation: progress 3s linear forwards;
- }
- 
- @keyframes progress {
-  to {
-    transform: scaleX(0);
-  }
- }
+}
 
- 
+@keyframes progress {
+  to {
+      transform: scaleX(0);
+  }
+}

@@ -1,66 +1,28 @@
-// // Detect the current domain
+// // Detect the current domain and port
 // const currentDomain = window.location.hostname;
+// const currentPort = window.location.port;
+
+// // Check if running in development environment (localhost or 127.0.0.1 with ports 5500 or 5501)
+// const isDevelopment = (currentDomain.includes("localhost") || currentDomain === "127.0.0.1") &&
+//     (currentPort === "5500" || currentPort === "5501");
 
 // // Determine the base URL based on the domain
-// const apiUrl = currentDomain.includes("localhost") || currentDomain === "127.0.0.1"
-//     ? "http://127.0.0.1:5500/public/" // Development mode
-//     : `https://${currentDomain}/`;    // Use the current production domain
+// const apiUrl = isDevelopment
+//     ? `http://${currentDomain}:${currentPort}/` // Development mode - will use actual port
+//     : `https://${currentDomain}/`;    // Production domain
 
 // // Define friendly URLs for navigation
 // export const pageUrls = {
-//     loginPagina: `${apiUrl}loginpagina`,
-//     quiz: `${apiUrl}quiz`,
-//     userInfoStudent: `${apiUrl}user-info-student`,
-//     studentDashboard: `${apiUrl}student-dashboard`,
-//     loginParent: `${apiUrl}login-parent`,
-//     loginEmployee: `${apiUrl}login-employee`,
-//     globalHeader: `${apiUrl}global-header`,
+//     // Development URLs use direct file paths
+//     loginPagina: isDevelopment ? `${apiUrl}public/login_student_tvt.html` : `${apiUrl}loginpagina`,
+//     quiz: isDevelopment ? `${apiUrl}public/quiz.html` : `${apiUrl}quiz`,
+//     userInfoStudent: isDevelopment ? `${apiUrl}public/user_info_student.html` : `${apiUrl}user-info-student`,
+//     studentDashboard: isDevelopment ? `${apiUrl}public/student_dashboard.html` : `${apiUrl}student-dashboard`,
+//     loginParent: isDevelopment ? `${apiUrl}public/login_parent_tvt.html` : `${apiUrl}login-parent`,
+//     loginEmployee: isDevelopment ? `${apiUrl}public/login_employee_tvt.html` : `${apiUrl}login-employee`,
+//     loginStudent: isDevelopment ? `${apiUrl}public/login_student_tvt.html` : `${apiUrl}login-student`,
+//     answersheet: isDevelopment ? `${apiUrl}public/answersheet_v1.html` : `${apiUrl}answersheet-v1`,
+//     globalHeader: isDevelopment ? `${apiUrl}public/global_header.html` : `${apiUrl}global-header`,
+//     parentDashboard: isDevelopment ? `${apiUrl}public/parent_overview.html` : `${apiUrl}parent-overview`,
+//     employeeDashboard: isDevelopment ? `${apiUrl}public/employee_dashboard.html` : `${apiUrl}employee-dashboard`,
 // };
-
-// // Optional: Log the current environment for debugging
-// console.log(`Environment: ${currentDomain.includes("localhost") ? "Development" : "Production"}`);
-// console.log(`API Base URL: ${apiUrl}`);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // // Base URL detection for local or production
-// // const apiUrl = window.location.hostname.includes("localhost") || window.location.hostname === "127.0.0.1"
-// //     ? "http://127.0.0.1:5500/public/"
-// //     : "https://www.taalvoorthuis.nl/";
-
-// // // Define friendly URLs for navigation
-// // export const pageUrls = {
-// //     loginPagina: `${apiUrl}loginpagina`, // Student login is now "loginpagina"
-// //     quiz: `${apiUrl}quiz`,
-// //     userInfoStudent: `${apiUrl}user-info-student`,
-// //     studentDashboard: `${apiUrl}student-dashboard`,
-// //     loginParent: `${apiUrl}login-parent`,
-// //     loginEmployee: `${apiUrl}login-employee`,
-// //     globalHeader: `${apiUrl}global-header`,
-// // };
-
-// // // Redirect to a specific page by friendly name
-// // function goToPage(page) {
-// //     if (pageUrls[page]) {
-// //         window.location.href = pageUrls[page];
-// //     } else {
-// //         console.error("Page not found:", page);
-// //     }
-// // }
-
-// // // Example usage
-// // // Redirect to the student login page
-// // goToPage('loginPagina');

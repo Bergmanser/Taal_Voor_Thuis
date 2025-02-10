@@ -3,28 +3,99 @@ RewriteEngine On
 
 # Redirect secondary domains to the primary domain (.nl)
 RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.com [NC,OR]
-RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.online [NC,OR]
+# RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.nl [NC,OR]
 RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.be [NC,OR]
 RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.eu [NC]
-RewriteRule ^(.*)$ https://www.taalvoorthuis.nl/$1 [R=301,L]
+# RewriteRule ^(.*)$ https://www.taalvoorthuis.nl/$1 [R=301,L]
+RewriteRule ^(.*)$ https://www.taalvoorthuis.online/$1 [R=301,L]
 
 # Force HTTPS (always recommended for production)
 RewriteCond %{HTTPS} off
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Base directory for files (adjust if needed)
+RewriteBase /
+
 # Rewrite friendly URLs to specific file paths
-RewriteRule ^loginpagina$ /public/login_student_tvt.html [L]
-RewriteRule ^quiz$ /public/quiz.html [L]
-RewriteRule ^user-info-student$ /public/user_info_student.html [L]
-RewriteRule ^student-dashboard$ /public/student_dashboard.html [L]
-RewriteRule ^login-parent$ /public/login_parent_tvt.html [L]
-RewriteRule ^login-employee$ /public/login_employee_tvt.html [L]
-RewriteRule ^login-student$ /public/login_student_tvt.html [L]
+RewriteRule ^loginpagina/?$ public/login_student_tvt.html [L]
+RewriteRule ^quiz/?$ public/quiz.html [L]
+RewriteRule ^user-info-student/?$ public/user_info_student.html [L]
+RewriteRule ^student-dashboard/?$ public/student_dashboard.html [L]
+RewriteRule ^login-parent/?$ public/login_parent_tvt.html [L]
+RewriteRule ^login-employee/?$ public/login_employee_tvt.html [L]
+RewriteRule ^login-student/?$ public/login_student_tvt.html [L]
+RewriteRule ^answersheet-v1/?$ public/answersheet_v1.html [L]
+RewriteRule ^parent-overview/?$ public/parent_overview.html [L]
+RewriteRule ^employee-dashboard/?$ public/employee_dashboard.html [L]
+RewriteRule ^global-header/?$ public/global_header.html [L]
 
-# Rewrite for global_header.html
-RewriteRule ^global-header$ /public/global_header.html [L]
-
-# Graceful handling for non-existing files or directories (SPA fallback)
+# If the request is not for a real file or directory
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+
+# Optional: Handle 404s by redirecting to index
 RewriteRule . /index.html [L]
+
+#Possible FIX
+
+# # Enable URL rewriting
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteBase /
+
+#     # Redirect secondary domains to the primary domain (.nl)
+#     RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.com [NC,OR]
+#     RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.online [NC,OR]
+#     RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.be [NC,OR]
+#     RewriteCond %{HTTP_HOST} ^(www\.)?taalvoorthuis\.eu [NC]
+#     RewriteRule ^(.*)$ https://www.taalvoorthuis.nl/$1 [R=301,L]
+
+#     # Force HTTPS (always recommended for production)
+#     RewriteCond %{HTTPS} off
+#     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+#     # Custom routes FIRST - with case insensitive flag
+#     RewriteRule ^loginpagina/?$ /public/login_student_tvt.html [L,NC]
+#     RewriteRule ^quiz/?$ /public/quiz.html [L,NC]
+#     RewriteRule ^user-info-student/?$ /public/user_info_student.html [L,NC]
+#     RewriteRule ^student-dashboard/?$ /public/student_dashboard.html [L,NC]
+#     RewriteRule ^login-parent/?$ /public/login_parent_tvt.html [L,NC]
+#     RewriteRule ^login-employee/?$ /public/login_employee_tvt.html [L,NC]
+#     RewriteRule ^login-student/?$ /public/login_student_tvt.html [L,NC]
+#     RewriteRule ^answersheet-v1/?$ /public/answersheet_v1.html [L,NC]
+#     RewriteRule ^parent-overview/?$ /public/parent_overview.html [L,NC]
+#     RewriteRule ^employee-dashboard/?$ /public/employee_dashboard.html [L,NC]
+#     RewriteRule ^global-header/?$ /public/global_header.html [L,NC]
+
+#     # WordPress rules AFTER custom routes
+#     RewriteRule ^index\.php$ - [L]
+    
+#     # Exclude public directory and existing files/directories from WordPress routing
+#     RewriteCond %{REQUEST_URI} !^/public/
+#     RewriteCond %{REQUEST_FILENAME} !-f
+#     RewriteCond %{REQUEST_FILENAME} !-d
+#     RewriteRule . /index.php [L]
+# </IfModule>
+
+# # Various security headers
+# <IfModule mod_headers.c>
+#     Header set X-Content-Type-Options nosniff
+#     Header set X-Frame-Options SAMEORIGIN
+#     Header set X-XSS-Protection "1; mode=block"
+#     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+# </IfModule>
+
+# # Prevent directory listing
+# Options -Indexes
+
+# # Protect files and directories
+# <FilesMatch "^\.">
+#     Order allow,deny
+#     Deny from all
+# </FilesMatch>
+
+# # Protect wp-config.php
+# <Files wp-config.php>
+#     Order allow,deny
+#     Deny from all
+# </Files>
